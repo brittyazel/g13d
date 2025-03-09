@@ -1,0 +1,8 @@
+SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c21c", MODE="0660", OWNER="g13", GROUP="g13"
+
+# Uncomment below (and reboot) on errors on uinput or keys not generating keypresses after binding
+KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess", GROUP="input"
+
+# Uncomment the following to start g13d as a systemd service when G13 is plugged in
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c21c", RUN+="/usr/bin/systemctl start g13.service"
+ACTION=="remove", SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="046d", ENV{ID_MODEL_ID}=="c21c", RUN+="/usr/bin/systemctl stop g13.service"
