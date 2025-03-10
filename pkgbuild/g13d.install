@@ -1,0 +1,9 @@
+post_install() {
+    systemctl enable --now g13.target
+    systemctl enable --now g13-resume.service
+}
+
+pre_remove() {
+    systemctl disable --now g13.target
+    systemctl disable --now g13-resume.service
+}

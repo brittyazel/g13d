@@ -1,11 +1,2 @@
-/g13d
-.cproject
-.project
-.pydevproject
 .idea/
 cmake-build-debug/
-*.o
-pbm2lpbm
-.settings/*
-GIT-VERSION.h
-GIT-VERSION-FILE

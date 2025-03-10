@@ -11,24 +11,19 @@ arch=('x86_64' 'i686')
 url="https://github.com/brittyazel/g13d/"
 license=('MIT')
 depends=('log4cpp')
+provides=('g13d')
+conflicts=('g13d' 'g13' 'g13-git')
 makedepends=('git' 'cmake')
 source=("git+https://github.com/brittyazel/g13d.git")
 sha256sums=('SKIP')
+install=g13d.install
 
 build() {
-    export CFLAGS+=" ${CPPFLAGS}"
-    export CXXFLAGS+=" ${CPPFLAGS}"
     cmake -B build -S "${pkgbase}"
-    make -C build g13d pbm2lpbm
+    cmake --build build --target g13d pbm2lpbm
 }
 
 package() {
     # binaries
-    install -dm 755 "${pkgdir}"/usr/bin/
-    install -m 755 build/g13d "${pkgdir}"/usr/bin/
-    install -m 755 build/pbm2lpbm "${pkgdir}"/usr/bin/
-
-    # host
-    cp -r "${pkgbase}/assets/host/." "${pkgdir}/"
-
+    cmake --install build --prefix "${pkgdir}"
 }

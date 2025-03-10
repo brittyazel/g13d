@@ -1,8 +1,7 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 project(g13d)
 
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS "-std=c++23")
 
 option(DEBUG "Compile for debugging" OFF)
 if(DEBUG)
@@ -10,14 +9,10 @@ if(DEBUG)
         add_link_options(-g)
 endif()
 
-set(CONTROL_DIR "/run/g13d" CACHE STRING
-        "Absolute directory of default pipe files (/run/g13d/)")
-add_compile_definitions(-DCONTROL_DIR="${CONTROL_DIR}")
+set(CONTROL_DIR "/run/g13d" CACHE STRING "Absolute directory of default pipe files (/run/g13d/)")
+add_definitions(-DCONTROL_DIR="${CONTROL_DIR}")
 
-include_directories(include/ src/)
-
-add_executable(pbm2lpbm
-        src/pbm2lpbm.cpp)
+add_executable(pbm2lpbm src/pbm2lpbm.cpp)
 
 add_executable(g13d
         include/g13.hpp
@@ -45,9 +40,8 @@ add_executable(g13d
         src/g13_stick.cpp
         include/helper.hpp
         src/helper.cpp
-        include/logo.hpp)
-
-set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES)
+        include/logo.hpp
+)
 
 add_executable(runtests
         include/g13.hpp
@@ -76,7 +70,19 @@ add_executable(runtests
         include/helper.hpp
         src/helper.cpp
         include/logo.hpp
-        src/testKeys.cpp)
+        src/testKeys.cpp
+)
 
-target_link_libraries (g13d usb-1.0 log4cpp evdev)
-target_link_libraries (runtests usb-1.0 log4cpp evdev gtest gmock)
+target_include_directories(g13d PRIVATE include src)
+target_include_directories(runtests PRIVATE include src)
+
+target_link_libraries(g13d usb-1.0 log4cpp evdev)
+target_link_libraries(runtests usb-1.0 log4cpp evdev gtest gmock)
+
+install(TARGETS g13d pbm2lpbm
+        RUNTIME DESTINATION usr/bin
+)
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/host/
+        DESTINATION .
+)
