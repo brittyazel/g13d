@@ -2,8 +2,8 @@
 // Created by khampf on 07-05-2020.
 //
 
-#ifndef G13_G13_STICK_HPP
-#define G13_G13_STICK_HPP
+#ifndef G13_STICK_HPP
+#define G13_STICK_HPP
 
 #include <vector>
 #include <regex>
@@ -65,4 +65,4 @@ protected:
 
 } // namespace G13
 
-#endif // G13_G13_STICK_HPP
+#endif // G13_STICK_HPP

@@ -2,8 +2,8 @@
 // Created by khampf on 07-05-2020.
 //
 
-#ifndef G13_G13_LCD_HPP
-#define G13_G13_LCD_HPP
+#ifndef G13_LCD_HPP
+#define G13_LCD_HPP
 
 #include <cstring>
 
@@ -46,4 +46,4 @@ public:
   void WritePos(int row, int col);
 };
 } // namespace G13
-#endif // G13_G13_LCD_HPP
+#endif // G13_LCD_HPP

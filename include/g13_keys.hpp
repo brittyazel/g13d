@@ -2,8 +2,8 @@
 // Created by khampf on 07-05-2020.
 //
 
-#ifndef G13_G13_KEYS_HPP
-#define G13_G13_KEYS_HPP
+#ifndef G13_KEYS_HPP
+#define G13_KEYS_HPP
 
 #include <string>
 #include <vector>
@@ -64,4 +64,4 @@ private:
 };
 
 } // namespace G13
-#endif // G13_G13_KEYS_HPP
+#endif // G13_KEYS_HPP

@@ -2,8 +2,8 @@
 // Created by khampf on 13-05-2020.
 //
 
-#ifndef G13_G13_PROFILE_HPP
-#define G13_G13_PROFILE_HPP
+#ifndef G13_PROFILE_HPP
+#define G13_PROFILE_HPP
 
 #include <regex>
 #include "g13_main.hpp"
@@ -52,4 +52,4 @@ protected:
 };
 } // namespace G13
 
-#endif // G13_G13_PROFILE_HPP
+#endif // G13_PROFILE_HPP

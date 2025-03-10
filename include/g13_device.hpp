@@ -1,8 +1,8 @@
 //
 // Created by khampf on 07-05-2020.
 //
-#ifndef G13_G13_DEVICE_HPP
-#define G13_G13_DEVICE_HPP
+#ifndef G13_DEVICE_HPP
+#define G13_DEVICE_HPP
 
 #include "g13_lcd.hpp"
 #include "g13_manager.hpp"
@@ -165,4 +165,4 @@ inline bool G13_Device::update(int key, bool v) {
 }
 } // namespace G13
 
-#endif // G13_G13_DEVICE_HPP
+#endif // G13_DEVICE_HPP

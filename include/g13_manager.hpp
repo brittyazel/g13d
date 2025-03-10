@@ -2,8 +2,8 @@
 // Created by khampf on 13-05-2020.
 //
 
-#ifndef G13_G13_MANAGER_HPP
-#define G13_G13_MANAGER_HPP
+#ifndef G13_MANAGER_HPP
+#define G13_MANAGER_HPP
 
 #include "g13_main.hpp"
 #include "g13_action.hpp"
@@ -105,4 +105,4 @@ protected:
 };
 } // namespace G13
 
-#endif // G13_G13_MANAGER_HPP
+#endif // G13_MANAGER_HPP

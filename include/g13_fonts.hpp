@@ -2,8 +2,8 @@
 // Created by khampf on 07-05-2020.
 //
 
-#ifndef G13_G13_FONTS_HPP
-#define G13_G13_FONTS_HPP
+#ifndef G13_FONTS_HPP
+#define G13_FONTS_HPP
 
 #include <cstring>
 #include <memory>
@@ -54,4 +54,4 @@ protected:
 };
 
 } // namespace G13
-#endif // G13_G13_FONTS_HPP
+#endif // G13_FONTS_HPP
