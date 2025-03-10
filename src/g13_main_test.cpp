@@ -24,14 +24,14 @@ class MockManager : public G13::G13_Manager {
 */
 
 class MockDevice : public G13::G13_Device {
-   public:
-  //  G13_Device(libusb_device *dev, libusb_context *ctx,
-  //             libusb_device_handle *handle, int m_id);
+public:
+    //  G13_Device(libusb_device *dev, libusb_context *ctx,
+    //             libusb_device_handle *handle, int m_id);
     MockDevice(G13::G13_Manager& manager) : G13_Device(nullptr, nullptr, nullptr, 0) {}
 };
 
 class MockProfile : public G13::G13_Profile {
-   public:
+public:
     MockProfile(G13::G13_Device& device) : G13_Profile(device, std::string("mock")) {}
 };
 

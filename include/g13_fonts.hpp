@@ -10,48 +10,56 @@
 #include <string>
 
 namespace G13 {
-class G13_Font;
+    class G13_Font;
 
-typedef std::shared_ptr<G13_Font> FontPtr;
+    typedef std::shared_ptr<G13_Font> FontPtr;
 
-class G13_FontChar {
-public:
-  static const int CHAR_BUF_SIZE = 8;
-  enum FONT_FLAGS { FF_ROTATE = 0x01 };
+    class G13_FontChar {
+    public:
+        static const int CHAR_BUF_SIZE = 8;
 
-  G13_FontChar() {
-    memset(bits_regular, 0, CHAR_BUF_SIZE);
-    memset(bits_inverted, 0, CHAR_BUF_SIZE);
-  }
-  void SetCharacter(unsigned char *data, unsigned int width, unsigned flags);
-  unsigned char bits_regular[CHAR_BUF_SIZE]{};
-  unsigned char bits_inverted[CHAR_BUF_SIZE]{};
-};
+        enum FONT_FLAGS { FF_ROTATE = 0x01 };
 
-class G13_Font {
-public:
-  G13_Font();
-  explicit G13_Font(std::string name, unsigned int width = 8);
+        G13_FontChar() {
+            memset(bits_regular, 0, CHAR_BUF_SIZE);
+            memset(bits_inverted, 0, CHAR_BUF_SIZE);
+        }
 
-  // void SetCharacter(unsigned int c, unsigned char* data);
+        void SetCharacter(unsigned char* data, unsigned int width, unsigned flags);
+        unsigned char bits_regular[CHAR_BUF_SIZE]{};
+        unsigned char bits_inverted[CHAR_BUF_SIZE]{};
+    };
 
-  template <class ARRAY_T, class FLAGST>
-  void InstallFont(ARRAY_T &data, FLAGST flags, int first = 0);
+    class G13_Font {
+    public:
+        G13_Font();
+        explicit G13_Font(std::string name, unsigned int width = 8);
 
-  [[nodiscard]] const std::string &name() const { return m_name; }
-  [[nodiscard]] unsigned int width() const { return m_width; }
+        // void SetCharacter(unsigned int c, unsigned char* data);
 
-  const G13_FontChar &char_data(unsigned int x) { return m_chars[x]; }
+        template <class ARRAY_T, class FLAGST>
+        void InstallFont(ARRAY_T& data, FLAGST flags, int first = 0);
 
-protected:
-  std::string m_name;
-  unsigned int m_width;
+        [[nodiscard]] const std::string& name() const {
+            return m_name;
+        }
 
-  G13_FontChar m_chars[256];
+        [[nodiscard]] unsigned int width() const {
+            return m_width;
+        }
 
-  // unsigned char font_basic[256][8];
-  // unsigned char font_inverted[256][8];
-};
+        const G13_FontChar& char_data(unsigned int x) {
+            return m_chars[x];
+        }
 
+    protected:
+        std::string m_name;
+        unsigned int m_width;
+
+        G13_FontChar m_chars[256];
+
+        // unsigned char font_basic[256][8];
+        // unsigned char font_inverted[256][8];
+    };
 } // namespace G13
 #endif // G13_FONTS_HPP

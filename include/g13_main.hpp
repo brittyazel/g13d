@@ -11,7 +11,6 @@
 // *************************************************************************
 
 namespace G13 {
-
     static const size_t G13_VENDOR_ID = 0x046d;
     static const size_t G13_PRODUCT_ID = 0xc21c;
     static const size_t G13_REPORT_SIZE = 8;
@@ -29,11 +28,12 @@ namespace G13 {
 
         ~G13_CommandException() noexcept override = default;
 
-        [[nodiscard]] const char *what() const noexcept override { return _reason.c_str(); }
+        [[nodiscard]] const char* what() const noexcept override {
+            return _reason.c_str();
+        }
 
         std::string _reason;
     };
-
-}  // namespace G13
+} // namespace G13
 
 #endif  // __G13_H__

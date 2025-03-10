@@ -11,7 +11,6 @@
 // clang-format on
 
 namespace G13 {
-
 // clang-format off
 const char* G13_Key_Tables::G13_KEY_STRINGS[] = {
   /* byte 3 */
@@ -37,30 +36,33 @@ const char* G13_Key_Tables::G13_BTN_SEQ[] = {
   "LEFT", "RIGHT", "MIDDLE", "SIDE", "EXTRA",
   nullptr
 };
-// clang-format on
+    // clang-format on
 
 
-void G13_Key::dump(std::ostream &o) const {
-  o << G13_Manager::Instance()->FindG13KeyName(index()) << "(" << index()
-    << ") : ";
-  if (action()) {
-    action()->dump(o);
-  } else {
-    o << "(no action)";
-  }
-}
+    void G13_Key::dump(std::ostream& o) const {
+        o << G13_Manager::Instance()->FindG13KeyName(index()) << "(" << index()
+            << ") : ";
+        if (action())
+        {
+            action()->dump(o);
+        }
+        else
+        {
+            o << "(no action)";
+        }
+    }
 
-// *************************************************************************
+    // *************************************************************************
 
-void G13_Key::ParseKey(const unsigned char *byte, G13_Device *g13) {
-  bool key_is_down = byte[_index.offset] & _index.mask;
-  auto key_state_changed = g13->update(_index.index, key_is_down);
+    void G13_Key::ParseKey(const unsigned char* byte, G13_Device* g13) {
+        bool key_is_down = byte[_index.offset] & _index.mask;
+        auto key_state_changed = g13->update(_index.index, key_is_down);
 
-  if (key_state_changed && _action) {
-    _action->act(*g13, key_is_down);
-  }
-}
+        if (key_state_changed && _action)
+        {
+            _action->act(*g13, key_is_down);
+        }
+    }
 
-// *************************************************************************
-
+    // *************************************************************************
 } // namespace G13

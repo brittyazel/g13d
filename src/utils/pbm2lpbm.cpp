@@ -12,7 +12,8 @@ int main(int argc, char* argv[]) {
     const int LEN = 256;
     char s[LEN];
     std::cin.getline(s, LEN);
-    if (std::strncmp(s, "P4", 2)) {
+    if (std::strncmp(s, "P4", 2))
+    {
         std::cerr << "input file is not .pbm (P4)" << std::endl;
         return -1;
     }
@@ -20,20 +21,23 @@ int main(int argc, char* argv[]) {
     while (s[0] == '#' || s[0] == ' ')
         std::cin.getline(s, LEN);
     unsigned int w = 0, h = 0;
-    if (std::sscanf(s, "%d %d", &w, &h) != 2) {
+    if (std::sscanf(s, "%d %d", &w, &h) != 2)
+    {
         std::cerr << "height and width not found" << std::endl;
         return -1;
     }
-    if (w != 160 || h != 43) {
+    if (w != 160 || h != 43)
+    {
         std::cerr << "incorrect width / height, mandated: 160x43, found: " << w << "x" << h
-                  << std::endl;
+            << std::endl;
         return -1;
     }
     std::cin >> std::noskipws;
     int i = 0, row = -1;
     unsigned char buf[160 * 48];
     std::memset(buf, 0, 160 * 43);
-    while (std::cin >> c) {
+    while (std::cin >> c)
+    {
         if (i % 20 == 0)
             row++;
         if (row == 8)
@@ -48,11 +52,13 @@ int main(int argc, char* argv[]) {
         buf[0 + (i % 20) * 8 + i / 160 * 160] |= ((c >> 7) & 0x01) << row;
         i++;
     }
-    if (i != 160 * 43 / 8) {
+    if (i != 160 * 43 / 8)
+    {
         std::cerr << "wrong number of bytes, expected " << 160 * 43 / 8 << ", got " << i
-                  << std::endl;
+            << std::endl;
     }
-    for (int i = 0; i < 160 * 48 / 8; i++) {
+    for (int i = 0; i < 160 * 48 / 8; i++)
+    {
         std::cout << std::hex << (char)buf[i];
     }
 }
