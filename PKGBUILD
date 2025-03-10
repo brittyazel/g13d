@@ -12,7 +12,7 @@ url="https://github.com/brittyazel/g13/"
 license=('unknown')
 depends=('log4cpp')
 makedepends=('git' 'cmake')
-source=("${pkgname}::git+https://github.com/brittyazel/g13.git#branch=WIP")
+source=("${pkgname}::git+https://github.com/brittyazel/g13.git")
 sha256sums=('SKIP')
 
 build() {
