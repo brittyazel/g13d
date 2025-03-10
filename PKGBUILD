@@ -18,15 +18,15 @@ sha256sums=('SKIP')
 build() {
     export CFLAGS+=" ${CPPFLAGS}"
     export CXXFLAGS+=" ${CPPFLAGS}"
-    cmake -S "${pkgbase}"
-    make -C . g13d pbm2lpbm
+    cmake -B build -S "${pkgbase}"
+    make -C build g13d pbm2lpbm
 }
 
 package() {
     # binaries
     install -dm 755 "${pkgdir}"/usr/bin/
-    install -m 755 g13d "${pkgdir}"/usr/bin/
-    install -m 755 pbm2lpbm "${pkgdir}"/usr/bin/
+    install -m 755 build/g13d "${pkgdir}"/usr/bin/
+    install -m 755 build/pbm2lpbm "${pkgdir}"/usr/bin/
 
     # host
     cp -r "${pkgbase}/assets/host/." "${pkgdir}/"
