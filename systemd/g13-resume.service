@@ -1,0 +1,10 @@
+[Unit]
+Description=Restart G13 Target on Resume
+After=suspend.target hibernate.target hybrid-sleep.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/systemctl restart g13.target
+
+[Install]
+WantedBy=suspend.target hibernate.target hybrid-sleep.target

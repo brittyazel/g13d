@@ -51,4 +51,6 @@ package() {
   # systemd
   install -dm 755 "${pkgdir}"/usr/lib/systemd/system/
   install -m 644 systemd/g13.service "${pkgdir}"/usr/lib/systemd/system/
+  install -m 644 systemd/g13.target "${pkgdir}"/usr/lib/systemd/system/
+  install -m 644 systemd/g13-resume.service "${pkgdir}"/usr/lib/systemd/system/
 }

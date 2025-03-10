@@ -1,9 +1,11 @@
 [Unit]
 Description=Logitech G13 Daemon
+BindsTo=g13.target
+After=g13.target
 
 [Service]
-Type=simple
 ExecStart=/usr/bin/g13d --config /etc/g13/default.bind --umask 007 --pipe_in /run/g13d/g13-0 --pipe_out /run/g13d/g13-0_out
+Restart=always
 
 [Install]
-WantedBy=default.target
+WantedBy=g13.target

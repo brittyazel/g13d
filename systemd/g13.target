@@ -1,0 +1,7 @@
+[Unit]
+Description=Logitech G13 Hotplug Target
+Requires=g13.service
+After=usb.target
+
+[Install]
+WantedBy=multi-user.target
