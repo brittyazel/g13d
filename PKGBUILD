@@ -2,17 +2,17 @@
 # Maintainer: K. Hampf <khampf@users.sourceforge.net>
 # Original maintainer: Lukas Sabota <lukas@lwsabota.com>
 
-pkgbase="g13"
+pkgbase="g13d"
 pkgname="g13-git"
 pkgver=0.1.0
 pkgrel=1
 pkgdesc="Userspace driver for the Logitech G13 Keyboard"
 arch=('x86_64' 'i686')
-url="https://github.com/brittyazel/g13/"
-license=('unknown')
+url="https://github.com/brittyazel/g13d/"
+license=('MIT')
 depends=('log4cpp')
 makedepends=('git' 'cmake')
-source=("git+https://github.com/brittyazel/g13.git")
+source=("git+https://github.com/brittyazel/g13d.git")
 sha256sums=('SKIP')
 
 build() {
