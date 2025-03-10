@@ -14,70 +14,69 @@ set(CONTROL_DIR "/tmp" CACHE STRING
         "Absolute directory of default pipe files (/tmp)")
 add_compile_definitions(-DCONTROL_DIR="${CONTROL_DIR}")
 
-include_directories(.)
+include_directories(include/ src/)
 
 add_executable(pbm2lpbm
-        pbm2lpbm.cpp)
+        src/pbm2lpbm.cpp)
 
 add_executable(g13d
-        g13.hpp
-        version.hpp
-        g13_action.hpp
-        g13_action.cpp
-        g13_device.hpp
-        g13_device.cpp
-        g13_fonts.hpp
-        g13_fonts.cpp
-        g13_hotplug.hpp
-        g13_hotplug.cpp
-        g13_keys.hpp
-        g13_keys.cpp
-        g13_lcd.hpp
-        g13_lcd.cpp
-        g13_log.hpp
-        g13_log.cpp
-        g13_main.cpp
-        g13_manager.hpp
-        g13_manager.cpp
-        g13_profile.hpp
-        g13_profile.cpp
-        g13_stick.hpp
-        g13_stick.cpp
-        g13_test.py
-        helper.hpp
-        helper.cpp
-        logo.hpp)
+        include/g13.hpp
+        include/version.hpp
+        include/g13_action.hpp
+        src/g13_action.cpp
+        include/g13_device.hpp
+        src/g13_device.cpp
+        include/g13_fonts.hpp
+        src/g13_fonts.cpp
+        include/g13_hotplug.hpp
+        src/g13_hotplug.cpp
+        include/g13_keys.hpp
+        src/g13_keys.cpp
+        include/g13_lcd.hpp
+        src/g13_lcd.cpp
+        include/g13_log.hpp
+        src/g13_log.cpp
+        src/g13_main.cpp
+        include/g13_manager.hpp
+        src/g13_manager.cpp
+        include/g13_profile.hpp
+        src/g13_profile.cpp
+        include/g13_stick.hpp
+        src/g13_stick.cpp
+        include/helper.hpp
+        src/helper.cpp
+        include/logo.hpp)
 
 set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES)
 
 add_executable(runtests
-        g13.hpp
-        version.hpp
-        g13_action.hpp
-        g13_action.cpp
-        g13_device.hpp
-        g13_device.cpp
-        g13_fonts.hpp
-        g13_fonts.cpp
-        g13_hotplug.hpp
-        g13_hotplug.cpp
-        g13_keys.hpp
-        g13_keys.cpp
-        g13_lcd.hpp
-        g13_lcd.cpp
-        g13_log.hpp
-        g13_log.cpp
-        g13_manager.hpp
-        g13_manager.cpp
-        g13_profile.hpp
-        g13_profile.cpp
-        g13_stick.hpp
-        g13_stick.cpp
-        g13_test.py
-        helper.hpp
-        helper.cpp
-        logo.hpp
-        testKeys.cpp)
+        include/g13.hpp
+        include/version.hpp
+        include/g13_action.hpp
+        src/g13_action.cpp
+        include/g13_device.hpp
+        src/g13_device.cpp
+        include/g13_fonts.hpp
+        src/g13_fonts.cpp
+        include/g13_hotplug.hpp
+        src/g13_hotplug.cpp
+        include/g13_keys.hpp
+        src/g13_keys.cpp
+        include/g13_lcd.hpp
+        src/g13_lcd.cpp
+        include/g13_log.hpp
+        src/g13_log.cpp
+        include/g13_manager.hpp
+        src/g13_manager.cpp
+        include/g13_profile.hpp
+        src/g13_profile.cpp
+        include/g13_stick.hpp
+        src/g13_stick.cpp
+        src/scripts/g13_test.py
+        include/helper.hpp
+        src/helper.cpp
+        include/logo.hpp
+        src/testKeys.cpp)
 
 target_link_libraries (g13d usb-1.0 log4cpp evdev)
 target_link_libraries (runtests usb-1.0 log4cpp evdev gtest gmock)

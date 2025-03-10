@@ -3,7 +3,7 @@
 # Original maintainer: Lukas Sabota <lukas@lwsabota.com>
 
 pkgbase="g13d"
-pkgname="g13-git"
+pkgname="g13d-git"
 pkgver=0.1.0
 pkgrel=1
 pkgdesc="Userspace driver for the Logitech G13 Keyboard"
