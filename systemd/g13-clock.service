@@ -1,16 +1,12 @@
 [Unit]
 Description=Logitech G13 clock
 After=g13.service
-PartOf=g13.service
+Requires=g13.service
 
 [Service]
 Type=simple
-User=g13
-Group=g13
-
-#ExecStart=/usr/local/bin/g13-clock -s -o /run/g13d/g13-0
 ExecStart=/usr/local/bin/g13-clock -o /run/g13d/g13-0
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=g13.service
 
