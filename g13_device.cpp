@@ -47,16 +47,10 @@ std::string G13_Device::DescribeLibusbErrorCode(int code) {
 }
 
 static int G13CreateFifo(const char *fifo_name, mode_t umask) {
-  int fd;
-
-  umask |= std::stoi(std::string("0") +
-                     G13_Manager::Instance()->getStringConfigValue("umask"),
-                     nullptr, 8);
-  // mkfifo(g13->fifo_name(), 0777); - didn't work
+  umask |= std::stoi(std::string("0") + G13::G13_Manager::getStringConfigValue("umask"), nullptr, 8);
   mkfifo(fifo_name, 0666);
-  fd = open(fifo_name, O_RDWR | O_NONBLOCK);
+  const int fd = open(fifo_name, O_RDWR | O_NONBLOCK);
   chmod(fifo_name, 0777 & ~umask);
-
   return fd;
 }
 

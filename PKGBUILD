@@ -49,6 +49,6 @@ package() {
   install -m 644 udev/91-g13.rules "${pkgdir}"/usr/lib/udev/rules.d/91-g13.rules
   
   # systemd
-  install -dm 755 "${pkgdir}"/usr/lib/systemd/user
-  install -m 644 systemd/g13.service "${pkgdir}"/usr/lib/systemd/user/g13.service
+  install -dm 755 "${pkgdir}"/usr/lib/systemd/system
+  install -m 644 systemd/g13.service "${pkgdir}"/usr/lib/systemd/system/g13.service
 }
