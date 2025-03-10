@@ -1,34 +1,8 @@
 # Userspace driver for the G13
 
-## This is a 100% boost free version
-You no longer need to rebuild this every other week when boost updates. It started out as a quick rewrite but has turned out to be a refactoring job gone wild. It is not completely refactored but I have so far:
-
-* Removed all dependencies on boost libraries
-* Fixed a couple of bugs (and probably introduced some others)
-* Merged some work on adding support for additional keys and mouse clicks
-* Added support for USB hotplugging
-* Moved from regular Makefile to CMake
-* Refactored by splitting up huge source files into smaller parts
-* Renamed lots of stuff to start transitioning towards something more like Mozilla coding style
-
-## Changelog
-* v1.0.4
-  * Fixed a major bug in LCD init (thanks to [nihilman](https://github.com/nihilman))
-  * Fixed a small memory leak on hotplug disconnect
-  * More methods renamed for style
-* v1.0.3
-  * Major refactoring work continued
-    (I just wanted something to show here as to not look too empty)
-* v1.0.2
-  * I really can't recall but lots
-* v1.0.1
-  * Somewhere here boost got killed off
-* v1.0.0 Started a version scheme
-
-
 ## Installation
 
-Make sure you have ~~boost~~ log4cpp, libevdev and libusb-1.0 installed.
+Make sure you have log4cpp, libevdev and libusb-1.0 installed.
 
 ### For Archlinux
 
@@ -44,12 +18,6 @@ $ make
 ```
 
 ## OLD DOCUMENTATION FOLLOWS
-
-### For Ubuntu (15.10)
-
-* ***sudo apt-get install libusb-1.0-0-dev***
-* ~~***sudo apt-get install libboost-all-dev***~~
-
 
 ### Build
 Compile by running
@@ -109,10 +77,10 @@ Configuration is accomplished using the commands described in the [Commands] sec
 
 Commands can be loaded from a file specified by the --config option on the command line.  
 
-Commands can be also be sent to the command input pipe, which is at ***/tmp/g13-0*** by 
+Commands can be also be sent to the command input pipe, which is at ***/run/g13d/g13-0*** by 
 default. Example:
 
-    echo rgb 0 255 0 > /tmp/g13-0
+    echo rgb 0 255 0 > /run/g13d/g13-0
 
 ### Actions
 
@@ -120,7 +88,7 @@ Various parts of configuring the G13 depend on assigning actions to occur based 
 * key, possible values shown upon startup  (e.g. ***LEFTSHIFT***). It may be prefixed with "-" to indicate a release action.
 * multiple keys,  like ***LEFTSHIFT+F1***
 * keys on release,  like ***LEFTSHIFT+F1 LEFTSHIFT+F2***
-* pipe output, by using ">" followed by text, as in ***>Hello*** - causing **Hello** (plus newline) to be written to the output pipe ( **/tmp/g13-0_out** by default )
+* pipe output, by using ">" followed by text, as in ***>Hello*** - causing **Hello** (plus newline) to be written to the output pipe ( **/run/g13d/g13-0_out** by default )
 * command, by using "!" followed by text, as in ***!stickmode KEYS*** 
 
 ## Commands
@@ -229,7 +197,7 @@ Changes the level of detail written to the g13d console
 
 ### LCD display
 
-Use pbm2lpbm to convert a pbm image to the correct format, then just cat that into the pipe (cat starcraft2.lpbm > /tmp/g13-0).
+Use pbm2lpbm to convert a pbm image to the correct format, then just cat that into the pipe (cat starcraft2.lpbm > /run/g13d/g13-0).
 The pbm file must be 160x43 pixels.
 
 ## License
