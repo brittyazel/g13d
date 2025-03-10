@@ -5,7 +5,7 @@
 #ifndef G13_G13_MANAGER_HPP
 #define G13_G13_MANAGER_HPP
 
-#include "g13.hpp"
+#include "g13_main.hpp"
 #include "g13_action.hpp"
 #include "g13_device.hpp"
 #include "g13_keys.hpp"

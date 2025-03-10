@@ -6,7 +6,7 @@
 #define G13_G13_PROFILE_HPP
 
 #include <regex>
-#include "g13.hpp"
+#include "g13_main.hpp"
 #include "g13_action.hpp"
 #include "g13_device.hpp"
 

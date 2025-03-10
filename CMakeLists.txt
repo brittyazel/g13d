@@ -15,8 +15,10 @@ add_definitions(-DCONTROL_DIR="${CONTROL_DIR}")
 add_executable(pbm2lpbm src/pbm2lpbm.cpp)
 
 add_executable(g13d
-        include/g13.hpp
         include/version.hpp
+        include/logo.hpp
+        include/g13_main.hpp
+        src/g13_main.cpp
         include/g13_action.hpp
         src/g13_action.cpp
         include/g13_device.hpp
@@ -31,7 +33,6 @@ add_executable(g13d
         src/g13_lcd.cpp
         include/g13_log.hpp
         src/g13_log.cpp
-        src/g13_main.cpp
         include/g13_manager.hpp
         src/g13_manager.cpp
         include/g13_profile.hpp
@@ -40,12 +41,13 @@ add_executable(g13d
         src/g13_stick.cpp
         include/helper.hpp
         src/helper.cpp
-        include/logo.hpp
 )
 
 add_executable(runtests
-        include/g13.hpp
         include/version.hpp
+        include/logo.hpp
+        include/g13_main.hpp
+        src/g13_main_test.cpp
         include/g13_action.hpp
         src/g13_action.cpp
         include/g13_device.hpp
@@ -66,11 +68,8 @@ add_executable(runtests
         src/g13_profile.cpp
         include/g13_stick.hpp
         src/g13_stick.cpp
-        src/scripts/g13_test.py
         include/helper.hpp
         src/helper.cpp
-        include/logo.hpp
-        src/testKeys.cpp
 )
 
 target_include_directories(g13d PRIVATE include src)

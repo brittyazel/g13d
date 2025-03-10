@@ -3,7 +3,7 @@
 //
 
 #include "g13_hotplug.hpp"
-#include "g13.hpp"
+#include "g13_main.hpp"
 #include "g13_device.hpp"
 #include "g13_manager.hpp"
 #include <libevdev-1.0/libevdev/libevdev.h>
