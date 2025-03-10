@@ -151,8 +151,8 @@ void G13_Device::SetModeLeds(int leds) {
   unsigned char usb_data[] = {5, 0, 0, 0, 0};
   usb_data[1] = leds;
   int error = libusb_control_transfer(
-      handle, LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE, 9, 0x305,
-      0, usb_data, 5, 1000);
+      handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) | static_cast<uint8_t>(LIBUSB_RECIPIENT_INTERFACE),
+      9, 0x305, 0, usb_data, 5, 1000);
   if (error != 5) {
     G13_ERR("Problem setting mode LEDs: " + DescribeLibusbErrorCode(error));
     return;
@@ -167,8 +167,8 @@ void G13_Device::SetKeyColor(int red, int green, int blue) {
   usb_data[3] = blue;
 
   error = libusb_control_transfer(
-      handle, LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE, 9, 0x307,
-      0, usb_data, 5, 1000);
+      handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) | static_cast<uint8_t>(LIBUSB_RECIPIENT_INTERFACE),
+      9, 0x307, 0, usb_data, 5, 1000);
   if (error != 5) {
     G13_ERR("Problem changing color: " + DescribeLibusbErrorCode(error));
     return;

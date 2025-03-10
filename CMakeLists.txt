@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(g13d)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-std=c++17")
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_FLAGS "-std=c++23")
 
 option(DEBUG "Compile for debugging" OFF)
 if(DEBUG)
