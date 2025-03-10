@@ -16,41 +16,19 @@ source=("${pkgname}::git+https://github.com/brittyazel/g13.git")
 sha256sums=('SKIP')
 
 build() {
-  export CFLAGS+=" ${CPPFLAGS}"
-  export CXXFLAGS+=" ${CPPFLAGS}"
-  cmake -B build -S "${pkgname}"
-  make -C build g13d pbm2lpbm
+    export CFLAGS+=" ${CPPFLAGS}"
+    export CXXFLAGS+=" ${CPPFLAGS}"
+    cmake -S "${pkgname}"
+    make -C . g13d pbm2lpbm
 }
 
 package() {
-  cd build
-  # binaries
-  install -dm 755 "${pkgdir}"/usr/bin/
-  install -m 755 g13d "${pkgdir}"/usr/bin/
-  install -m 755 pbm2lpbm "${pkgdir}"/usr/bin/
+    # binaries
+    install -dm 755 "${pkgdir}"/usr/bin/
+    install -m 755 g13d "${pkgdir}"/usr/bin/
+    install -m 755 pbm2lpbm "${pkgdir}"/usr/bin/
 
-  cd ..
-  cd "${pkgname}"
-  # configuration (location of default.bind)
-  install -dm 755 "${pkgdir}"/etc/g13/
-  install -m 644 bindfiles/default.bind "${pkgdir}"/etc/g13/
-  
-  # docs
-  install -dm 755 "${pkgdir}"/usr/share/doc/"${pkgname}"/
-  install -m 644 README.md g13.png g13.svg "${pkgdir}"/usr/share/doc/"${pkgname}"/
-  install -dm 755 "${pkgdir}"/usr/share/doc/"${pkgname}"/examples/
-  install -dm 755 "${pkgdir}"/usr/share/doc/"${pkgname}"/examples/bitmaps/
-  install -m 644 bitmaps/*.lpbm "${pkgdir}"/usr/share/doc/${pkgname}/examples/bitmaps/
-  install -dm 755 "${pkgdir}"/usr/share/doc/"${pkgname}"/examples/bindfiles/
-  install -m 644 bindfiles/*.bind "${pkgdir}"/usr/share/doc/"${pkgname}"/examples/bindfiles/
+    # host
+    cp -r "${pkgname}/assets/host/." "${pkgdir}/"
 
-  # udev
-  install -dm 755 "${pkgdir}"/usr/lib/udev/rules.d/
-  install -m 644 udev/91-g13.rules "${pkgdir}"/usr/lib/udev/rules.d/
-  
-  # systemd
-  install -dm 755 "${pkgdir}"/usr/lib/systemd/system/
-  install -m 644 systemd/g13.service "${pkgdir}"/usr/lib/systemd/system/
-  install -m 644 systemd/g13.target "${pkgdir}"/usr/lib/systemd/system/
-  install -m 644 systemd/g13-resume.service "${pkgdir}"/usr/lib/systemd/system/
 }
