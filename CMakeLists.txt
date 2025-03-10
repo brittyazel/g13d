@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(g13)
+project(g13d)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-std=c++17")
@@ -21,6 +21,7 @@ add_executable(pbm2lpbm
 
 add_executable(g13d
         g13.hpp
+        version.hpp
         g13_action.hpp
         g13_action.cpp
         g13_device.hpp
@@ -47,19 +48,11 @@ add_executable(g13d
         helper.cpp
         logo.hpp)
 
-add_custom_target(version
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_SOURCE_DIR}/GIT-VERSION-GEN
-        DEPENDS GIT-VERSION-GEN
-        COMMENT "Checking version header ..."
-)
-add_dependencies(g13d version)
-set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
-        "${CMAKE_CURRENT_SOURCE_DIR}/GIT-VERSION.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/GIT-VERSION-FILE")
+set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES)
 
 add_executable(runtests
         g13.hpp
+        version.hpp
         g13_action.hpp
         g13_action.cpp
         g13_device.hpp

@@ -12,13 +12,13 @@ url="https://github.com/brittyazel/g13/"
 license=('unknown')
 depends=('log4cpp')
 makedepends=('git' 'cmake')
-source=("${pkgname}::git+https://github.com/brittyazel/g13.git")
+source=("git+https://github.com/brittyazel/g13.git")
 sha256sums=('SKIP')
 
 build() {
     export CFLAGS+=" ${CPPFLAGS}"
     export CXXFLAGS+=" ${CPPFLAGS}"
-    cmake -S "${pkgname}"
+    cmake -S "${pkgbase}"
     make -C . g13d pbm2lpbm
 }
 
@@ -29,6 +29,6 @@ package() {
     install -m 755 pbm2lpbm "${pkgdir}"/usr/bin/
 
     # host
-    cp -r "${pkgname}/assets/host/." "${pkgdir}/"
+    cp -r "${pkgbase}/assets/host/." "${pkgdir}/"
 
 }
