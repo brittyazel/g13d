@@ -12,8 +12,6 @@ endif()
 set(CONTROL_DIR "/run/g13d" CACHE STRING "Absolute directory of default pipe files (/run/g13d/)")
 add_definitions(-DCONTROL_DIR="${CONTROL_DIR}")
 
-add_executable(pbm2lpbm src/pbm2lpbm.cpp)
-
 add_executable(g13d
         include/version.hpp
         include/logo.hpp
@@ -71,6 +69,8 @@ add_executable(runtests
         include/helper.hpp
         src/helper.cpp
 )
+
+add_executable(pbm2lpbm src/utils/pbm2lpbm.cpp)
 
 target_include_directories(g13d PRIVATE include src)
 target_include_directories(runtests PRIVATE include src)
