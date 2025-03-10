@@ -82,6 +82,6 @@ install(TARGETS g13d pbm2lpbm
         RUNTIME DESTINATION usr/bin
 )
 
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/host/
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/host/
         DESTINATION .
 )
