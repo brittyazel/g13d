@@ -5,7 +5,7 @@ Requires=g13.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/g13-clock -o /run/g13d/g13-0
+ExecStart=/usr/bin/g13-clock.sh
 
 [Install]
 WantedBy=g13.service
