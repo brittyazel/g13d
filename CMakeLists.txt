@@ -10,8 +10,8 @@ if(DEBUG)
         add_link_options(-g)
 endif()
 
-set(CONTROL_DIR "/tmp" CACHE STRING
-        "Absolute directory of default pipe files (/tmp)")
+set(CONTROL_DIR "/run/g13d" CACHE STRING
+        "Absolute directory of default pipe files (/run/g13d/)")
 add_compile_definitions(-DCONTROL_DIR="${CONTROL_DIR}")
 
 include_directories(include/ src/)
