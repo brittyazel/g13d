@@ -20,7 +20,7 @@
 #  T
 #                DOWN
 
-rgb 177 13 201
+rgb 150 200 200
 
 bind G1 KEY_1
 bind G2 KEY_2
