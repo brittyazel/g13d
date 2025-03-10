@@ -47,6 +47,16 @@ std::string G13_Device::DescribeLibusbErrorCode(int code) {
 }
 
 static int G13CreateFifo(const char *fifo_name, mode_t umask) {
+
+  // Extract the directory path from the FIFO path
+  const std::filesystem::path fifo_path(fifo_name);
+  const std::filesystem::path dir_path = fifo_path.parent_path();
+
+  // Create directories recursively if they don't exist
+  if (!dir_path.empty()) {
+    create_directories(dir_path);
+  }
+
   umask |= std::stoi(std::string("0") + G13::G13_Manager::getStringConfigValue("umask"), nullptr, 8);
   mkfifo(fifo_name, 0666);
   const int fd = open(fifo_name, O_RDWR | O_NONBLOCK);
