@@ -156,9 +156,9 @@ namespace G13 {
 
         const auto i = input_name_to_key.find(modified_keyname);
         if (i == input_name_to_key.end()) {
-            return BAD_KEY_VALUE;
+            return G13_State_Key(BAD_KEY_VALUE);
         }
-        return {i->second, down};
+        return G13_State_Key(i->second, down);
     }
 
     std::string G13_Manager::FindInputKeyName(const LINUX_KEY_VALUE v) {

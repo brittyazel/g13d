@@ -37,7 +37,7 @@ namespace G13 {
 
         void set_mode(stick_mode_t);
         G13_StickZone* zone(const std::string&, bool create = false);
-        std::vector<std::string> FilteredZoneNames(const std::regex& pattern);
+        [[nodiscard]] std::vector<std::string> FilteredZoneNames(const std::regex& pattern) const;
         void RemoveZone(const G13_StickZone& zone);
 
         /*
@@ -49,7 +49,7 @@ namespace G13 {
         void dump(std::ostream&) const;
 
     protected:
-        void RecalcCalibrated();
+        static void RecalcCalibrated();
 
         G13_Device& _keypad;
         std::vector<G13_StickZone> m_zones;

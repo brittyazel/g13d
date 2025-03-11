@@ -16,7 +16,7 @@ namespace G13 {
 
     class G13_FontChar {
     public:
-        static const int CHAR_BUF_SIZE = 8;
+        static constexpr int CHAR_BUF_SIZE = 8;
 
         enum FONT_FLAGS { FF_ROTATE = 0x01 };
 
@@ -48,7 +48,7 @@ namespace G13 {
             return m_width;
         }
 
-        const G13_FontChar& char_data(unsigned int x) {
+        [[nodiscard]] const G13_FontChar& char_data(const unsigned int x) const {
             return m_chars[x];
         }
 

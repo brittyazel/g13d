@@ -5,7 +5,6 @@
 #ifndef G13_ACTION_HPP
 #define G13_ACTION_HPP
 
-#include "g13_main.hpp"
 #include "g13_keys.hpp"
 #include "g13_manager.hpp"
 #include "g13_stick.hpp"

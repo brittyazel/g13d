@@ -6,7 +6,7 @@ import time
 
 # simple test script to update G13 LCD with temperature values from lm-sensors
 
-def doCmd(*cmd):
+def docmd(*cmd):
     # print( "cmd = %r" % (cmd,) )
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
@@ -14,9 +14,9 @@ def doCmd(*cmd):
 
 
 def get_sensors():
-    sensor_lines = doCmd('sensors').split('\n')
+    sensor_lines = docmd('sensors').split('\n')
     print("sensor_lines = %r" % (sensor_lines,))
-    temp_re = re.compile(r'''([a-zA-Z])[a-zA-Z s]+([0-9])\:\s*\+([0-9.]+)[\xc2\xb0C]*C.*''')
+    temp_re = re.compile(r'''([a-zA-Z])[a-zA-Z s]+([0-9]):\s*\+([0-9.]+)[\xc2\xb0C]*C.*''')
 
     temps = []
     for line in sensor_lines:

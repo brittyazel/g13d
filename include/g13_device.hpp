@@ -69,7 +69,7 @@ namespace G13 {
 
         int ReadKeypresses();
 
-        void parse_joystick(unsigned char* buf);
+        void parse_joystick(const unsigned char* buf);
 
         G13_ActionPtr MakeAction(const std::string& action);
 

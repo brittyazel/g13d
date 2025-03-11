@@ -4,22 +4,19 @@
 #include "g13_main.hpp"
 
 namespace G13 {
-    // *************************************************************************
-
-    void G13_Device::parse_joystick(unsigned char* buf) {
+    void G13_Device::parse_joystick(const unsigned char* buf) {
         m_stick.ParseJoystick(buf);
     }
 
-    G13_Stick::G13_Stick(G13_Device& keypad)
-        : _keypad(keypad), m_bounds(0, 0, 255, 255), m_center_pos(127, 127),
-          m_north_pos(127, 0) {
+    G13_Stick::G13_Stick(G13_Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255),
+                                               m_center_pos(127, 127), m_north_pos(127, 0) {
         m_stick_mode = STICK_KEYS;
 
-        auto add_zone = [this, &keypad](const std::string& name, double x1, double y1,
-                                        double x2, double y2) {
-            m_zones.emplace_back(
-                *this, "STICK_" + name, G13_ZoneBounds(x1, y1, x2, y2),
-                G13_ActionPtr(new G13_Action_Keys(keypad, "KEY_" + name)));
+        auto add_zone = [this, &keypad](const std::string& name, const double x1, const double y1,
+                                        const double x2, const double y2) {
+            m_zones.emplace_back(*this, "STICK_" + name, G13_ZoneBounds(x1, y1, x2, y2),
+                                 std::static_pointer_cast<G13_Action>(
+                                     std::make_shared<G13_Action_Keys>(keypad, "KEY_" + name)));
         };
 
         add_zone("UP", 0.0, 0.1, 1.0, 0.3);
@@ -30,54 +27,44 @@ namespace G13 {
         add_zone("PAGEDOWN", 0.0, 0.9, 1.0, 1.0);
     }
 
-    G13_StickZone* G13_Stick::zone(const std::string& name, bool create) {
-        for (auto& zone : m_zones)
-        {
-            if (zone.name() == name)
-            {
+    G13_StickZone* G13_Stick::zone(const std::string& name, const bool create) {
+        for (auto& zone : m_zones) {
+            if (zone.name() == name) {
                 return &zone;
             }
         }
-        if (create)
-        {
-            m_zones.push_back(
-                G13_StickZone(*this, name, G13_ZoneBounds(0.0, 0.0, 0.0, 0.0)));
-            return zone(name);
+        if (create) {
+            m_zones.emplace_back(*this, name, G13_ZoneBounds(0.0, 0.0, 0.0, 0.0));
+            return &m_zones.back();
         }
         return nullptr;
     }
 
-    std::vector<std::string>
-    G13_Stick::FilteredZoneNames(const std::regex& pattern) {
+    std::vector<std::string> G13_Stick::FilteredZoneNames(const std::regex& pattern) const {
         std::vector<std::string> names;
 
-        for (auto zone : m_zones)
+        for (const auto& zone : m_zones)
             if (std::regex_match(zone.name(), pattern))
                 names.emplace_back(zone.name());
         return names;
     }
 
-    void G13_Stick::set_mode(stick_mode_t m) {
+    void G13_Stick::set_mode(const stick_mode_t m) {
         if (m == m_stick_mode)
             return;
         if (m_stick_mode == STICK_CALCENTER || m_stick_mode == STICK_CALBOUNDS ||
-            m_stick_mode == STICK_CALNORTH)
-        {
+            m_stick_mode == STICK_CALNORTH) {
             RecalcCalibrated();
         }
         m_stick_mode = m;
-        switch (m_stick_mode)
-        {
+        switch (m_stick_mode) {
         case STICK_CALBOUNDS:
             m_bounds.tl = G13_StickCoord(255, 255);
             m_bounds.br = G13_StickCoord(0, 0);
             break;
         case STICK_ABSOLUTE:
-            break;
         case STICK_KEYS:
-            break;
         case STICK_CALCENTER:
-            break;
         case STICK_CALNORTH:
             break;
         }
@@ -87,12 +74,11 @@ namespace G13 {
 
     void G13_Stick::RemoveZone(const G13_StickZone& zone) {
         const G13_StickZone& target(zone);
-        m_zones.erase(std::remove(m_zones.begin(), m_zones.end(), target), m_zones.end());
+        std::erase(m_zones, target);
     }
 
     void G13_Stick::dump(std::ostream& out) const {
-        for (auto& zone : m_zones)
-        {
+        for (auto& zone : m_zones) {
             zone.dump(out);
             out << std::endl;
         }
@@ -100,12 +86,10 @@ namespace G13 {
 
     void G13_StickZone::dump(std::ostream& out) const {
         out << "   " << std::setw(20) << name() << "   " << _bounds << "  ";
-        if (action())
-        {
+        if (action()) {
             action()->dump(out);
         }
-        else
-        {
+        else {
             out << " (no action)";
         }
     }
@@ -113,18 +97,15 @@ namespace G13 {
     void G13_StickZone::test(const G13_ZoneCoord& loc) {
         if (!_action)
             return;
-        bool prior_active = _active;
+        const bool prior_active = _active;
         _active = _bounds.contains(loc);
-        if (!_active)
-        {
-            if (prior_active)
-            {
+        if (!_active) {
+            if (prior_active) {
                 // cout << "exit stick zone " << m_name << std::endl;
                 _action->act(false);
             }
         }
-        else
-        {
+        else {
             // cout << "in stick zone " << m_name << std::endl;
             _action->act(true);
         }
@@ -133,8 +114,8 @@ namespace G13 {
     G13_StickZone::G13_StickZone(G13_Stick& stick, const std::string& name,
                                  const G13_ZoneBounds& b,
                                  const G13_ActionPtr& action)
-        : G13_Actionable<G13_Stick>(stick, name), _bounds(b), _active(false) {
-        set_action(action); // Call to virtual from ctor!
+        : G13_Actionable(stick, name), _bounds(b), _active(false) {
+        G13_Actionable::set_action(action); // Call to virtual from ctor!
     }
 
     void G13_Stick::ParseJoystick(const unsigned char* buf) {
@@ -142,8 +123,7 @@ namespace G13 {
         m_current_pos.y = buf[2];
 
         // update targets if we're in calibration mode
-        switch (m_stick_mode)
-        {
+        switch (m_stick_mode) {
         case STICK_CALCENTER:
             m_center_pos = m_current_pos;
             return;
@@ -157,32 +137,27 @@ namespace G13 {
             return;
 
         case STICK_ABSOLUTE:
-            break;
         case STICK_KEYS:
             break;
         }
 
         // determine our normalized position
         double dx; // = 0.5
-        if (m_current_pos.x <= m_center_pos.x)
-        {
+        if (m_current_pos.x <= m_center_pos.x) {
             dx = m_current_pos.x - m_bounds.tl.x;
             dx /= (m_center_pos.x - m_bounds.tl.x) * 2;
         }
-        else
-        {
+        else {
             dx = m_bounds.br.x - m_current_pos.x;
             dx /= (m_bounds.br.x - m_center_pos.x) * 2;
             dx = 1.0 - dx;
         }
         double dy; // = 0.5;
-        if (m_current_pos.y <= m_center_pos.y)
-        {
+        if (m_current_pos.y <= m_center_pos.y) {
             dy = m_current_pos.y - m_bounds.tl.y;
             dy /= (m_center_pos.y - m_bounds.tl.y) * 2;
         }
-        else
-        {
+        else {
             dy = m_bounds.br.y - m_current_pos.y;
             dy /= (m_bounds.br.y - m_center_pos.y) * 2;
             dy = 1.0 - dy;
@@ -190,23 +165,19 @@ namespace G13 {
 
         G13_DBG("x=" << m_current_pos.x << " y=" << m_current_pos.y << " dx=" << dx
             << " dy=" << dy);
-        G13_ZoneCoord jpos(dx, dy);
-        if (m_stick_mode == STICK_ABSOLUTE)
-        {
+        const G13_ZoneCoord jpos(dx, dy);
+        if (m_stick_mode == STICK_ABSOLUTE) {
             _keypad.SendEvent(EV_ABS, ABS_X, m_current_pos.x);
             _keypad.SendEvent(EV_ABS, ABS_Y, m_current_pos.y);
         }
-        else if (m_stick_mode == STICK_KEYS)
-        {
+        else if (m_stick_mode == STICK_KEYS) {
             // BOOST_FOREACH (G13_StickZone& zone, m_zones) { zone.test(jpos); }
-            for (auto& zone : m_zones)
-            {
+            for (auto& zone : m_zones) {
                 zone.test(jpos);
             }
             return;
         }
-        else
-        {
+        else {
             /*    send_event(g13->uinput_file, EV_REL, REL_X, stick_x/16 - 8);
              SendEvent(g13->uinput_file, EV_REL, REL_Y, stick_y/16 - 8);*/
         }

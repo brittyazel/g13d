@@ -11,7 +11,7 @@
 namespace G13 {
     typedef int G13_KEY_INDEX;
     typedef int LINUX_KEY_VALUE;
-    const LINUX_KEY_VALUE BAD_KEY_VALUE = -1;
+    constexpr LINUX_KEY_VALUE BAD_KEY_VALUE = -1;
 
 
     /*!
@@ -50,16 +50,16 @@ namespace G13 {
      */
     class G13_State_Key {
     public:
-        G13_State_Key(LINUX_KEY_VALUE key = 0, bool down = true) {
+        explicit G13_State_Key(const LINUX_KEY_VALUE key = 0, const bool down = true) {
             _key = key;
             _down = down;
         }
 
-        LINUX_KEY_VALUE key(void) const {
+        [[nodiscard]] LINUX_KEY_VALUE key() const {
             return _key;
         }
 
-        bool is_down(void) const {
+        [[nodiscard]] bool is_down() const {
             return _down;
         }
 

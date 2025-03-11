@@ -95,7 +95,7 @@ namespace G13 {
 
     G13_Action_PipeOut::~G13_Action_PipeOut() = default;
 
-    void G13_Action_PipeOut::act(G13_Device& kp, bool is_down) {
+    void G13_Action_PipeOut::act(G13_Device& kp, const bool is_down) {
         if (is_down)
         {
             kp.OutputPipeWrite(_out);
@@ -111,7 +111,7 @@ namespace G13 {
 
     G13_Action_Command::~G13_Action_Command() = default;
 
-    void G13_Action_Command::act(G13_Device& kp, bool is_down) {
+    void G13_Action_Command::act(G13_Device& kp, const bool is_down) {
         if (is_down)
         {
             keypad().Command(_cmd.c_str());

@@ -37,10 +37,8 @@ namespace Helper {
         const char* cp = s.c_str();
         const char* end = cp + s.size();
 
-        while (cp < end)
-        {
-            switch (*cp)
-            {
+        while (cp < end) {
+            switch (*cp) {
             case '\n':
                 o << "\\n";
                 break;
@@ -60,14 +58,12 @@ namespace Helper {
                 break;
             default: {
                 unsigned char c = *cp;
-                if (c < 32)
-                {
-                    unsigned char hi = '0' + (c & 0x0fu);
-                    unsigned char lo = '0' + ((unsigned char)(c >> 4u) & 0x0fu);
+                if (c < 32) {
+                    const unsigned char hi = '0' + (c & 0x0fu);
+                    const unsigned char lo = '0' + (static_cast<unsigned char>(c >> 4u) & 0x0fu);
                     o << "\\x" << hi << lo;
                 }
-                else
-                {
+                else {
                     o << c;
                 }
             }
@@ -82,37 +78,32 @@ namespace Helper {
     // Translate a glob pattern into a regular expression.
     std::string glob2regex(const char* glob) {
         std::string regex("^");
-        const char lparent = '(';
-        const char rparent = ')';
-        const char lbracket = '[';
-        const char rbracket = ']';
-        const char lbrace = '{';
-        const char rbrace = '}';
+        constexpr char lparent = '(';
+        constexpr char rparent = ')';
+        constexpr char lbracket = '[';
+        constexpr char rbracket = ']';
+        constexpr char lbrace = '{';
+        constexpr char rbrace = '}';
 
         // Translate wildcards '*', '**' and '?'.
-        auto wildcard = [&](void) {
+        auto wildcard = [&]() {
             unsigned int min(0);
             bool nomax(false);
 
-            if (*glob == '*' && glob[1] == '*')
-            {
+            if (*glob == '*' && glob[1] == '*') {
                 // Match descendant?
-                nomax = true;
                 regex += ".";
                 for (glob += 2; *glob == '*'; glob++);
             }
-            else
-            {
-                regex += "[^/]"; // Do not match dscendant.
+            else {
+                regex += "[^/]"; // Do not match descendant.
                 // Optimize consecutive wildcards gathering min and max counts.
-                for (;; glob++)
-                {
+                for (;; glob++) {
                     if (*glob == '?')
                         min++;
-                    else if (*glob == '*')
-                    {
+                    else if (*glob == '*') {
                         if (glob[1] == '*')
-                            break; // Stop on descendant match mark.
+                            break; // Stop on descendant matchmark.
                         nomax = true;
                     }
                     else
@@ -123,13 +114,11 @@ namespace Helper {
             // Generate repetition counts.
             if (!min)
                 regex += '*';
-            else if (min == 1)
-            {
+            else if (min == 1) {
                 if (nomax)
                     regex += '+';
             }
-            else
-            {
+            else {
                 regex += std::string("{") + std::to_string(min);
                 if (nomax)
                     regex += ',';
@@ -138,22 +127,19 @@ namespace Helper {
         };
 
         // Translate [] sets.
-        auto set = [&](void) {
+        auto set = [&]() {
             regex += *glob++;
-            if (*glob == '^' || *glob == '!')
-            {
+            if (*glob == '^' || *glob == '!') {
                 // Handle negation mark.
                 regex += "^";
                 glob++;
             }
             // Convert set content.
-            while (auto c = *glob)
-            {
+            while (auto c = *glob) {
                 glob++;
                 if (c == rbracket)
                     break;
-                if (c != '-')
-                {
+                if (c != '-') {
                     if (c == '\\' && *glob)
                         c = *glob++;
                     if (strchr("]\\-", c))
@@ -166,17 +152,14 @@ namespace Helper {
 
         // Translate {,} groups.
         std::function<void(bool)> terms;
-        auto group = [&](void) {
+        auto group = [&]() {
             regex += lparent;
-            for (glob++; *glob;)
-            {
-                if (*glob == ',')
-                {
+            for (glob++; *glob;) {
+                if (*glob == ',') {
                     regex += '|';
                     glob++;
                 }
-                else if (*glob == rbrace)
-                {
+                else if (*glob == rbrace) {
                     glob++;
                     break;
                 }
@@ -187,9 +170,8 @@ namespace Helper {
         };
 
         // Translate a sequence of terms.
-        terms = [&](bool ingroup) {
-            while (*glob)
-            {
+        terms = [&](const bool ingroup) {
+            while (*glob) {
                 if (ingroup && (*glob == ',' || *glob == rbrace))
                     break;
                 if (*glob == lbracket)
@@ -198,8 +180,7 @@ namespace Helper {
                     group();
                 else if (*glob == '?' || *glob == '*')
                     wildcard();
-                else
-                {
+                else {
                     if (*glob == '\\' && glob[1])
                         glob++;
                     if (strchr("$^+*?.=!|\\()[]{}", *glob))

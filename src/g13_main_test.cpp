@@ -27,12 +27,12 @@ class MockDevice : public G13::G13_Device {
 public:
     //  G13_Device(libusb_device *dev, libusb_context *ctx,
     //             libusb_device_handle *handle, int m_id);
-    MockDevice(G13::G13_Manager& manager) : G13_Device(nullptr, nullptr, nullptr, 0) {}
+    explicit MockDevice(G13::G13_Manager& manager) : G13_Device(nullptr, nullptr, nullptr, 0) {}
 };
 
 class MockProfile : public G13::G13_Profile {
 public:
-    MockProfile(G13::G13_Device& device) : G13_Profile(device, std::string("mock")) {}
+    explicit MockProfile(G13::G13_Device& device) : G13_Profile(device, std::string("mock")) {}
 };
 
 // class MockProfile : public G13::G13_Profile {
@@ -45,10 +45,10 @@ public:
 //};
 
 TEST(G13Key, g13_key_maps_to_value) {
-    G13::G13_Manager* manager = G13::G13_Manager::Instance();
+    const G13::G13_Manager* manager = G13::G13_Manager::Instance();
 
-    EXPECT_EQ((*manager).FindG13KeyValue("G1"), 0);
-    EXPECT_EQ((*manager).FindG13KeyValue("G22"), 21);
+    EXPECT_EQ(manager->FindG13KeyValue("G1"), 0);
+    EXPECT_EQ(manager->FindG13KeyValue("G22"), 21);
     // G13::G13_Device device = MockDevice(manager);
     // G13::G13_Profile Profile = MockProfile(device);
 
@@ -60,13 +60,11 @@ TEST(G13Key, g13_key_maps_to_value) {
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
 
-    int returnValue;
-
     // Do whatever setup here you will need for your tests here
     //
     //
 
-    returnValue = RUN_ALL_TESTS();
+    const int returnValue = RUN_ALL_TESTS();
 
     // Do Your teardown here if required
     //

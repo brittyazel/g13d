@@ -10,13 +10,13 @@
 namespace G13 {
     class G13_Device;
 
-    const size_t G13_LCD_BUFFER_SIZE = 0x3c0;
-    const size_t G13_LCD_COLUMNS = 160;
-    const size_t G13_LCD_ROWS = 48;
-    const size_t G13_LCD_BYTES_PER_ROW = G13_LCD_COLUMNS / 8;
-    const size_t G13_LCD_BUF_SIZE = G13_LCD_ROWS * G13_LCD_BYTES_PER_ROW;
-    const size_t G13_LCD_TEXT_CHEIGHT = 8;
-    const size_t G13_LCD_TEXT_ROWS = 160 / G13_LCD_TEXT_CHEIGHT;
+    constexpr size_t G13_LCD_BUFFER_SIZE = 0x3c0;
+    constexpr size_t G13_LCD_COLUMNS = 160;
+    constexpr size_t G13_LCD_ROWS = 48;
+    constexpr size_t G13_LCD_BYTES_PER_ROW = G13_LCD_COLUMNS / 8;
+    constexpr size_t G13_LCD_BUF_SIZE = G13_LCD_ROWS * G13_LCD_BYTES_PER_ROW;
+    constexpr size_t G13_LCD_TEXT_CHEIGHT = 8;
+    constexpr size_t G13_LCD_TEXT_ROWS = 160 / G13_LCD_TEXT_CHEIGHT;
 
     class G13_LCD {
     public:
@@ -30,7 +30,7 @@ namespace G13 {
 
         void Image(const unsigned char* data, int size) const;
 
-        void image_send() {
+        void image_send() const {
             Image(image_buf, G13_LCD_BUF_SIZE);
         }
 
@@ -39,7 +39,7 @@ namespace G13 {
             memset(image_buf, 0, G13_LCD_BUF_SIZE);
         }
 
-        static unsigned image_byte_offset(unsigned row, unsigned col) {
+        static unsigned image_byte_offset(const unsigned row, const unsigned col) {
             return col + (row / 8) * G13_LCD_BYTES_PER_ROW * 8;
         }
 

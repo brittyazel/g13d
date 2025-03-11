@@ -124,7 +124,7 @@ namespace G13 {
         }
     }
 
-    void G13_LCD::WriteChar(char c, unsigned int row, unsigned int col) {
+    void G13_LCD::WriteChar(const char c, unsigned int row, unsigned int col) {
         if (row == static_cast<unsigned int>(-1)) {
             row = cursor_row;
             col = cursor_col;

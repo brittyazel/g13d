@@ -9,10 +9,10 @@
 
 int main(int argc, char* argv[]) {
     unsigned char c;
-    const int LEN = 256;
+    constexpr int LEN = 256;
     char s[LEN];
     std::cin.getline(s, LEN);
-    if (std::strncmp(s, "P4", 2))
+    if (std::strncmp(s, "P4", 2) != 0)
     {
         std::cerr << "input file is not .pbm (P4)" << std::endl;
         return -1;
@@ -57,8 +57,8 @@ int main(int argc, char* argv[]) {
         std::cerr << "wrong number of bytes, expected " << 160 * 43 / 8 << ", got " << i
             << std::endl;
     }
-    for (int i = 0; i < 160 * 48 / 8; i++)
+    for (i = 0; i < 160 * 48 / 8; i++)
     {
-        std::cout << std::hex << (char)buf[i];
+        std::cout << std::hex << static_cast<char>(buf[i]);
     }
 }

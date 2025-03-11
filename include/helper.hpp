@@ -52,8 +52,7 @@ namespace Helper {
         return o;
     }
 
-    template <class T>
-    inline const T& repr(const T& v) {
+    template <class T> const T& repr(const T& v) {
         return v;
     }
 
@@ -74,22 +73,18 @@ namespace Helper {
         }
     };
 
-    template <class KEYT, class VALT>
-    inline const VALT& find_or_throw(const std::map<KEYT, VALT>& m,
-                                     const KEYT& target) {
+    template <class KEYT, class VALT> const VALT& find_or_throw(const std::map<KEYT, VALT>& m,
+                              const KEYT& target) {
         auto i = m.find(target);
-        if (i == m.end())
-        {
+        if (i == m.end()) {
             throw NotFoundException();
         }
         return i->second;
     }
 
-    template <class KEYT, class VALT>
-    inline VALT& find_or_throw(std::map<KEYT, VALT>& m, const KEYT& target) {
+    template <class KEYT, class VALT> VALT& find_or_throw(std::map<KEYT, VALT>& m, const KEYT& target) {
         auto i = m.find(target);
-        if (i == m.end())
-        {
+        if (i == m.end()) {
             throw NotFoundException();
         }
         return i->second;
@@ -158,9 +153,8 @@ namespace Helper {
     }
 
     inline const char* advance_ws(CCP& source, std::string& dest) {
-        size_t l;
         source = ltrim(source);
-        l = strcspn(source, "# \t");
+        const size_t l = strcspn(source, "# \t");
         dest = std::string(source, l);
         source = !source[l] || source[l] == '#' ? "" : source + l + 1;
         return source;
@@ -180,15 +174,12 @@ namespace Helper {
     template <class STREAM_T, class MAP_T>
     STREAM_T& operator<<(STREAM_T& o, const _map_keys_out<MAP_T>& _mko) {
         bool first = true;
-        for (auto i = _mko.container.begin(); i != _mko.container.end(); i++)
-        {
-            if (first)
-            {
+        for (auto i = _mko.container.begin(); i != _mko.container.end(); ++i) {
+            if (first) {
                 first = false;
                 o << i->first;
             }
-            else
-            {
+            else {
                 o << _mko.sep << i->first;
             }
         }
@@ -196,8 +187,7 @@ namespace Helper {
     }
 
     template <class MAP_T>
-    _map_keys_out<MAP_T> map_keys_out(const MAP_T& c,
-                                      const std::string& sep = " ") {
+    _map_keys_out<MAP_T> map_keys_out(const MAP_T& c, const std::string& sep = " ") {
         return _map_keys_out<MAP_T>(c, sep);
     }
 
@@ -230,20 +220,17 @@ namespace Helper {
     template <typename Container>
     auto split(const typename Container::value_type& srcStr,
                const typename Container::value_type& delimiters,
-               split_t::empties_t empties = split_t::empties_ok) {
+               const split_t::empties_t empties = split_t::empties_ok) {
         Container result;
-        size_t current;
-        auto next = (size_t)-1;
-        do
-        {
-            if (empties == split_t::no_empties)
-            {
+        auto next = static_cast<size_t>(-1);
+        do {
+            if (empties == split_t::no_empties) {
                 next = srcStr.find_first_not_of(delimiters, next + 1);
                 if (next == Container::value_type::npos)
                     break;
                 next -= 1;
             }
-            current = next + 1;
+            size_t current = next + 1;
             next = srcStr.find_first_of(delimiters, current);
             result.push_back(srcStr.substr(current, next - current));
         }
