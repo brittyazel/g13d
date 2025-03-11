@@ -81,7 +81,7 @@ namespace G13 {
 
         void OutputPipeWrite(const std::string& out) const;
 
-        void LcdWrite(unsigned char* data, size_t size);
+        void LcdWrite(const unsigned char* data, size_t size) const;
 
         // bool is_set(int key);
 
@@ -93,7 +93,7 @@ namespace G13 {
 
         void RegisterContext(libusb_context* libusbContext);
 
-        void LcdWriteFile(const std::string& filename);
+        void LcdWriteFile(const std::string& filename) const;
 
         [[nodiscard]] G13_Font& current_font() const {
             return *m_currentFont;
@@ -122,7 +122,7 @@ namespace G13 {
     protected:
         void InitFonts();
 
-        void LcdInit();
+        void LcdInit() const;
 
         void InitCommands();
 
