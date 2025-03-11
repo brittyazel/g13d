@@ -5,8 +5,6 @@
 #ifndef G13_MANAGER_HPP
 #define G13_MANAGER_HPP
 
-#include "g13_main.hpp"
-#include "g13_action.hpp"
 #include "g13_device.hpp"
 #include "g13_keys.hpp"
 #include "g13_log.hpp"
@@ -18,14 +16,13 @@
  */
 namespace G13 {
     class G13_Manager {
-    private:
         G13_Manager();
 
         // declarations
         static bool running;
         static std::map<std::string, std::string> stringConfigValues;
         static libusb_context* libusbContext;
-        static std::vector<G13::G13_Device*> g13s;
+        static std::vector<G13_Device*> g13s;
         static libusb_hotplug_callback_handle hotplug_cb_handle[3];
         static std::map<G13_KEY_INDEX, std::string> g13_key_to_name;
         static std::map<std::string, G13_KEY_INDEX> g13_name_to_key;
@@ -41,18 +38,17 @@ namespace G13 {
         Instance(); // Singleton pattern instead of passing references around
 
         // static const std::string &getLogoFilename();
-        static void setLogoFilename(const std::string& logoFilename);
+        static void setLogoFilename(const std::string& newLogoFilename);
 
         [[nodiscard]] static int FindG13KeyValue(const std::string& keyname);
 
         [[nodiscard]] static std::string FindG13KeyName(int v);
 
-        [[nodiscard]] static G13_State_Key
-        FindInputKeyValue(const std::string& keyname, bool down = true);
+        [[nodiscard]] static G13_State_Key FindInputKeyValue(const std::string& keyname, bool down = true);
 
-        [[nodiscard]] static std::string FindInputKeyName(G13::LINUX_KEY_VALUE v);
+        [[nodiscard]] static std::string FindInputKeyName(LINUX_KEY_VALUE v);
 
-        [[nodiscard]] static LINUX_KEY_VALUE InputKeyMax(void) {
+        [[nodiscard]] static LINUX_KEY_VALUE InputKeyMax() {
             return input_key_max;
         }
 
@@ -64,7 +60,7 @@ namespace G13 {
         static void setStringConfigValue(const std::string& name,
                                          const std::string& value);
 
-        static std::string MakePipeName(G13::G13_Device* d, bool is_input);
+        static std::string MakePipeName(const G13_Device* d, bool is_input);
 
         static void start_logging();
 
@@ -84,20 +80,20 @@ namespace G13 {
 
         static void SignalHandler(int);
 
-        static void SetupDevice(G13::G13_Device* g13);
+        static void SetupDevice(G13_Device* g13);
 
-        static int LIBUSB_CALL HotplugCallbackEnumerate(struct libusb_context* ctx,
-                                                        struct libusb_device* dev,
+        static int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* ctx,
+                                                        libusb_device* dev,
                                                         libusb_hotplug_event event,
                                                         void* user_data);
 
-        static int LIBUSB_CALL HotplugCallbackInsert(struct libusb_context* ctx,
-                                                     struct libusb_device* dev,
+        static int LIBUSB_CALL HotplugCallbackInsert(libusb_context* ctx,
+                                                     libusb_device* dev,
                                                      libusb_hotplug_event event,
                                                      void* user_data);
 
-        static int LIBUSB_CALL HotplugCallbackRemove(struct libusb_context* ctx,
-                                                     struct libusb_device* dev,
+        static int LIBUSB_CALL HotplugCallbackRemove(libusb_context* ctx,
+                                                     libusb_device* dev,
                                                      libusb_hotplug_event event,
                                                      void* user_data);
 

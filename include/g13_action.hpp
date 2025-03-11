@@ -58,7 +58,7 @@ namespace G13 {
      */
     class G13_Action_Keys : public G13_Action {
     public:
-        G13_Action_Keys(G13_Device& keypad, const std::string& keys);
+        G13_Action_Keys(G13_Device& keypad, const std::string& keys_string);
         ~G13_Action_Keys() override;
 
         void act(G13_Device&, bool is_down) override;

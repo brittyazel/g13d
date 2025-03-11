@@ -28,8 +28,8 @@
  *
  */
 
-#ifndef __HELPER_HPP__
-#define __HELPER_HPP__
+#ifndef HELPER_HPP_
+#define HELPER_HPP_
 
 #include <string>
 #include <cstring>
@@ -206,7 +206,7 @@ namespace Helper {
     // This is from http://www.cplusplus.com/faq/sequences/strings/split
     // TODO: decltype
 
-    struct split {
+    struct split_t {
         enum empties_t { empties_ok, no_empties };
     };
 
@@ -216,7 +216,7 @@ namespace Helper {
                      const typename Container::value_type& srcStr,
                      const typename Container::value_type& delimiters,
                      split::empties_t empties = split::empties_ok) {
-    
+
         Container result = split(srcStr,delimiters,empties);
         std::swap(target,result);
         return target;
@@ -230,13 +230,13 @@ namespace Helper {
     template <typename Container>
     auto split(const typename Container::value_type& srcStr,
                const typename Container::value_type& delimiters,
-               split::empties_t empties = split::empties_ok) {
+               split_t::empties_t empties = split_t::empties_ok) {
         Container result;
         size_t current;
         auto next = (size_t)-1;
         do
         {
-            if (empties == split::no_empties)
+            if (empties == split_t::no_empties)
             {
                 next = srcStr.find_first_not_of(delimiters, next + 1);
                 if (next == Container::value_type::npos)
@@ -266,4 +266,4 @@ namespace Helper {
 
 // *************************************************************************
 
-#endif // __HELPER_HPP__
+#endif // HELPER_HPP_
