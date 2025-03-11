@@ -5,7 +5,6 @@
 #define G13_DEVICE_HPP
 
 #include "g13_lcd.hpp"
-#include "g13_manager.hpp"
 #include "g13_profile.hpp"
 #include "g13_stick.hpp"
 #include <functional>
@@ -29,7 +28,7 @@ namespace G13 {
     typedef std::shared_ptr<G13_Action> G13_ActionPtr;
     typedef std::shared_ptr<G13_Font> FontPtr;
 
-    const size_t G13_NUM_KEYS = 40;
+    constexpr size_t G13_NUM_KEYS = 40;
 
     class G13_Device {
     public:
@@ -53,7 +52,7 @@ namespace G13 {
 
         void SwitchToProfile(const std::string& name);
 
-        std::vector<std::string> FilteredProfileNames(const std::regex& pattern);
+        [[nodiscard]] std::vector<std::string> FilteredProfileNames(const std::regex& pattern) const;
 
         ProfilePtr Profile(const std::string& name);
 
@@ -74,9 +73,9 @@ namespace G13 {
 
         G13_ActionPtr MakeAction(const std::string& action);
 
-        void SetKeyColor(int red, int green, int blue);
+        void SetKeyColor(int red, int green, int blue) const;
 
-        void SetModeLeds(int leds);
+        void SetModeLeds(int leds) const;
 
         void SendEvent(int type, int code, int val);
 
@@ -89,14 +88,14 @@ namespace G13 {
         bool update(int key, bool v);
 
         // used by G13_Manager
-        void Cleanup();
+        void Cleanup() const;
 
 
         void RegisterContext(libusb_context* libusbContext);
 
         void LcdWriteFile(const std::string& filename);
 
-        G13_Font& current_font() {
+        [[nodiscard]] G13_Font& current_font() const {
             return *m_currentFont;
         }
 
@@ -118,7 +117,7 @@ namespace G13 {
                 }
         */
         // libusb_device_handle *Handle() const;
-        libusb_device* Device() const;
+        [[nodiscard]] libusb_device* Device() const;
 
     protected:
         void InitFonts();
@@ -131,7 +130,7 @@ namespace G13 {
         CommandFunctionTable _command_table;
 
         // struct timeval _event_time;
-        struct input_event m_event{};
+        input_event m_event{};
 
         int m_id_within_manager;
         libusb_context* m_ctx;
@@ -166,8 +165,8 @@ namespace G13 {
     }
     */
 
-    inline bool G13_Device::update(int key, bool v) {
-        bool old = keys[key];
+    inline bool G13_Device::update(const int key, const bool v) {
+        const bool old = keys[key];
         keys[key] = v;
         return old != v;
     }
