@@ -368,34 +368,28 @@ namespace G13 {
 
     G13_Font::G13_Font() : m_name("default"), m_width(8) {}
 
-    G13_Font::G13_Font(std::string name, unsigned int width)
+    G13_Font::G13_Font(std::string name, const unsigned int width)
         : m_name(std::move(name)), m_width(width) {}
 
-    void G13_FontChar::SetCharacter(unsigned char* data, unsigned int width,
-                                    unsigned flags) {
+    void G13_FontChar::SetCharacter(const unsigned char* data, const unsigned int width,
+                                    const unsigned flags) {
         unsigned char* dest = bits_regular;
         memset(dest, 0, CHAR_BUF_SIZE);
-        if (flags & FF_ROTATE)
-        {
-            for (unsigned int x = 0; x < width; x++)
-            {
-                unsigned char x_mask = (unsigned char)1u << x;
-                for (unsigned int y = 0; y < 8; y++)
-                {
+        if (flags & FF_ROTATE) {
+            for (unsigned int x = 0; x < width; x++) {
+                const unsigned char x_mask = static_cast<unsigned char>(1u) << x;
+                for (unsigned int y = 0; y < 8; y++) {
                     // unsigned char y_mask = 1 << y;
-                    if (data[y] & x_mask)
-                    {
+                    if (data[y] & x_mask) {
                         dest[x] |= 1u << y;
                     }
                 }
             }
         }
-        else
-        {
+        else {
             memcpy(dest, data, (size_t)width);
         }
-        for (unsigned int x = 0; x < width; x++)
-        {
+        for (unsigned int x = 0; x < width; x++) {
             bits_inverted[x] = ~dest[x];
         }
     }
@@ -406,9 +400,8 @@ namespace G13 {
     }
 
     template <class ARRAY_T, class FLAGST>
-    void G13_Font::InstallFont(ARRAY_T& data, FLAGST flags, int first) {
-        for (size_t i = 0; i < GetFontCharacterCount(data); i++)
-        {
+    void G13_Font::InstallFont(ARRAY_T& data, FLAGST flags, const int first) {
+        for (size_t i = 0; i < GetFontCharacterCount(data); i++) {
             m_chars[i + first].SetCharacter(&data[i][0], m_width, flags);
         }
     }
@@ -419,7 +412,7 @@ namespace G13 {
 
         m_currentFont->InstallFont(font8x8_basic, G13_FontChar::FF_ROTATE, 0);
 
-        FontPtr fiveXeight(new G13_Font("5x8", 5));
+        const FontPtr fiveXeight(new G13_Font("5x8", 5));
         fiveXeight->InstallFont(font5x8, 0, 32);
         pFonts[fiveXeight->name()] = fiveXeight;
     }

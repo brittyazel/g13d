@@ -57,15 +57,13 @@ namespace G13 {
         [[nodiscard]] static std::string
         getStringConfigValue(const std::string& name);
 
-        static void setStringConfigValue(const std::string& name,
-                                         const std::string& value);
+        static void setStringConfigValue(const std::string& name, const std::string& value);
 
         static std::string MakePipeName(const G13_Device* d, bool is_input);
 
         static void start_logging();
 
-        [[maybe_unused]] static void
-        SetLogLevel(log4cpp::Priority::PriorityLevel lvl);
+        [[maybe_unused]] static void SetLogLevel(log4cpp::Priority::PriorityLevel lvl);
 
         static void SetLogLevel(const std::string& level);
 
@@ -82,20 +80,14 @@ namespace G13 {
 
         static void SetupDevice(G13_Device* g13);
 
-        static int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* ctx,
-                                                        libusb_device* dev,
-                                                        libusb_hotplug_event event,
-                                                        void* user_data);
+        static int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* ctx, libusb_device* dev,
+                                                        libusb_hotplug_event event, void* user_data);
 
-        static int LIBUSB_CALL HotplugCallbackInsert(libusb_context* ctx,
-                                                     libusb_device* dev,
-                                                     libusb_hotplug_event event,
-                                                     void* user_data);
+        static int LIBUSB_CALL HotplugCallbackInsert(libusb_context* ctx, libusb_device* dev,
+                                                     libusb_hotplug_event event, void* user_data);
 
-        static int LIBUSB_CALL HotplugCallbackRemove(libusb_context* ctx,
-                                                     libusb_device* dev,
-                                                     libusb_hotplug_event event,
-                                                     void* user_data);
+        static int LIBUSB_CALL HotplugCallbackRemove(libusb_context* ctx, libusb_device* dev,
+                                                     libusb_hotplug_event event, void* user_data);
 
         static int OpenAndAddG13(libusb_device* dev);
 
