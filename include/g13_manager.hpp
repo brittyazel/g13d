@@ -34,8 +34,7 @@ namespace G13 {
         static const int class_id;
 
     public:
-        static G13_Manager*
-        Instance(); // Singleton pattern instead of passing references around
+        static G13_Manager* Instance(); // Singleton pattern instead of passing references around
 
         // static const std::string &getLogoFilename();
         static void setLogoFilename(const std::string& newLogoFilename);
