@@ -99,8 +99,7 @@ namespace G13 {
     template <class PARENT_T>
     class G13_Actionable {
     public:
-        G13_Actionable(PARENT_T& parent_arg, std::string name)
-            : _name(std::move(name)), _parent_ptr(&parent_arg) {}
+        G13_Actionable(PARENT_T& parent_arg, std::string name) : _name(std::move(name)), _parent_ptr(&parent_arg) {}
 
         virtual ~G13_Actionable() {
             _parent_ptr = nullptr;
@@ -158,13 +157,13 @@ namespace G13 {
         // G13_Profile is the only class able to instantiate G13_Keys
         friend class G13_Profile;
 
-        G13_Key(G13_Profile& mode, const std::string& name, const int index)
-            : G13_Actionable(mode, name), _index(index), _should_parse(true) {}
+        G13_Key(G13_Profile& mode, const std::string& name, const int index) : G13_Actionable(mode, name),
+                                                                               _index(index), _should_parse(true) {}
 
-        G13_Key(G13_Profile& mode, const G13_Key& key)
-            : G13_Actionable(mode, key.name()), _index(key._index), _should_parse(key._should_parse) {
-            G13_Actionable::set_action(
-                key.action()); // TODO: do not invoke virtual member function from ctor
+        G13_Key(G13_Profile& mode, const G13_Key& key) : G13_Actionable(mode, key.name()), _index(key._index),
+                                                         _should_parse(key._should_parse) {
+            // TODO: do not invoke virtual member function from ctor
+            G13_Actionable::set_action(key.action());
         }
 
         KeyIndex _index;
@@ -175,8 +174,7 @@ namespace G13 {
 
     class G13_StickZone final : public G13_Actionable<G13_Stick> {
     public:
-        G13_StickZone(G13_Stick&, const std::string& name, const G13_ZoneBounds&,
-                      const G13_ActionPtr& = nullptr);
+        G13_StickZone(G13_Stick&, const std::string& name, const G13_ZoneBounds&, const G13_ActionPtr& = nullptr);
 
         bool operator==(const G13_StickZone& other) const {
             return _name == other._name;

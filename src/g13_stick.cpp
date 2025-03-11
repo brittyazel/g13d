@@ -8,12 +8,12 @@ namespace G13 {
         m_stick.ParseJoystick(buf);
     }
 
-    G13_Stick::G13_Stick(G13_Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255),
-                                               m_center_pos(127, 127), m_north_pos(127, 0) {
+    G13_Stick::G13_Stick(G13_Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255), m_center_pos(127, 127),
+                                               m_north_pos(127, 0) {
         m_stick_mode = STICK_KEYS;
 
-        auto add_zone = [this, &keypad](const std::string& name, const double x1, const double y1,
-                                        const double x2, const double y2) {
+        auto add_zone = [this, &keypad](const std::string& name, const double x1, const double y1, const double x2,
+                                        const double y2) {
             m_zones.emplace_back(*this, "STICK_" + name, G13_ZoneBounds(x1, y1, x2, y2),
                                  std::static_pointer_cast<G13_Action>(
                                      std::make_shared<G13_Action_Keys>(keypad, "KEY_" + name)));
@@ -43,17 +43,19 @@ namespace G13 {
     std::vector<std::string> G13_Stick::FilteredZoneNames(const std::regex& pattern) const {
         std::vector<std::string> names;
 
-        for (const auto& zone : m_zones)
-            if (std::regex_match(zone.name(), pattern))
+        for (const auto& zone : m_zones) {
+            if (std::regex_match(zone.name(), pattern)) {
                 names.emplace_back(zone.name());
+            }
+        }
         return names;
     }
 
     void G13_Stick::set_mode(const stick_mode_t m) {
-        if (m == m_stick_mode)
+        if (m == m_stick_mode) {
             return;
-        if (m_stick_mode == STICK_CALCENTER || m_stick_mode == STICK_CALBOUNDS ||
-            m_stick_mode == STICK_CALNORTH) {
+        }
+        if (m_stick_mode == STICK_CALCENTER || m_stick_mode == STICK_CALBOUNDS || m_stick_mode == STICK_CALNORTH) {
             RecalcCalibrated();
         }
         m_stick_mode = m;
@@ -111,10 +113,9 @@ namespace G13 {
         }
     }
 
-    G13_StickZone::G13_StickZone(G13_Stick& stick, const std::string& name,
-                                 const G13_ZoneBounds& b,
-                                 const G13_ActionPtr& action)
-        : G13_Actionable(stick, name), _bounds(b), _active(false) {
+    G13_StickZone::G13_StickZone(G13_Stick& stick, const std::string& name, const G13_ZoneBounds& b,
+                                 const G13_ActionPtr& action) : G13_Actionable(stick, name), _bounds(b),
+                                                                _active(false) {
         G13_Actionable::set_action(action); // Call to virtual from ctor!
     }
 
@@ -163,9 +164,9 @@ namespace G13 {
             dy = 1.0 - dy;
         }
 
-        G13_DBG("x=" << m_current_pos.x << " y=" << m_current_pos.y << " dx=" << dx
-            << " dy=" << dy);
+        G13_DBG("x=" << m_current_pos.x << " y=" << m_current_pos.y << " dx=" << dx << " dy=" << dy);
         const G13_ZoneCoord jpos(dx, dy);
+
         if (m_stick_mode == STICK_ABSOLUTE) {
             _keypad.SendEvent(EV_ABS, ABS_X, m_current_pos.x);
             _keypad.SendEvent(EV_ABS, ABS_Y, m_current_pos.y);

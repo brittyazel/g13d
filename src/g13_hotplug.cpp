@@ -33,16 +33,14 @@ namespace G13 {
         libusb_device_handle* handle;
         int error = libusb_open(dev, &handle);
         if (error != LIBUSB_SUCCESS) {
-            G13_ERR("Error opening G13 device: "
-                << G13_Device::DescribeLibusbErrorCode(error));
+            G13_ERR("Error opening G13 device: " << G13_Device::DescribeLibusbErrorCode(error));
             return 1;
         }
 
         libusb_set_auto_detach_kernel_driver(handle, true);
         error = libusb_claim_interface(handle, 0);
         if (error != LIBUSB_SUCCESS) {
-            G13_ERR("Cannot Claim Interface: "
-                << G13_Device::DescribeLibusbErrorCode(error));
+            G13_ERR("Cannot Claim Interface: " << G13_Device::DescribeLibusbErrorCode(error));
         }
         if (error == LIBUSB_ERROR_BUSY) {
             if (libusb_kernel_driver_active(handle, 0) == 1) {
@@ -50,8 +48,7 @@ namespace G13 {
                     G13_ERR("Kernel driver detached");
                 }
                 error = libusb_claim_interface(handle, 0);
-                G13_ERR("Still cannot claim Interface: "
-                    << G13_Device::DescribeLibusbErrorCode(error));
+                G13_ERR("Still cannot claim Interface: " << G13_Device::DescribeLibusbErrorCode(error));
             }
         }
 
@@ -132,34 +129,28 @@ namespace G13 {
         G13_DBG("Registering USB hotplug callbacks");
 
         // For currently attached devices
-        int error = libusb_hotplug_register_callback(
-            libusbContext, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
-            LIBUSB_HOTPLUG_ENUMERATE, G13_VENDOR_ID, G13_PRODUCT_ID, class_id,
-            HotplugCallbackEnumerate, nullptr, &hotplug_cb_handle[0]);
+        int error = libusb_hotplug_register_callback(libusbContext, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
+                                                     LIBUSB_HOTPLUG_ENUMERATE, G13_VENDOR_ID, G13_PRODUCT_ID, class_id,
+                                                     HotplugCallbackEnumerate, nullptr, &hotplug_cb_handle[0]);
         if (error != LIBUSB_SUCCESS) {
-            G13_ERR("Error registering hotplug enumeration callback: "
-                << G13_Device::DescribeLibusbErrorCode(error));
+            G13_ERR("Error registering hotplug enumeration callback: " << G13_Device::DescribeLibusbErrorCode(error));
         }
 
         // For future devices
-        error = libusb_hotplug_register_callback(
-            libusbContext, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
-            LIBUSB_HOTPLUG_NO_FLAGS, G13_VENDOR_ID, G13_PRODUCT_ID, class_id,
-            HotplugCallbackInsert, nullptr, &hotplug_cb_handle[1]);
+        error = libusb_hotplug_register_callback(libusbContext, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
+                                                 LIBUSB_HOTPLUG_NO_FLAGS, G13_VENDOR_ID, G13_PRODUCT_ID, class_id,
+                                                 HotplugCallbackInsert, nullptr, &hotplug_cb_handle[1]);
         if (error != LIBUSB_SUCCESS) {
-            G13_ERR("Error registering hotplug insertion callback: "
-                << G13_Device::DescribeLibusbErrorCode(error));
+            G13_ERR("Error registering hotplug insertion callback: " << G13_Device::DescribeLibusbErrorCode(error));
         }
 
         // For disconnected devices
         error = libusb_hotplug_register_callback(libusbContext, LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
                                                  LIBUSB_HOTPLUG_NO_FLAGS, G13_VENDOR_ID, G13_PRODUCT_ID, class_id,
-                                                 HotplugCallbackRemove,
-                                                 nullptr, &hotplug_cb_handle[2]);
+                                                 HotplugCallbackRemove, nullptr, &hotplug_cb_handle[2]);
 
         if (error != LIBUSB_SUCCESS) {
-            G13_ERR("Error registering hotplug removal callback: "
-                << G13_Device::DescribeLibusbErrorCode(error));
+            G13_ERR("Error registering hotplug removal callback: " << G13_Device::DescribeLibusbErrorCode(error));
         }
     }
 } // namespace G13

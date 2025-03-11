@@ -73,19 +73,13 @@ int main(const int argc, char* argv[]) {
 void printHelp() {
     constexpr auto indent = 24;
     std::cout << "Allowed options" << std::endl;
-    std::cout << std::left << std::setw(indent) << "  --help"
-        << "produce help message" << std::endl;
-    std::cout << std::left << std::setw(indent) << "  --logo <file>"
-        << "set logo from file" << std::endl;
-    std::cout << std::left << std::setw(indent) << "  --config <file>"
-        << "load config commands from file" << std::endl;
-    std::cout << std::left << std::setw(indent) << "  --pipe_in <name>"
-        << "specify name for input pipe" << std::endl;
-    std::cout << std::left << std::setw(indent) << "  --pipe_out <name>"
-        << "specify name for output pipe" << std::endl;
-    std::cout << std::left << std::setw(indent) << "  --umask <octal>"
-        << "specify umask for pipes creation" << std::endl;
-    std::cout << std::left << std::setw(indent) << "  --log_level <level>"
-        << "logging level" << std::endl;
+    std::cout << std::left << std::setw(indent) << "  --help" << "produce help message" << std::endl;
+    std::cout << std::left << std::setw(indent) << "  --logo <file>" << "set logo from file" << std::endl;
+    std::cout << std::left << std::setw(indent) << "  --config <file>" << "load config commands from file" << std::endl;
+    std::cout << std::left << std::setw(indent) << "  --pipe_in <name>" << "specify name for input pipe" << std::endl;
+    std::cout << std::left << std::setw(indent) << "  --pipe_out <name>" << "specify name for output pipe" << std::endl;
+    std::cout << std::left << std::setw(indent) << "  --umask <octal>" << "specify umask for pipes creation" <<
+        std::endl;
+    std::cout << std::left << std::setw(indent) << "  --log_level <level>" << "logging level" << std::endl;
     exit(1);
 }

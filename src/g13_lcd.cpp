@@ -37,20 +37,22 @@ namespace G13 {
 
     void G13_Device::LcdWrite(const unsigned char* data, const size_t size) const {
         if (size != G13_LCD_BUFFER_SIZE) {
-            G13_LOG(log4cpp::Priority::ERROR << "Invalid LCD data size " << size
-                << ", should be " << G13_LCD_BUFFER_SIZE);
+            G13_LOG(
+                log4cpp::Priority::ERROR << "Invalid LCD data size " << size << ", should be " << G13_LCD_BUFFER_SIZE);
             return;
         }
+
         unsigned char buffer[G13_LCD_BUFFER_SIZE + 32] = {};
         buffer[0] = 0x03;
         memcpy(buffer + 32, data, G13_LCD_BUFFER_SIZE);
         int bytes_written;
-        const int error = libusb_interrupt_transfer(
-            handle, LIBUSB_ENDPOINT_OUT | G13_LCD_ENDPOINT, buffer,
-            G13_LCD_BUFFER_SIZE + 32, &bytes_written, 1000);
+
+        const int error = libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_OUT | G13_LCD_ENDPOINT, buffer,
+                                                    G13_LCD_BUFFER_SIZE + 32, &bytes_written, 1000);
+
         if (error) {
-            G13_LOG(log4cpp::Priority::ERROR << "Error when transferring image: "
-                << DescribeLibusbErrorCode(error) << ", "
+            G13_LOG(
+                log4cpp::Priority::ERROR << "Error when transferring image: " << DescribeLibusbErrorCode(error) << ", "
                 << bytes_written << " bytes written");
         }
     }
@@ -137,17 +139,14 @@ namespace G13 {
             }
         }
 
-        const unsigned offset =
-            image_byte_offset(row * G13_LCD_TEXT_CHEIGHT,
-                              col); //*m_keypad.m_currentFont->m_width );
+        const unsigned offset = image_byte_offset(row * G13_LCD_TEXT_CHEIGHT, col);
+
         if (text_mode) {
-            memcpy(&image_buf[offset],
-                   &m_keypad.current_font().char_data(c).bits_inverted,
+            memcpy(&image_buf[offset], &m_keypad.current_font().char_data(c).bits_inverted,
                    m_keypad.current_font().width());
         }
         else {
-            memcpy(&image_buf[offset],
-                   &m_keypad.current_font().char_data(c).bits_regular,
+            memcpy(&image_buf[offset], &m_keypad.current_font().char_data(c).bits_regular,
                    m_keypad.current_font().width());
         }
     }

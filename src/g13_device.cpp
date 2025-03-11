@@ -19,8 +19,8 @@ namespace G13 {
     // *************************************************************************
 
     G13_Device::G13_Device(libusb_device* dev, libusb_context* ctx, libusb_device_handle* handle, const int m_id)
-        : m_id_within_manager(m_id), m_ctx(ctx), m_uinput_fid(-1),
-          m_lcd(*this), m_stick(*this), handle(handle), device(dev) {
+        : m_id_within_manager(m_id), m_ctx(ctx), m_uinput_fid(-1), m_lcd(*this), m_stick(*this), handle(handle),
+          device(dev) {
         m_currentProfile = std::make_shared<G13_Profile>(*this, "default");
         m_profiles["default"] = m_currentProfile;
 
@@ -59,12 +59,11 @@ namespace G13 {
 
     int G13CreateUinput(G13_Device* g13) {
         uinput_user_dev uinp{};
-        const char* dev_uinput_fname =
-            access("/dev/input/uinput", F_OK) == 0
-                ? "/dev/input/uinput"
-                : access("/dev/uinput", F_OK) == 0
-                ? "/dev/uinput"
-                : nullptr;
+        const char* dev_uinput_fname = access("/dev/input/uinput", F_OK) == 0
+                                           ? "/dev/input/uinput"
+                                           : access("/dev/uinput", F_OK) == 0
+                                           ? "/dev/uinput"
+                                           : nullptr;
         if (!dev_uinput_fname) {
             G13_ERR("Could not find an uinput device");
             return -1;
@@ -145,12 +144,11 @@ namespace G13 {
     void G13_Device::SetModeLeds(const int leds) const {
         unsigned char usb_data[] = {5, 0, 0, 0, 0};
         usb_data[1] = leds;
-        const int error = libusb_control_transfer(
-            handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) | static_cast<uint8_t>(LIBUSB_RECIPIENT_INTERFACE),
-            9, 0x305, 0, usb_data, 5, 1000);
+        const int error = libusb_control_transfer(handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) |
+                                                  static_cast<uint8_t>(LIBUSB_RECIPIENT_INTERFACE), 9, 0x305, 0,
+                                                  usb_data, 5, 1000);
         if (error != 5) {
             G13_ERR("Problem setting mode LEDs: " + DescribeLibusbErrorCode(error));
-            return;
         }
     }
 
@@ -160,12 +158,11 @@ namespace G13 {
         usb_data[2] = green;
         usb_data[3] = blue;
 
-        const int error = libusb_control_transfer(
-            handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) | static_cast<uint8_t>(LIBUSB_RECIPIENT_INTERFACE),
-            9, 0x307, 0, usb_data, 5, 1000);
+        const int error = libusb_control_transfer(handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) |
+                                                  static_cast<uint8_t>(LIBUSB_RECIPIENT_INTERFACE), 9, 0x307, 0,
+                                                  usb_data, 5, 1000);
         if (error != 5) {
             G13_ERR("Problem changing color: " + DescribeLibusbErrorCode(error));
-            return;
         }
     }
 
@@ -175,9 +172,8 @@ namespace G13 {
     int G13_Device::ReadKeypresses() {
         unsigned char buffer[G13_REPORT_SIZE];
         int size = 0;
-        const int error =
-            libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_IN | G13_KEY_ENDPOINT,
-                                      buffer, G13_REPORT_SIZE, &size, 100);
+        const int error = libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_IN | G13_KEY_ENDPOINT, buffer,
+                                                    G13_REPORT_SIZE, &size, 100);
 
         if (error && error != LIBUSB_ERROR_TIMEOUT) {
             G13_ERR("Error while reading keys: " << DescribeLibusbErrorCode(error));
@@ -225,17 +221,19 @@ namespace G13 {
         std::string fn(filepath);
 
         // Check for load recursion.
-        for (auto& f : m_filesLoading)
+        for (auto& f : m_filesLoading) {
             if (f == fn) {
                 G13_ERR(filename << " loading recursion");
                 return;
             }
+        }
 
         in_use autoclean(this, fn);
 
-        if (std::ifstream s(fn); s.fail())
+        if (std::ifstream s(fn); s.fail()) {
             G13_LOG(log4cpp::Priority::ERROR << strerror(errno));
-        else
+        }
+        else {
             while (s.good()) {
                 // grab a line
                 char buf[1024];
@@ -246,6 +244,7 @@ namespace G13 {
                 // send it
                 Command(buf, info);
             }
+        }
     }
 
     void G13_Device::ReadConfigFile(const std::string& filename) {
@@ -269,14 +268,13 @@ namespace G13 {
 
             if (ret < 0) {}
             // Read error: should not occur after successful select().
-            else if (ret + end ==
-                960) {
+            else if (ret + end == 960) {
                 // TODO probably image, for now, don't test, just assume image
                 lcd().Image(reinterpret_cast<unsigned char*>(buf), ret + end);
             }
             else {
                 size_t beg = 0;
-                for (ret += end; end < static_cast<size_t>(ret); end++)
+                for (ret += end; end < static_cast<size_t>(ret); end++) {
                     if (buf[end] == '\r' || buf[end] == '\n') {
                         if (end != beg) {
                             buf[end] = '\0';
@@ -284,9 +282,12 @@ namespace G13 {
                         }
                         beg = end + 1;
                     }
+                }
                 m_input_pipe_fifo.clear();
-                if (ret - beg < sizeof buf) // Drop too long lines.
+                if (ret - beg < sizeof buf) {
+                    // Drop too long lines.
                     m_input_pipe_fifo = std::string(buf + beg, ret - beg);
+                }
             }
         }
     }
@@ -362,12 +363,10 @@ namespace G13 {
     }
 
     struct commandAdder {
-        commandAdder(G13_Device::CommandFunctionTable& t, const char* name)
-            : _t(t), _name(name) {}
+        commandAdder(G13_Device::CommandFunctionTable& t, const char* name) : _t(t), _name(name) {}
 
         commandAdder(G13_Device::CommandFunctionTable& t, const char* name,
-                     G13_Device::COMMAND_FUNCTION f)
-            : _t(t), _name(name) {
+                     G13_Device::COMMAND_FUNCTION f) : _t(t), _name(name) {
             _t[_name] = std::move(f);
         }
 
@@ -409,10 +408,14 @@ namespace G13 {
             const char* rawaction = ltrim(remainder);
             advance_ws(remainder, action);
             advance_ws(remainder, actionup);
-            if (!action.empty() && strchr("!>", action[0]))
+
+            if (!action.empty() && strchr("!>", action[0])) {
                 action = std::string(rawaction);
-            else if (!actionup.empty())
+            }
+            else if (!actionup.empty()) {
                 action += std::string(" ") + actionup;
+            }
+
             try {
                 if (const auto key = m_currentProfile->FindKey(keyname)) {
                     key->set_action(MakeAction(action));
@@ -424,20 +427,18 @@ namespace G13 {
                     G13_ERR("bind key " << keyname << " unknown");
                     return;
                 }
-                G13_LOG(log4cpp::Priority::DEBUG << "bind " << keyname << " [" << action
-                    << "]");
+                G13_LOG(log4cpp::Priority::DEBUG << "bind " << keyname << " [" << action << "]");
             }
             catch (const std::exception& ex) {
                 G13_ERR("bind " << keyname << " " << action << " failed : " << ex.what());
             }
         });
 
-        commandAdder add_profile(
-            _command_table, "profile", [this](const char* remainder) {
-                std::string profile;
-                advance_ws(remainder, profile);
-                SwitchToProfile(profile);
-            });
+        commandAdder add_profile(_command_table, "profile", [this](const char* remainder) {
+            std::string profile;
+            advance_ws(remainder, profile);
+            SwitchToProfile(profile);
+        });
 
         commandAdder add_font(_command_table, "font", [this](const char* remainder) {
             std::string font;
@@ -483,59 +484,57 @@ namespace G13 {
             }
         });
 
-        commandAdder add_stickmode(
-            _command_table, "stickmode", [this](const char* remainder) {
-                std::string mode;
-                advance_ws(remainder, mode);
-                // TODO: this could be part of a G13::Constants class I think
-                const std::string modes[] = {"ABSOLUTE", "KEYS", "CALCENTER", "CALBOUNDS", "CALNORTH"};
-                int index = 0;
-                for (auto& test : modes) {
-                    if (test == mode) {
-                        m_stick.set_mode(static_cast<stick_mode_t>(index));
-                        return;
-                    }
-                    index++;
+        commandAdder add_stickmode(_command_table, "stickmode", [this](const char* remainder) {
+            std::string mode;
+            advance_ws(remainder, mode);
+            // TODO: this could be part of a G13::Constants class I think
+            const std::string modes[] = {"ABSOLUTE", "KEYS", "CALCENTER", "CALBOUNDS", "CALNORTH"};
+            int index = 0;
+            for (auto& test : modes) {
+                if (test == mode) {
+                    m_stick.set_mode(static_cast<stick_mode_t>(index));
+                    return;
                 }
-                G13_ERR("unknown stick mode : <" << mode << ">");
-            });
+                index++;
+            }
+            G13_ERR("unknown stick mode : <" << mode << ">");
+        });
 
-        commandAdder add_stickzone(
-            _command_table, "stickzone", [this](const char* remainder) {
-                std::string operation, zonename;
-                advance_ws(remainder, operation);
-                advance_ws(remainder, zonename);
-                if (operation == "add") {
-                    /* G13_StickZone* zone = */
-                    m_stick.zone(zonename, true);
+        commandAdder add_stickzone(_command_table, "stickzone", [this](const char* remainder) {
+            std::string operation, zonename;
+            advance_ws(remainder, operation);
+            advance_ws(remainder, zonename);
+            if (operation == "add") {
+                /* G13_StickZone* zone = */
+                m_stick.zone(zonename, true);
+            }
+            else {
+                G13_StickZone* zone = m_stick.zone(zonename);
+                if (!zone) {
+                    throw G13_CommandException("unknown stick zone");
+                }
+                if (operation == "action") {
+                    zone->set_action(MakeAction(remainder));
+                }
+                else if (operation == "bounds") {
+                    char* endptr;
+                    const double x1 = strtod(remainder, &endptr);
+                    const double y1 = strtod(endptr, &endptr);
+                    const double x2 = strtod(endptr, &endptr);
+                    const double y2 = strtod(endptr, nullptr);
+                    if (endptr == remainder) {
+                        throw G13_CommandException("bad bounds format");
+                    }
+                    zone->set_bounds(G13_ZoneBounds(x1, y1, x2, y2));
+                }
+                else if (operation == "del") {
+                    m_stick.RemoveZone(*zone);
                 }
                 else {
-                    G13_StickZone* zone = m_stick.zone(zonename);
-                    if (!zone) {
-                        throw G13_CommandException("unknown stick zone");
-                    }
-                    if (operation == "action") {
-                        zone->set_action(MakeAction(remainder));
-                    }
-                    else if (operation == "bounds") {
-                        char* endptr;
-                        const double x1 = strtod(remainder, &endptr);
-                        const double y1 = strtod(endptr, &endptr);
-                        const double x2 = strtod(endptr, &endptr);
-                        const double y2 = strtod(endptr, nullptr);
-                        if (endptr == remainder) {
-                            throw G13_CommandException("bad bounds format");
-                        }
-                        zone->set_bounds(G13_ZoneBounds(x1, y1, x2, y2));
-                    }
-                    else if (operation == "del") {
-                        m_stick.RemoveZone(*zone);
-                    }
-                    else {
-                        G13_ERR("unknown stickzone operation: <" << operation << ">");
-                    }
+                    G13_ERR("unknown stickzone operation: <" << operation << ">");
                 }
-            });
+            }
+        });
 
         commandAdder add_dump(_command_table, "dump", [this](const char* remainder) {
             std::string target;
@@ -554,69 +553,64 @@ namespace G13 {
             }
         });
 
-        commandAdder add_log_level(_command_table, "log_level",
-                                   [this](const char* remainder) {
-                                       std::string level;
-                                       advance_ws(remainder, level);
-                                       G13_Manager::SetLogLevel(level);
-                                   });
+        commandAdder add_log_level(_command_table, "log_level", [this](const char* remainder) {
+            std::string level;
+            advance_ws(remainder, level);
+            G13_Manager::SetLogLevel(level);
+        });
 
-        commandAdder add_refresh(_command_table, "refresh",
-                                 [this](const char* remainder) {
-                                     lcd().image_send();
-                                 });
+        commandAdder add_refresh(_command_table, "refresh", [this](const char* remainder) {
+            lcd().image_send();
+        });
 
-        commandAdder add_clear(_command_table, "clear",
-                               [this](const char* remainder) {
-                                   lcd().image_clear();
-                                   lcd().image_send();
-                               });
+        commandAdder add_clear(_command_table, "clear", [this](const char* remainder) {
+            lcd().image_clear();
+            lcd().image_send();
+        });
 
-        commandAdder add_delete(_command_table, "delete",
-                                [this](const char* remainder) {
-                                    std::string target;
-                                    std::string glob;
-                                    bool found = false;
-                                    advance_ws(remainder, target);
-                                    advance_ws(remainder, glob);
-                                    const std::regex re(glob2regex(glob.c_str()));
+        commandAdder add_delete(_command_table, "delete", [this](const char* remainder) {
+            std::string target;
+            std::string glob;
+            bool found = false;
+            advance_ws(remainder, target);
+            advance_ws(remainder, glob);
+            const std::regex re(glob2regex(glob.c_str()));
 
-                                    if (target == "profile") {
-                                        for (auto& profile : FilteredProfileNames(re)) {
-                                            m_profiles.erase(profile);
-                                            G13_OUT("profile " << profile << " deleted");
-                                            found = true;
-                                        }
-                                    }
-                                    else if (target == "key") {
-                                        for (const auto& key : m_currentProfile->FilteredKeyNames(re)) {
-                                            m_currentProfile->FindKey(key)->set_action(nullptr);
-                                            G13_OUT("key " << key << " unbound");
-                                            found = true;
-                                        }
-                                    }
-                                    else if (target == "zone") {
-                                        for (auto& zone : m_stick.FilteredZoneNames(re)) {
-                                            m_stick.RemoveZone(*m_stick.zone(zone));
-                                            G13_OUT("stickzone " << zone << " unbound");
-                                            found = true;
-                                        }
-                                    }
-                                    else {
-                                        G13_ERR("unknown delete target: <" << target << ">");
-                                        found = true;
-                                    }
-                                    if (!found) {
-                                        G13_OUT("no " << target << " name matches <" << glob << ">");
-                                    }
-                                });
+            if (target == "profile") {
+                for (auto& profile : FilteredProfileNames(re)) {
+                    m_profiles.erase(profile);
+                    G13_OUT("profile " << profile << " deleted");
+                    found = true;
+                }
+            }
+            else if (target == "key") {
+                for (const auto& key : m_currentProfile->FilteredKeyNames(re)) {
+                    m_currentProfile->FindKey(key)->set_action(nullptr);
+                    G13_OUT("key " << key << " unbound");
+                    found = true;
+                }
+            }
+            else if (target == "zone") {
+                for (auto& zone : m_stick.FilteredZoneNames(re)) {
+                    m_stick.RemoveZone(*m_stick.zone(zone));
+                    G13_OUT("stickzone " << zone << " unbound");
+                    found = true;
+                }
+            }
+            else {
+                G13_ERR("unknown delete target: <" << target << ">");
+                found = true;
+            }
+            if (!found) {
+                G13_OUT("no " << target << " name matches <" << glob << ">");
+            }
+        });
 
-        commandAdder add_load(_command_table, "load",
-                              [this](const char* remainder) {
-                                  std::string filename;
-                                  advance_ws(remainder, filename);
-                                  ReadCommandsFromFile(filename, std::string(1 + m_filesLoading.size(), '>').c_str());
-                              });
+        commandAdder add_load(_command_table, "load", [this](const char* remainder) {
+            std::string filename;
+            advance_ws(remainder, filename);
+            ReadCommandsFromFile(filename, std::string(1 + m_filesLoading.size(), '>').c_str());
+        });
     }
 
     void G13_Device::Command(char const* str, const char* info) {

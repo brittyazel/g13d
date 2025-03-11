@@ -61,8 +61,7 @@ namespace G13 {
 
         void ReadCommandsFromPipe();
 
-        void ReadCommandsFromFile(const std::string& filename,
-                                  const char* info = nullptr);
+        void ReadCommandsFromFile(const std::string& filename, const char* info = nullptr);
 
         void ReadConfigFile(const std::string& filename);
 

@@ -368,11 +368,9 @@ namespace G13 {
 
     G13_Font::G13_Font() : m_name("default"), m_width(8) {}
 
-    G13_Font::G13_Font(std::string name, const unsigned int width)
-        : m_name(std::move(name)), m_width(width) {}
+    G13_Font::G13_Font(std::string name, const unsigned int width) : m_name(std::move(name)), m_width(width) {}
 
-    void G13_FontChar::SetCharacter(const unsigned char* data, const unsigned int width,
-                                    const unsigned flags) {
+    void G13_FontChar::SetCharacter(const unsigned char* data, const unsigned int width, const unsigned flags) {
         unsigned char* dest = bits_regular;
         memset(dest, 0, CHAR_BUF_SIZE);
         if (flags & FF_ROTATE) {

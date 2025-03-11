@@ -56,9 +56,8 @@ namespace Helper {
             case '\"':
                 o << "\\" << *cp;
                 break;
-            default: {
-                unsigned char c = *cp;
-                if (c < 32) {
+            default:
+                if (const unsigned char c = *cp; c < 32) {
                     const unsigned char hi = '0' + (c & 0x0fu);
                     const unsigned char lo = '0' + (static_cast<unsigned char>(c >> 4u) & 0x0fu);
                     o << "\\x" << hi << lo;
@@ -66,7 +65,6 @@ namespace Helper {
                 else {
                     o << c;
                 }
-            }
             }
             cp++;
         }
@@ -99,29 +97,35 @@ namespace Helper {
                 regex += "[^/]"; // Do not match descendant.
                 // Optimize consecutive wildcards gathering min and max counts.
                 for (;; glob++) {
-                    if (*glob == '?')
+                    if (*glob == '?') {
                         min++;
+                    }
                     else if (*glob == '*') {
-                        if (glob[1] == '*')
+                        if (glob[1] == '*') {
                             break; // Stop on descendant matchmark.
+                        }
                         nomax = true;
                     }
-                    else
+                    else {
                         break;
+                    }
                 }
             }
 
             // Generate repetition counts.
-            if (!min)
+            if (!min) {
                 regex += '*';
+            }
             else if (min == 1) {
-                if (nomax)
+                if (nomax) {
                     regex += '+';
+                }
             }
             else {
                 regex += std::string("{") + std::to_string(min);
-                if (nomax)
+                if (nomax) {
                     regex += ',';
+                }
                 regex += rbrace;
             }
         };
@@ -137,13 +141,16 @@ namespace Helper {
             // Convert set content.
             while (auto c = *glob) {
                 glob++;
-                if (c == rbracket)
+                if (c == rbracket) {
                     break;
+                }
                 if (c != '-') {
-                    if (c == '\\' && *glob)
+                    if (c == '\\' && *glob) {
                         c = *glob++;
-                    if (strchr("]\\-", c))
+                    }
+                    if (strchr("]\\-", c)) {
                         regex += "\\";
+                    }
                 }
                 regex += c;
             }
@@ -163,8 +170,9 @@ namespace Helper {
                     glob++;
                     break;
                 }
-                else
+                else {
                     terms(true);
+                }
             }
             regex += rparent;
         };
@@ -172,26 +180,33 @@ namespace Helper {
         // Translate a sequence of terms.
         terms = [&](const bool ingroup) {
             while (*glob) {
-                if (ingroup && (*glob == ',' || *glob == rbrace))
+                if (ingroup && (*glob == ',' || *glob == rbrace)) {
                     break;
-                if (*glob == lbracket)
+                }
+                if (*glob == lbracket) {
                     set();
-                else if (*glob == lbrace)
+                }
+                else if (*glob == lbrace) {
                     group();
-                else if (*glob == '?' || *glob == '*')
+                }
+                else if (*glob == '?' || *glob == '*') {
                     wildcard();
+                }
                 else {
-                    if (*glob == '\\' && glob[1])
+                    if (*glob == '\\' && glob[1]) {
                         glob++;
-                    if (strchr("$^+*?.=!|\\()[]{}", *glob))
+                    }
+                    if (strchr("$^+*?.=!|\\()[]{}", *glob)) {
                         regex += '\\';
+                    }
                     regex += *glob++;
                 }
             }
         };
 
-        while (*glob)
+        while (*glob) {
             terms(false);
+        }
         return regex + '$';
     }
 } // namespace Helper

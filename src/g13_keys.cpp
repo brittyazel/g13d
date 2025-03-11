@@ -33,8 +33,7 @@ namespace G13 {
         };
 
     void G13_Key::dump(std::ostream& o) const {
-        o << G13_Manager::FindG13KeyName(index()) << "(" << index()
-            << ") : ";
+        o << G13_Manager::FindG13KeyName(index()) << "(" << index() << ") : ";
         if (action()) {
             action()->dump(o);
         }

@@ -52,7 +52,8 @@ namespace Helper {
         return o;
     }
 
-    template <class T> const T& repr(const T& v) {
+    template <class T>
+    const T& repr(const T& v) {
         return v;
     }
 
@@ -73,8 +74,8 @@ namespace Helper {
         }
     };
 
-    template <class KEYT, class VALT> const VALT& find_or_throw(const std::map<KEYT, VALT>& m,
-                              const KEYT& target) {
+    template <class KEYT, class VALT>
+    const VALT& find_or_throw(const std::map<KEYT, VALT>& m, const KEYT& target) {
         auto i = m.find(target);
         if (i == m.end()) {
             throw NotFoundException();
@@ -82,7 +83,8 @@ namespace Helper {
         return i->second;
     }
 
-    template <class KEYT, class VALT> VALT& find_or_throw(std::map<KEYT, VALT>& m, const KEYT& target) {
+    template <class KEYT, class VALT>
+    VALT& find_or_throw(std::map<KEYT, VALT>& m, const KEYT& target) {
         auto i = m.find(target);
         if (i == m.end()) {
             throw NotFoundException();
@@ -139,8 +141,7 @@ namespace Helper {
 
     template <class T>
     std::ostream& operator<<(std::ostream& o, const Bounds<T>& b) {
-        o << "{ " << b.tl.x << " x " << b.tl.y << " / " << b.br.x << " x " << b.br.y
-            << " }";
+        o << "{ " << b.tl.x << " x " << b.tl.y << " / " << b.br.x << " x " << b.br.y << " }";
         return o;
     }
 
@@ -164,8 +165,7 @@ namespace Helper {
 
     template <class MAP_T>
     struct _map_keys_out {
-        _map_keys_out(const MAP_T& c, std::string s)
-            : container(c), sep(std::move(s)) {}
+        _map_keys_out(const MAP_T& c, std::string s) : container(c), sep(std::move(s)) {}
 
         const MAP_T& container;
         std::string sep;
@@ -218,8 +218,7 @@ namespace Helper {
 
     // decltype(*std::declval<T>()) operator*() { /* ... */ }
     template <typename Container>
-    auto split(const typename Container::value_type& srcStr,
-               const typename Container::value_type& delimiters,
+    auto split(const typename Container::value_type& srcStr, const typename Container::value_type& delimiters,
                const split_t::empties_t empties = split_t::empties_ok) {
         Container result;
         auto next = static_cast<size_t>(-1);

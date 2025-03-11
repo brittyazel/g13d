@@ -23,8 +23,8 @@ namespace G13 {
             _init_keys();
         }
 
-        G13_Profile(const G13_Profile& other, std::string name_arg)
-            : _keypad(other._keypad), _keys(other._keys), _name(std::move(name_arg)) {}
+        G13_Profile(const G13_Profile& other, std::string name_arg) : _keypad(other._keypad), _keys(other._keys),
+                                                                      _name(std::move(name_arg)) {}
 
         // search key by G13 keyname
         G13_Key* FindKey(const std::string& keyname);
