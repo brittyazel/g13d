@@ -1,11 +1,11 @@
 [Unit]
 Description=Logitech G13 Daemon
-BindsTo=g13.target
-After=g13.target
+BindsTo=g13d.target
+After=g13d.target
 
 [Service]
 ExecStart=/usr/bin/g13d --config /etc/g13d/default.bind --pipe_in /run/g13d/g13-0 --pipe_out /run/g13d/g13-0_out
 Restart=always
 
 [Install]
-WantedBy=g13.target
+WantedBy=g13d.target

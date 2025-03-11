@@ -53,8 +53,7 @@ namespace G13 {
 
         static int Run();
 
-        [[nodiscard]] static std::string
-        getStringConfigValue(const std::string& name);
+        [[nodiscard]] static std::string getStringConfigValue(const std::string& name);
 
         static void setStringConfigValue(const std::string& name, const std::string& value);
 

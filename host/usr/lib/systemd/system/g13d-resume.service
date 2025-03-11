@@ -4,7 +4,7 @@ After=suspend.target hibernate.target hybrid-sleep.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/systemctl restart g13.target
+ExecStart=/bin/systemctl restart g13d.target
 
 [Install]
 WantedBy=suspend.target hibernate.target hybrid-sleep.target

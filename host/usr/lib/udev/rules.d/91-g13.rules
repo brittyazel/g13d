@@ -1,7 +1,7 @@
 SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c21c", MODE="0666"
 
 # Start the g13 user service when the device is plugged in
-ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c21c", TAG+="systemd", ENV{SYSTEMD_WANTS}="g13.target"
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c21c", TAG+="systemd", ENV{SYSTEMD_WANTS}="g13d.target"
 
 # Stio the g13 user service when the device is unplugged
-ACTION=="remove", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{PRODUCT}=="46d/c21c/203", RUN+="/usr/bin/systemctl stop g13.target"
+ACTION=="remove", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{PRODUCT}=="46d/c21c/203", RUN+="/usr/bin/systemctl stop g13d.target"

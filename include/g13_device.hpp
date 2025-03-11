@@ -32,8 +32,7 @@ namespace G13 {
 
     class G13_Device {
     public:
-        G13_Device(libusb_device* dev, libusb_context* ctx,
-                   libusb_device_handle* handle, int m_id);
+        G13_Device(libusb_device* dev, libusb_context* ctx, libusb_device_handle* handle, int m_id);
         ~G13_Device();
 
         G13_LCD& lcd() {
