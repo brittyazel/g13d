@@ -405,13 +405,13 @@ namespace G13 {
     }
 
     void G13_Device::InitFonts() {
-        m_currentFont = std::make_shared<G13_Font>("8x8", 8);
-        pFonts[m_currentFont->name()] = m_currentFont;
+        current_font = std::make_shared<G13_Font>("8x8", 8);
+        fonts[current_font->name()] = current_font;
 
-        m_currentFont->InstallFont(font8x8_basic, G13_FontChar::FF_ROTATE, 0);
+        current_font->InstallFont(font8x8_basic, G13_FontChar::FF_ROTATE, 0);
 
         const FontPtr fiveXeight(new G13_Font("5x8", 5));
         fiveXeight->InstallFont(font5x8, 0, 32);
-        pFonts[fiveXeight->name()] = fiveXeight;
+        fonts[fiveXeight->name()] = fiveXeight;
     }
 } // namespace G13

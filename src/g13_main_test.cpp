@@ -25,14 +25,14 @@ class MockManager : public G13::G13_Manager {
 
 class MockDevice : public G13::G13_Device {
 public:
-    //  G13_Device(libusb_device *dev, libusb_context *ctx,
-    //             libusb_device_handle *handle, int m_id);
+    //  G13_Device(libusb_device *dev, libusb_context *usb_context,
+    //             libusb_device_handle *usb_handle, int device_index);
     explicit MockDevice(G13::G13_Manager& manager) : G13_Device(nullptr, nullptr, nullptr, 0) {}
 };
 
 class MockProfile : public G13::G13_Profile {
 public:
-    explicit MockProfile(G13::G13_Device& device) : G13_Profile(device, std::string("mock")) {}
+    explicit MockProfile(G13::G13_Device& usb_device) : G13_Profile(usb_device, std::string("mock")) {}
 };
 
 // class MockProfile : public G13::G13_Profile {
@@ -49,7 +49,7 @@ TEST(G13Key, g13_key_maps_to_value) {
 
     EXPECT_EQ(manager->FindG13KeyValue("G1"), 0);
     EXPECT_EQ(manager->FindG13KeyValue("G22"), 21);
-    // G13::G13_Device device = MockDevice(manager);
+    // G13::G13_Device usb_device = MockDevice(manager);
     // G13::G13_Profile Profile = MockProfile(device);
 
     // auto Profile = G13::G13_Profile("",std::string(""),"");

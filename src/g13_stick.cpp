@@ -5,7 +5,7 @@
 
 namespace G13 {
     void G13_Device::parse_joystick(const unsigned char* buf) {
-        m_stick.ParseJoystick(buf);
+        getStickRef().ParseJoystick(buf);
     }
 
     G13_Stick::G13_Stick(G13_Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255), m_center_pos(127, 127),
@@ -172,11 +172,9 @@ namespace G13 {
             _keypad.SendEvent(EV_ABS, ABS_Y, m_current_pos.y);
         }
         else if (m_stick_mode == STICK_KEYS) {
-            // BOOST_FOREACH (G13_StickZone& zone, m_zones) { zone.test(jpos); }
             for (auto& zone : m_zones) {
                 zone.test(jpos);
             }
-            return;
         }
         else {
             /*    send_event(g13->uinput_file, EV_REL, REL_X, stick_x/16 - 8);

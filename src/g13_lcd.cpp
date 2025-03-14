@@ -27,7 +27,7 @@
 
 namespace G13 {
     void G13_Device::LcdInit() const {
-        if (const int error = libusb_control_transfer(handle, 0, 9, 1, 0, nullptr, 0, 1000); error != LIBUSB_SUCCESS) {
+        if (const int error = libusb_control_transfer(usb_handle, 0, 9, 1, 0, nullptr, 0, 1000); error != LIBUSB_SUCCESS) {
             G13_ERR("Error when initializing LCD endpoint: " << G13_Device::DescribeLibusbErrorCode(error));
         }
         else {
@@ -47,7 +47,7 @@ namespace G13 {
         memcpy(buffer + 32, data, G13_LCD_BUFFER_SIZE);
         int bytes_written;
 
-        const int error = libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_OUT | G13_LCD_ENDPOINT, buffer,
+        const int error = libusb_interrupt_transfer(usb_handle, LIBUSB_ENDPOINT_OUT | G13_LCD_ENDPOINT, buffer,
                                                     G13_LCD_BUFFER_SIZE + 32, &bytes_written, 1000);
 
         if (error) {
@@ -130,7 +130,7 @@ namespace G13 {
         if (row == static_cast<unsigned int>(-1)) {
             row = cursor_row;
             col = cursor_col;
-            cursor_col += m_keypad.current_font().width();
+            cursor_col += m_keypad.getCurrentFontRef().width();
             if (cursor_col >= G13_LCD_COLUMNS) {
                 cursor_col = 0;
                 if (++cursor_row >= G13_LCD_TEXT_ROWS) {
@@ -142,12 +142,12 @@ namespace G13 {
         const unsigned offset = image_byte_offset(row * G13_LCD_TEXT_CHEIGHT, col);
 
         if (text_mode) {
-            memcpy(&image_buf[offset], &m_keypad.current_font().char_data(c).bits_inverted,
-                   m_keypad.current_font().width());
+            memcpy(&image_buf[offset], &m_keypad.getCurrentFontRef().char_data(c).bits_inverted,
+                   m_keypad.getCurrentFontRef().width());
         }
         else {
-            memcpy(&image_buf[offset], &m_keypad.current_font().char_data(c).bits_regular,
-                   m_keypad.current_font().width());
+            memcpy(&image_buf[offset], &m_keypad.getCurrentFontRef().char_data(c).bits_regular,
+                   m_keypad.getCurrentFontRef().width());
         }
     }
 

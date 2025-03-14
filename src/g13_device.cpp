@@ -2,39 +2,87 @@
 // Created by khampf on 07-05-2020.
 //
 
-#include "g13_device.hpp"
-#include "g13_main.hpp"
-#include "g13_fonts.hpp"
-#include "g13_log.hpp"
-#include "g13_manager.hpp"
-#include "g13_profile.hpp"
-#include "g13_stick.hpp"
+#include <filesystem>
 #include <fstream>
 #include <ranges>
 #include <regex>
-#include <filesystem>
 #include <unistd.h>
+#include <vector>
+
+#include "g13_device.hpp"
+#include "g13_fonts.hpp"
+#include "g13_log.hpp"
+#include "g13_manager.hpp"
+#include "g13_main.hpp"
+#include "g13_profile.hpp"
+#include "g13_stick.hpp"
 
 namespace G13 {
     // *************************************************************************
 
-    G13_Device::G13_Device(libusb_device* dev, libusb_context* ctx, libusb_device_handle* handle, const int m_id)
-        : m_id_within_manager(m_id), m_ctx(ctx), m_uinput_fid(-1), m_lcd(*this), m_stick(*this), handle(handle),
-          device(dev) {
-        m_currentProfile = std::make_shared<G13_Profile>(*this, "default");
-        m_profiles["default"] = m_currentProfile;
+    // Constructor
+    G13_Device::G13_Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle, const int device_index)
+        : device_index(device_index),
+          usb_context(usb_context),
+          uinput_fid(-1),
+          lcd(*this),
+          stick(*this),
+          usb_handle(usb_handle),
+          usb_device(usb_device) {
+        current_profile = std::make_shared<G13_Profile>(*this, "default");
+        profiles["default"] = current_profile;
 
         for (bool& key : keys) {
             key = false;
         }
 
-        lcd().image_clear();
+        getLCDRef().image_clear();
 
         InitFonts();
         InitCommands();
     }
 
+    // Destructor
+    G13_Device::~G13_Device() {
+        Cleanup();
+    }
+
     // *************************************************************************
+
+    bool G13_Device::updateKeyState(const int key, const bool state) {
+        // state = true if key is pressed
+        const bool oldState = keys[key];
+        keys[key] = state;
+        return oldState != state;
+    }
+
+    int G13_Device::getDeviceIndex() const {
+        return device_index;
+    }
+
+    G13_LCD& G13_Device::getLCDRef() {
+        return lcd;
+    }
+
+    G13_Stick& G13_Device::getStickRef() {
+        return stick;
+    }
+
+    G13_Font& G13_Device::getCurrentFontRef() const {
+        return *current_font;
+    }
+
+    G13_Profile& G13_Device::getCurrentProfileRef() const {
+        return *current_profile;
+    }
+
+    libusb_device* G13_Device::getDevicePtr() const {
+        return usb_device;
+    }
+
+    libusb_device_handle* G13_Device::getHandlePtr() const {
+        return usb_handle;
+    }
 
     std::string G13_Device::DescribeLibusbErrorCode(const int code) {
         auto description = std::string(libusb_strerror(code));
@@ -128,23 +176,23 @@ namespace G13 {
 
     void G13_Device::SendEvent(const int type, const int code, const int val) {
         using Helper::IGUR;
-        memset(&m_event, 0, sizeof(m_event));
-        gettimeofday(&m_event.time, nullptr);
-        m_event.type = type;
-        m_event.code = code;
-        m_event.value = val;
-        IGUR(write(m_uinput_fid, &m_event, sizeof(m_event)));
+        memset(&device_event, 0, sizeof(device_event));
+        gettimeofday(&device_event.time, nullptr);
+        device_event.type = type;
+        device_event.code = code;
+        device_event.value = val;
+        IGUR(write(uinput_fid, &device_event, sizeof(device_event)));
     }
 
     void G13_Device::OutputPipeWrite(const std::string& out) const {
         using Helper::IGUR;
-        IGUR(write(m_output_pipe_fid, out.c_str(), out.size()));
+        IGUR(write(output_pipe_fid, out.c_str(), out.size()));
     }
 
     void G13_Device::SetModeLeds(const int leds) const {
         unsigned char usb_data[] = {5, 0, 0, 0, 0};
         usb_data[1] = leds;
-        const int error = libusb_control_transfer(handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) |
+        const int error = libusb_control_transfer(usb_handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) |
                                                   static_cast<uint8_t>(LIBUSB_RECIPIENT_INTERFACE), 9, 0x305, 0,
                                                   usb_data, 5, 1000);
         if (error != 5) {
@@ -158,7 +206,7 @@ namespace G13 {
         usb_data[2] = green;
         usb_data[3] = blue;
 
-        const int error = libusb_control_transfer(handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) |
+        const int error = libusb_control_transfer(usb_handle, static_cast<uint8_t>(LIBUSB_REQUEST_TYPE_CLASS) |
                                                   static_cast<uint8_t>(LIBUSB_RECIPIENT_INTERFACE), 9, 0x307, 0,
                                                   usb_data, 5, 1000);
         if (error != 5) {
@@ -172,78 +220,67 @@ namespace G13 {
     int G13_Device::ReadKeypresses() {
         unsigned char buffer[G13_REPORT_SIZE];
         int size = 0;
-        const int error = libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_IN | G13_KEY_ENDPOINT, buffer,
+        const int error = libusb_interrupt_transfer(usb_handle, LIBUSB_ENDPOINT_IN | G13_KEY_ENDPOINT, buffer,
                                                     G13_REPORT_SIZE, &size, 100);
 
         if (error && error != LIBUSB_ERROR_TIMEOUT) {
             G13_ERR("Error while reading keys: " << DescribeLibusbErrorCode(error));
             if (error == LIBUSB_ERROR_NO_DEVICE || error == LIBUSB_ERROR_IO) {
                 G13_DBG("Giving libusb a nudge");
-                libusb_handle_events(m_ctx);
+                libusb_handle_events(usb_context);
             }
         }
         if (size == G13_REPORT_SIZE) {
             parse_joystick(buffer);
-            m_currentProfile->ParseKeys(buffer);
+            getCurrentProfileRef().ParseKeys(buffer);
             SendEvent(EV_SYN, SYN_REPORT, 0);
         }
         return 0;
     }
 
     void G13_Device::ReadCommandsFromFile(const std::string& filename, const char* info) {
-        using std::filesystem::path;
-
         class in_use {
-            // Handle file name stack.
         public:
-            in_use(G13_Device* dev, const std::string& filename) {
-                m_dev = dev;
-                m_dev->m_filesLoading.emplace_back(filename);
+            in_use(G13_Device* device, const std::string& filename) : device(device) {
+                device->files_currently_loading.emplace_back(filename);
             }
 
             ~in_use() {
-                m_dev->m_filesLoading.pop_back();
+                device->files_currently_loading.pop_back();
             }
 
         private:
-            G13_Device* m_dev;
+            G13_Device* device;
         };
 
-        auto filepath = path(filename);
+        // Normalize and sanitize filename.
+        auto filepath = std::filesystem::path(filename);
 
         // If relative and loaded from a file, use previous file directory as base.
-        if (filepath.is_relative() && !m_filesLoading.empty()) {
-            auto p = path(m_filesLoading.back());
-            filepath = p.replace_filename(filepath);
+        if (filepath.is_relative() && !files_currently_loading.empty()) {
+            filepath = std::filesystem::path(files_currently_loading.back()).replace_filename(filepath);
         }
 
         filepath = filepath.lexically_normal();
-        std::string fn(filepath);
+        std::string clean_filename = filepath.string();
 
         // Check for load recursion.
-        for (auto& f : m_filesLoading) {
-            if (f == fn) {
-                G13_ERR(filename << " loading recursion");
-                return;
-            }
+        if (std::ranges::find(files_currently_loading, clean_filename) != files_currently_loading.end()) {
+            G13_ERR(filename << " loading recursion");
+            return;
         }
 
-        in_use autoclean(this, fn);
+        in_use autoclean(this, clean_filename);
 
-        if (std::ifstream s(fn); s.fail()) {
+        std::ifstream stream(clean_filename);
+        if (!stream) {
             G13_LOG(log4cpp::Priority::ERROR << strerror(errno));
+            return;
         }
-        else {
-            while (s.good()) {
-                // grab a line
-                char buf[1024];
-                buf[0] = 0;
-                buf[sizeof(buf) - 1] = 0;
-                s.getline(buf, sizeof(buf) - 1);
 
-                // send it
-                Command(buf, info);
-            }
+        std::string line;
+        while (std::getline(stream, line)) {
+            Command(line.c_str(), info);
         }
     }
 
@@ -255,22 +292,22 @@ namespace G13 {
     void G13_Device::ReadCommandsFromPipe() {
         fd_set set;
         FD_ZERO(&set);
-        FD_SET(m_input_pipe_fid, &set);
+        FD_SET(input_pipe_fid, &set);
         timeval tv{};
         tv.tv_sec = 0;
         tv.tv_usec = 0;
-        if (auto ret = select(m_input_pipe_fid + 1, &set, nullptr, nullptr, &tv); ret > 0) {
-            auto end = static_cast<int>(m_input_pipe_fifo.length());
+        if (auto ret = select(input_pipe_fid + 1, &set, nullptr, nullptr, &tv); ret > 0) {
+            auto end = static_cast<int>(input_pipe_fifo.length());
             char buf[1024 * 1024];
-            memcpy(buf, m_input_pipe_fifo.c_str(), end);
-            ret = static_cast<int>(read(m_input_pipe_fid, buf + end, sizeof buf - end));
+            memcpy(buf, input_pipe_fifo.c_str(), end);
+            ret = static_cast<int>(read(input_pipe_fid, buf + end, sizeof buf - end));
             G13_LOG(log4cpp::Priority::DEBUG << "read " << ret << " characters");
 
             if (ret < 0) {}
             // Read error: should not occur after successful select().
             else if (ret + end == 960) {
                 // TODO probably image, for now, don't test, just assume image
-                lcd().Image(reinterpret_cast<unsigned char*>(buf), ret + end);
+                getLCDRef().Image(reinterpret_cast<unsigned char*>(buf), ret + end);
             }
             else {
                 size_t beg = 0;
@@ -283,31 +320,31 @@ namespace G13 {
                         beg = end + 1;
                     }
                 }
-                m_input_pipe_fifo.clear();
+                input_pipe_fifo.clear();
                 if (ret - beg < sizeof buf) {
                     // Drop too long lines.
-                    m_input_pipe_fifo = std::string(buf + beg, ret - beg);
+                    input_pipe_fifo = std::string(buf + beg, ret - beg);
                 }
             }
         }
     }
 
     FontPtr G13_Device::SwitchToFont(const std::string& name) {
-        FontPtr rv = pFonts[name];
-        if (rv) {
-            m_currentFont = rv;
+        FontPtr font = fonts[name];
+        if (font) {
+            current_font = font;
         }
-        return rv;
+        return font;
     }
 
     void G13_Device::SwitchToProfile(const std::string& name) {
-        m_currentProfile = Profile(name);
+        current_profile = Profile(name);
     }
 
     std::vector<std::string> G13_Device::FilteredProfileNames(const std::regex& pattern) const {
         std::vector<std::string> names;
 
-        for (const auto& profile_name : m_profiles | std::views::keys) {
+        for (const auto& profile_name : profiles | std::views::keys) {
             if (std::regex_match(profile_name, pattern)) {
                 names.emplace_back(profile_name);
             }
@@ -316,12 +353,16 @@ namespace G13 {
     }
 
     ProfilePtr G13_Device::Profile(const std::string& name) {
-        ProfilePtr rv = m_profiles[name];
-        if (!rv) {
-            rv = std::make_shared<G13_Profile>(*m_currentProfile, name);
-            m_profiles[name] = rv;
+        // try to get profile from map
+        ProfilePtr profile = profiles[name];
+
+        // if not found, create it
+        if (!profile) {
+            profile = std::make_shared<G13_Profile>(*current_profile, name);
+            profiles[name] = profile;
         }
-        return rv;
+
+        return profile;
     }
 
     G13_ActionPtr G13_Device::MakeAction(const std::string& action) {
@@ -342,20 +383,20 @@ namespace G13 {
     // *************************************************************************
 
     void G13_Device::Dump(std::ostream& o, const int detail) {
-        o << "G13 id=" << id_within_manager() << std::endl;
-        o << "   input_pipe_name=" << Helper::repr(m_input_pipe_name) << std::endl;
-        o << "   output_pipe_name=" << Helper::repr(m_output_pipe_name) << std::endl;
-        o << "   current_profile=" << m_currentProfile->name() << std::endl;
-        o << "   current_font=" << m_currentFont->name() << std::endl;
+        o << "G13 id=" << getDeviceIndex() << std::endl;
+        o << "   input_pipe_name=" << Helper::repr(input_pipe_name) << std::endl;
+        o << "   output_pipe_name=" << Helper::repr(output_pipe_name) << std::endl;
+        o << "   current_profile=" << getCurrentProfileRef().name() << std::endl;
+        o << "   current_font=" << getCurrentFontRef().name() << std::endl;
 
         if (detail > 0) {
             o << "STICK" << std::endl;
-            stick().dump(o);
+            getStickRef().dump(o);
             if (detail == 1) {
-                m_currentProfile->dump(o);
+                getCurrentProfileRef().dump(o);
             }
             else {
-                for (const auto& profile : m_profiles | std::views::values) {
+                for (const auto& profile : profiles | std::views::values) {
                     profile->dump(o);
                 }
             }
@@ -385,11 +426,11 @@ namespace G13 {
         using Helper::glob2regex;
         // const char *remainder;
 
-        commandAdder add_out(_command_table, "out", [this](const char* remainder) {
-            lcd().WriteString(remainder);
+        commandAdder add_out(command_table, "out", [this](const char* remainder) {
+            getLCDRef().WriteString(remainder);
         });
 
-        commandAdder add_pos(_command_table, "pos", [this](const char* remainder) {
+        commandAdder add_pos(command_table, "pos", [this](const char* remainder) {
             char* endptr;
             const int row = static_cast<int>(strtol(remainder, &endptr, 10));
             const int col = static_cast<int>(strtol(endptr, &endptr, 10));
@@ -398,11 +439,11 @@ namespace G13 {
                 G13_ERR("bad pos : " << remainder);
             }
             else {
-                lcd().WritePos(row, col);
+                getLCDRef().WritePos(row, col);
             }
         });
 
-        commandAdder add_bind(_command_table, "bind", [this](const char* remainder) {
+        commandAdder add_bind(command_table, "bind", [this](const char* remainder) {
             std::string keyname, action, actionup;
             advance_ws(remainder, keyname);
             const char* rawaction = ltrim(remainder);
@@ -417,10 +458,10 @@ namespace G13 {
             }
 
             try {
-                if (const auto key = m_currentProfile->FindKey(keyname)) {
+                if (const auto key = getCurrentProfileRef().FindKey(keyname)) {
                     key->set_action(MakeAction(action));
                 }
-                else if (const auto stick_key = m_stick.zone(keyname)) {
+                else if (const auto stick_key = getStickRef().zone(keyname)) {
                     stick_key->set_action(MakeAction(action));
                 }
                 else {
@@ -434,19 +475,19 @@ namespace G13 {
             }
         });
 
-        commandAdder add_profile(_command_table, "profile", [this](const char* remainder) {
+        commandAdder add_profile(command_table, "profile", [this](const char* remainder) {
             std::string profile;
             advance_ws(remainder, profile);
             SwitchToProfile(profile);
         });
 
-        commandAdder add_font(_command_table, "font", [this](const char* remainder) {
+        commandAdder add_font(command_table, "font", [this](const char* remainder) {
             std::string font;
             advance_ws(remainder, font);
             SwitchToFont(font);
         });
 
-        commandAdder add_mod(_command_table, "mod", [this](const char* remainder) {
+        commandAdder add_mod(command_table, "mod", [this](const char* remainder) {
             char* endptr;
             const int leds = static_cast<int>(strtol(remainder, &endptr, 10));
 
@@ -458,7 +499,7 @@ namespace G13 {
             }
         });
 
-        commandAdder add_textmode(_command_table, "textmode", [this](const char* remainder) {
+        commandAdder add_textmode(command_table, "textmode", [this](const char* remainder) {
             char* endptr;
             const int textmode = static_cast<int>(strtol(remainder, &endptr, 10));
 
@@ -466,11 +507,11 @@ namespace G13 {
                 G13_ERR("bad textmode format: <" << remainder << ">");
             }
             else {
-                lcd().text_mode = textmode;
+                getLCDRef().text_mode = textmode;
             }
         });
 
-        commandAdder add_rgb(_command_table, "rgb", [this](const char* remainder) {
+        commandAdder add_rgb(command_table, "rgb", [this](const char* remainder) {
             char* endptr;
             const int red = static_cast<int>(strtol(remainder, &endptr, 10));
             const int green = static_cast<int>(strtol(endptr, &endptr, 10));
@@ -484,7 +525,7 @@ namespace G13 {
             }
         });
 
-        commandAdder add_stickmode(_command_table, "stickmode", [this](const char* remainder) {
+        commandAdder add_stickmode(command_table, "stickmode", [this](const char* remainder) {
             std::string mode;
             advance_ws(remainder, mode);
             // TODO: this could be part of a G13::Constants class I think
@@ -492,7 +533,7 @@ namespace G13 {
             int index = 0;
             for (auto& test : modes) {
                 if (test == mode) {
-                    m_stick.set_mode(static_cast<stick_mode_t>(index));
+                    getStickRef().set_mode(static_cast<stick_mode_t>(index));
                     return;
                 }
                 index++;
@@ -500,16 +541,16 @@ namespace G13 {
             G13_ERR("unknown stick mode : <" << mode << ">");
         });
 
-        commandAdder add_stickzone(_command_table, "stickzone", [this](const char* remainder) {
+        commandAdder add_stickzone(command_table, "stickzone", [this](const char* remainder) {
             std::string operation, zonename;
             advance_ws(remainder, operation);
             advance_ws(remainder, zonename);
             if (operation == "add") {
                 /* G13_StickZone* zone = */
-                m_stick.zone(zonename, true);
+                getStickRef().zone(zonename, true);
             }
             else {
-                G13_StickZone* zone = m_stick.zone(zonename);
+                G13_StickZone* zone = getStickRef().zone(zonename);
                 if (!zone) {
                     throw G13_CommandException("unknown stick zone");
                 }
@@ -528,7 +569,7 @@ namespace G13 {
                     zone->set_bounds(G13_ZoneBounds(x1, y1, x2, y2));
                 }
                 else if (operation == "del") {
-                    m_stick.RemoveZone(*zone);
+                    getStickRef().RemoveZone(*zone);
                 }
                 else {
                     G13_ERR("unknown stickzone operation: <" << operation << ">");
@@ -536,7 +577,7 @@ namespace G13 {
             }
         });
 
-        commandAdder add_dump(_command_table, "dump", [this](const char* remainder) {
+        commandAdder add_dump(command_table, "dump", [this](const char* remainder) {
             std::string target;
             advance_ws(remainder, target);
             if (target == "all") {
@@ -553,22 +594,22 @@ namespace G13 {
             }
         });
 
-        commandAdder add_log_level(_command_table, "log_level", [this](const char* remainder) {
+        commandAdder add_log_level(command_table, "log_level", [this](const char* remainder) {
             std::string level;
             advance_ws(remainder, level);
             G13_Manager::SetLogLevel(level);
         });
 
-        commandAdder add_refresh(_command_table, "refresh", [this](const char* remainder) {
-            lcd().image_send();
+        commandAdder add_refresh(command_table, "refresh", [this](const char* remainder) {
+            getLCDRef().image_send();
         });
 
-        commandAdder add_clear(_command_table, "clear", [this](const char* remainder) {
-            lcd().image_clear();
-            lcd().image_send();
+        commandAdder add_clear(command_table, "clear", [this](const char* remainder) {
+            getLCDRef().image_clear();
+            getLCDRef().image_send();
         });
 
-        commandAdder add_delete(_command_table, "delete", [this](const char* remainder) {
+        commandAdder add_delete(command_table, "delete", [this](const char* remainder) {
             std::string target;
             std::string glob;
             bool found = false;
@@ -578,21 +619,21 @@ namespace G13 {
 
             if (target == "profile") {
                 for (auto& profile : FilteredProfileNames(re)) {
-                    m_profiles.erase(profile);
+                    profiles.erase(profile);
                     G13_OUT("profile " << profile << " deleted");
                     found = true;
                 }
             }
             else if (target == "key") {
-                for (const auto& key : m_currentProfile->FilteredKeyNames(re)) {
-                    m_currentProfile->FindKey(key)->set_action(nullptr);
+                for (const auto& key : getCurrentProfileRef().FilteredKeyNames(re)) {
+                    getCurrentProfileRef().FindKey(key)->set_action(nullptr);
                     G13_OUT("key " << key << " unbound");
                     found = true;
                 }
             }
             else if (target == "zone") {
-                for (auto& zone : m_stick.FilteredZoneNames(re)) {
-                    m_stick.RemoveZone(*m_stick.zone(zone));
+                for (auto& zone : getStickRef().FilteredZoneNames(re)) {
+                    getStickRef().RemoveZone(*getStickRef().zone(zone));
                     G13_OUT("stickzone " << zone << " unbound");
                     found = true;
                 }
@@ -606,10 +647,10 @@ namespace G13 {
             }
         });
 
-        commandAdder add_load(_command_table, "load", [this](const char* remainder) {
+        commandAdder add_load(command_table, "load", [this](const char* remainder) {
             std::string filename;
             advance_ws(remainder, filename);
-            ReadCommandsFromFile(filename, std::string(1 + m_filesLoading.size(), '>').c_str());
+            ReadCommandsFromFile(filename, std::string(1 + files_currently_loading.size(), '>').c_str());
         });
     }
 
@@ -624,10 +665,10 @@ namespace G13 {
             advance_ws(remainder, cmd);
 
             if (!cmd.empty()) {
-                const auto i = _command_table.find(cmd);
+                const auto i = command_table.find(cmd);
                 if (info)
                     G13_OUT(info << ": " << ltrim(str));
-                if (i == _command_table.end()) {
+                if (i == command_table.end()) {
                     G13_ERR("unknown command : " << cmd);
                 }
                 else {
@@ -641,8 +682,8 @@ namespace G13 {
         }
     }
 
-    void G13_Device::RegisterContext(libusb_context* libusbContext) {
-        m_ctx = libusbContext;
+    void G13_Device::RegisterContext(libusb_context* new_usb_context) {
+        usb_context = new_usb_context;
 
         constexpr int leds = 0;
         constexpr int red = 0;
@@ -653,39 +694,30 @@ namespace G13 {
         SetModeLeds(leds);
         SetKeyColor(red, green, blue);
 
-        m_uinput_fid = G13CreateUinput(this);
-        m_input_pipe_name = G13_Manager::MakePipeName(this, true);
-        m_input_pipe_fid = G13CreateFifo(m_input_pipe_name.c_str(), S_IRGRP | S_IROTH);
+        uinput_fid = G13CreateUinput(this);
+        input_pipe_name = G13_Manager::MakePipeName(this, true);
+        input_pipe_fid = G13CreateFifo(input_pipe_name.c_str(), S_IRGRP | S_IROTH);
 
-        if (m_input_pipe_fid == -1) {
-            G13_ERR("failed opening input pipe " << m_input_pipe_name);
+        if (input_pipe_fid == -1) {
+            G13_ERR("failed opening input pipe " << input_pipe_name);
         }
 
-        m_output_pipe_name = G13_Manager::MakePipeName(this, false);
-        m_output_pipe_fid = G13CreateFifo(m_output_pipe_name.c_str(), S_IWGRP | S_IWOTH);
+        output_pipe_name = G13_Manager::MakePipeName(this, false);
+        output_pipe_fid = G13CreateFifo(output_pipe_name.c_str(), S_IWGRP | S_IWOTH);
 
-        if (m_output_pipe_fid == -1) {
-            G13_ERR("failed opening output pipe " << m_output_pipe_name);
+        if (output_pipe_fid == -1) {
+            G13_ERR("failed opening output pipe " << output_pipe_name);
         }
     }
 
     void G13_Device::Cleanup() const {
         SetKeyColor(0, 0, 0);
-        remove(m_input_pipe_name.c_str());
-        remove(m_output_pipe_name.c_str());
-        ioctl(m_uinput_fid, UI_DEV_DESTROY);
-        close(m_uinput_fid);
-        libusb_release_interface(handle, 0);
-        libusb_close(handle);
+        remove(input_pipe_name.c_str());
+        remove(output_pipe_name.c_str());
+        ioctl(uinput_fid, UI_DEV_DESTROY);
+        close(uinput_fid);
+        libusb_release_interface(usb_handle, 0);
+        libusb_close(usb_handle);
     }
 
-    G13_Device::~G13_Device() {
-        Cleanup();
-    }
-
-    // libusb_device_handle *G13_Device::Handle() const { return handle; }
-
-    libusb_device* G13_Device::Device() const {
-        return device;
-    }
 } // namespace G13

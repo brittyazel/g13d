@@ -4,25 +4,24 @@
 #ifndef G13_DEVICE_HPP
 #define G13_DEVICE_HPP
 
-#include "g13_lcd.hpp"
-#include "g13_profile.hpp"
-#include "g13_stick.hpp"
 #include <functional>
 #include <libusb-1.0/libusb.h>
 #include <linux/uinput.h>
 #include <map>
-#include <vector>
 #include <memory>
 #include <regex>
+#include <vector>
+
+#include "g13_lcd.hpp"
+#include "g13_profile.hpp"
+#include "g13_stick.hpp"
 
 namespace G13 {
-    // *************************************************************************
 
     class G13_Profile;
     class G13_Action;
-    class G13_Manager;
-
     class G13_Font;
+    class G13_Manager;
 
     typedef std::shared_ptr<G13_Profile> ProfilePtr;
     typedef std::shared_ptr<G13_Action> G13_ActionPtr;
@@ -32,142 +31,80 @@ namespace G13 {
 
     class G13_Device {
     public:
-        G13_Device(libusb_device* dev, libusb_context* ctx, libusb_device_handle* handle, int m_id);
-        ~G13_Device();
-
-        G13_LCD& lcd() {
-            return m_lcd;
-        }
-
-        // [[nodiscard]] const G13_LCD &lcd() const { return m_lcd; }
-
-        G13_Stick& stick() {
-            return m_stick;
-        }
-
-        // [[nodiscard]] const G13_Stick &stick() const { return m_stick; }
-
-        FontPtr SwitchToFont(const std::string& name);
-
-        void SwitchToProfile(const std::string& name);
-
-        [[nodiscard]] std::vector<std::string> FilteredProfileNames(const std::regex& pattern) const;
-
-        ProfilePtr Profile(const std::string& name);
-
-        void Dump(std::ostream& o, int detail = 0);
-
-        void Command(char const* str, const char* info = nullptr);
-
-        void ReadCommandsFromPipe();
-
-        void ReadCommandsFromFile(const std::string& filename, const char* info = nullptr);
-
-        void ReadConfigFile(const std::string& filename);
-
-        int ReadKeypresses();
-
-        void parse_joystick(const unsigned char* buf);
-
-        G13_ActionPtr MakeAction(const std::string& action);
-
-        void SetKeyColor(int red, int green, int blue) const;
-
-        void SetModeLeds(int leds) const;
-
-        void SendEvent(int type, int code, int val);
-
-        void OutputPipeWrite(const std::string& out) const;
-
-        void LcdWrite(const unsigned char* data, size_t size) const;
-
-        // bool is_set(int key);
-
-        bool update(int key, bool v);
-
-        // used by G13_Manager
-        void Cleanup() const;
-
-
-        void RegisterContext(libusb_context* libusbContext);
-
-        void LcdWriteFile(const std::string& filename) const;
-
-        [[nodiscard]] G13_Font& current_font() const {
-            return *m_currentFont;
-        }
-
-        // G13_Profile &current_profile() { return *m_currentProfile; }
-
-        [[nodiscard]] int id_within_manager() const {
-            return m_id_within_manager;
-        }
-
-        static std::string DescribeLibusbErrorCode(int code);
-
-        // typedef boost::function<void(const char*)> COMMAND_FUNCTION;
         typedef std::function<void(const char*)> COMMAND_FUNCTION;
         typedef std::map<std::string, COMMAND_FUNCTION> CommandFunctionTable;
 
-        /*
-                void setManager(G13_Manager manager) {
-                    _manager = manager;
-                }
-        */
-        // libusb_device_handle *Handle() const;
-        [[nodiscard]] libusb_device* Device() const;
+        G13_Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle, int device_index);
+        ~G13_Device();
+
+        G13_LCD& getLCDRef();
+        G13_Stick& getStickRef();
+
+        FontPtr SwitchToFont(const std::string& name);
+        void SwitchToProfile(const std::string& name);
+
+        [[nodiscard]] std::vector<std::string> FilteredProfileNames(const std::regex& pattern) const;
+        ProfilePtr Profile(const std::string& name);
+
+        void Dump(std::ostream& o, int detail = 0);
+        void Command(const char* str, const char* info = nullptr);
+        void ReadCommandsFromPipe();
+        void ReadCommandsFromFile(const std::string& filename, const char* info = nullptr);
+        void ReadConfigFile(const std::string& filename);
+        int ReadKeypresses();
+        void parse_joystick(const unsigned char* buf);
+
+        G13_ActionPtr MakeAction(const std::string& action);
+        void SetKeyColor(int red, int green, int blue) const;
+        void SetModeLeds(int leds) const;
+        void SendEvent(int type, int code, int val);
+        void OutputPipeWrite(const std::string& out) const;
+        void LcdWrite(const unsigned char* data, size_t size) const;
+        bool updateKeyState(int key, bool state);
+
+        void Cleanup() const;
+        void RegisterContext(libusb_context* new_usb_context);
+        void LcdWriteFile(const std::string& filename) const;
+        static std::string DescribeLibusbErrorCode(int code);
+
+        [[nodiscard]] int getDeviceIndex() const;
+        [[nodiscard]] libusb_device_handle* getHandlePtr() const;
+        [[nodiscard]] libusb_device* getDevicePtr() const;
+        [[nodiscard]] G13_Font& getCurrentFontRef() const;
+        [[nodiscard]] G13_Profile& getCurrentProfileRef() const;
 
     protected:
         void InitFonts();
-
         void LcdInit() const;
-
         void InitCommands();
 
-        // typedef void (COMMAND_FUNCTION)( G13_Device*, const char *, const char * );
-        CommandFunctionTable _command_table;
+        CommandFunctionTable command_table;
+        input_event device_event{};
 
-        // struct timeval _event_time;
-        input_event m_event{};
+        int device_index;
+        libusb_context* usb_context;
+        int uinput_fid;
+        int input_pipe_fid{};
+        std::string input_pipe_name;
+        std::string input_pipe_fifo;
+        int output_pipe_fid{};
+        std::string output_pipe_name;
 
-        int m_id_within_manager;
-        libusb_context* m_ctx;
+        std::map<std::string, FontPtr> fonts;
+        FontPtr current_font;
+        std::map<std::string, ProfilePtr> profiles;
+        ProfilePtr current_profile;
+        std::vector<std::string> files_currently_loading;
 
-        int m_uinput_fid;
-
-        int m_input_pipe_fid{};
-        std::string m_input_pipe_name;
-        std::string m_input_pipe_fifo;
-        int m_output_pipe_fid{};
-        std::string m_output_pipe_name;
-
-        std::map<std::string, FontPtr> pFonts;
-        FontPtr m_currentFont;
-        std::map<std::string, ProfilePtr> m_profiles;
-        ProfilePtr m_currentProfile;
-        std::vector<std::string> m_filesLoading;
-
-        G13_LCD m_lcd;
-        G13_Stick m_stick;
-
+        G13_LCD lcd;
+        G13_Stick stick;
         bool keys[G13_NUM_KEYS]{};
 
     private:
-        libusb_device_handle* handle;
-        libusb_device* device;
+        libusb_device_handle* usb_handle;
+        libusb_device* usb_device;
     };
 
-    /*
-    inline bool G13_Device::is_set(int key) {
-        return keys[key];
-    }
-    */
-
-    inline bool G13_Device::update(const int key, const bool v) {
-        const bool old = keys[key];
-        keys[key] = v;
-        return old != v;
-    }
 } // namespace G13
 
 #endif // G13_DEVICE_HPP

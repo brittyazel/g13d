@@ -21,9 +21,9 @@ namespace G13 {
         // declarations
         static bool running;
         static std::map<std::string, std::string> stringConfigValues;
-        static libusb_context* libusbContext;
+        static libusb_context* usb_context;
         static std::vector<G13_Device*> g13s;
-        static libusb_hotplug_callback_handle hotplug_cb_handle[3];
+        static libusb_hotplug_callback_handle usb_hotplug_cb_handle[3];
         static std::map<G13_KEY_INDEX, std::string> g13_key_to_name;
         static std::map<std::string, G13_KEY_INDEX> g13_name_to_key;
         static std::map<LINUX_KEY_VALUE, std::string> input_key_to_name;
@@ -58,7 +58,7 @@ namespace G13 {
 
         static void setStringConfigValue(const std::string& name, const std::string& value);
 
-        static std::string MakePipeName(const G13_Device* d, bool is_input);
+        static std::string MakePipeName(const G13_Device* usb_device, bool is_input);
 
         static void start_logging();
 
@@ -79,13 +79,13 @@ namespace G13 {
 
         static void SetupDevice(G13_Device* g13);
 
-        static int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* ctx, libusb_device* dev,
+        static int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
                                                         libusb_hotplug_event event, void* user_data);
 
-        static int LIBUSB_CALL HotplugCallbackInsert(libusb_context* ctx, libusb_device* dev,
+        static int LIBUSB_CALL HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
                                                      libusb_hotplug_event event, void* user_data);
 
-        static int LIBUSB_CALL HotplugCallbackRemove(libusb_context* ctx, libusb_device* dev,
+        static int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
                                                      libusb_hotplug_event event, void* user_data);
 
         static int OpenAndAddG13(libusb_device* dev);

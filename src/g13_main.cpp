@@ -1,7 +1,8 @@
+#include <getopt.h>
+
 #include "version.hpp"
 #include "g13_main.hpp"
 #include "g13_manager.hpp"
-#include <getopt.h>
 
 using namespace G13;
 

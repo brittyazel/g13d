@@ -45,10 +45,11 @@ namespace G13 {
     // *************************************************************************
 
     void G13_Key::ParseKey(const unsigned char* byte, G13_Device* g13) const {
-        const bool key_is_down = byte[_index.offset] & _index.mask;
-
-        if (const auto key_state_changed = g13->update(_index.index, key_is_down); key_state_changed && _action) {
-            _action->act(*g13, key_is_down);
+        // state = true if key is pressed
+        if (const bool state = byte[_index.offset] & _index.mask;
+            g13->updateKeyState(_index.index, state) && _action) {
+            // If the key state has changed and if we have an action, execute the action
+            _action->act(*g13, state);
         }
     }
 
