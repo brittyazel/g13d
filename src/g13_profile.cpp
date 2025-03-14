@@ -5,15 +5,6 @@
 #include "g13_profile.hpp"
 
 namespace G13 {
-    static G13_Manager* mInstance = nullptr;
-
-    G13_Manager* G13_Manager::Instance() // Singleton
-    {
-        if (mInstance == nullptr) {
-            mInstance = new G13_Manager;
-        }
-        return mInstance;
-    }
 
     void G13_Profile::_init_keys() {
         // create a G13_Key entry for every key in G13_KEY_SEQ

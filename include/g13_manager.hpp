@@ -16,6 +16,8 @@
  */
 namespace G13 {
     class G13_Manager {
+
+    public:
         G13_Manager();
 
         // declarations
@@ -32,10 +34,6 @@ namespace G13 {
         static libusb_device** devs;
         static std::string logoFilename;
         static const int class_id;
-
-    public:
-        // Singleton pattern instead of passing references around
-        static G13_Manager* Instance();
 
         // static const std::string &getLogoFilename();
         static void setLogoFilename(const std::string& newLogoFilename);

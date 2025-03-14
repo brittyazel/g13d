@@ -29,8 +29,7 @@ namespace G13 {
     libusb_device** G13_Manager::devs;
     std::string G13_Manager::logoFilename;
 
-    G13_Manager::G13_Manager() /* : usb_context(nullptr), devs(nullptr)*/
-    {
+    G13_Manager::G13_Manager() {
         InitKeynames();
     }
 

@@ -7,8 +7,8 @@
 using namespace G13;
 
 int main(const int argc, char* argv[]) {
-    // Ensure an instance of G13_Manager is started
-    G13_Manager::Instance();
+    // Start a new instance
+    G13_Manager();
 
     G13_Manager::start_logging();
     G13_Manager::SetLogLevel("INFO");
