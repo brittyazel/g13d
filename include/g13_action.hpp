@@ -15,17 +15,11 @@ namespace G13 {
     class G13_Device;
     class G13_Profile;
 
-    // typedef std::shared_ptr<G13_Profile> ProfilePtr;
 
-    // *************************************************************************
-
-    /*! holds potential actions which can be bound to G13 activity
-     *
-     */
+    /// Holds potential actions which can be bound to G13 activity
     class G13_Action {
     public:
         explicit G13_Action(G13_Device& keypad) : _keypad(keypad) {}
-
         virtual ~G13_Action();
 
         virtual void act(G13_Device&, bool is_down) = 0;
@@ -39,20 +33,13 @@ namespace G13 {
             return _keypad;
         }
 
-        // [[maybe_unused]] [[nodiscard]] const G13_Device& keypad() const { return
-        // m_keypad; }
-
-        // [[nodiscard]] const G13_Manager& manager() const;
-
     private:
         G13_Device& _keypad;
     };
 
     typedef std::shared_ptr<G13_Action> G13_ActionPtr;
 
-    /*!
-     * action to send one or more keystrokes
-     */
+    /// Action to send one or more keystrokes
     class G13_Action_Keys final : public G13_Action {
     public:
         G13_Action_Keys(G13_Device& keypad, const std::string& keys_string);
@@ -65,9 +52,8 @@ namespace G13 {
         std::vector<G13_State_Key> _keysup;
     };
 
-    /*!
-     * action to send a string to the output pipe
-     */
+
+    /// Action to send a string to the output pipe
     class G13_Action_PipeOut final : public G13_Action {
     public:
         G13_Action_PipeOut(G13_Device& keypad, const std::string& out);
@@ -79,9 +65,7 @@ namespace G13 {
         std::string _out;
     };
 
-    /*!
-     * action to send a command to the g13
-     */
+    /// Action to send a command to the g13
     class G13_Action_Command final : public G13_Action {
     public:
         G13_Action_Command(G13_Device& keypad, std::string cmd);
@@ -93,7 +77,7 @@ namespace G13 {
         std::string _cmd;
     };
 
-    // *************************************************************************
+    /// Template class to hold a reference to the parent object
     template <class PARENT_T>
     class G13_Actionable {
     public:
@@ -111,12 +95,6 @@ namespace G13 {
             return _name;
         }
 
-        // PARENT_T& parent() { return *_parent_ptr; }
-        // [[nodiscard]] const PARENT_T& parent() const { return *_parent_ptr; }
-        // G13_Manager& manager() { return _parent_ptr->manager(); }
-        // [[nodiscard]] const G13_Manager& manager() const { return
-        // _parent_ptr->manager(); }
-
         virtual void set_action(const G13_ActionPtr& action) {
             _action = action;
         }
@@ -129,10 +107,8 @@ namespace G13 {
         PARENT_T* _parent_ptr;
     };
 
-    // *************************************************************************
-    /*! manages the bindings for a G13 key
-     *
-     */
+
+    /// Manages the bindings for a G13 key
     class G13_Key final : public G13_Actionable<G13_Profile> {
     public:
         void dump(std::ostream& o) const;
@@ -168,8 +144,8 @@ namespace G13 {
         bool _should_parse;
     };
 
-    // *************************************************************************
 
+    /// Manages the bindings for a G13 stick
     class G13_StickZone final : public G13_Actionable<G13_Stick> {
     public:
         G13_StickZone(G13_Stick&, const std::string& name, const G13_ZoneBounds&, const G13_ActionPtr& = nullptr);
@@ -180,7 +156,6 @@ namespace G13 {
 
         void dump(std::ostream&) const;
 
-        // void ParseKey(unsigned char* byte, G13_Device* g13);
         void test(const G13_ZoneCoord& loc);
 
         void set_bounds(const G13_ZoneBounds& bounds) {
@@ -191,5 +166,6 @@ namespace G13 {
         G13_ZoneBounds _bounds;
         bool _active;
     };
+
 } // namespace G13
 #endif // G13_ACTION_HPP

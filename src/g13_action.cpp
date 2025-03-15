@@ -3,17 +3,17 @@
 //
 
 #include "g13_action.hpp"
-#include "g13_main.hpp"
 #include "g13_device.hpp"
+#include "g13_main.hpp"
 
-
-// *************************************************************************
 namespace G13 {
+    // *************************************************************************
+
     G13_Action::~G13_Action() = default;
 
     G13_Action_Keys::G13_Action_Keys(G13_Device& keypad, const std::string& keys_string) : G13_Action(keypad) {
         auto scan = [](const std::string& in, std::vector<G13_State_Key>& out) {
-            for (auto keys = Helper::split<std::vector<std::string>>(in, "+"); auto& key : keys) {
+            for (auto keys = split<std::vector<std::string>>(in, "+"); auto& key : keys) {
                 auto kval = FindInputKeyValue(key);
                 if (kval.key() == BAD_KEY_VALUE) {
                     throw G13_CommandException("create action unknown key : " + key);
@@ -22,7 +22,7 @@ namespace G13 {
             }
         };
 
-        const auto keydownup = Helper::split<std::vector<std::string>>(keys_string, " ");
+        const auto keydownup = split<std::vector<std::string>>(keys_string, " ");
 
         scan(keydownup[0], _keys);
         if (keydownup.size() > 1) {
@@ -100,7 +100,7 @@ namespace G13 {
     }
 
     void G13_Action_PipeOut::dump(std::ostream& o) const {
-        o << "WRITE PIPE : " << Helper::repr(_out);
+        o << "WRITE PIPE : " << repr(_out);
     }
 
     G13_Action_Command::G13_Action_Command(G13_Device& keypad, std::string cmd) : G13_Action(keypad),
@@ -115,17 +115,7 @@ namespace G13 {
     }
 
     void G13_Action_Command::dump(std::ostream& o) const {
-        o << "COMMAND : " << Helper::repr(_cmd);
+        o << "COMMAND : " << repr(_cmd);
     }
-
-    /*
-        // inlines
-        inline G13_Manager& G13_Action::manager() {
-            return m_keypad.manager();
-        }
-    */
-
-    /*inline const G13_Manager& G13_Action::manager() const {
-        return m_keypad.manager();
-    }*/
 } // namespace G13
+

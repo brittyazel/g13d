@@ -175,7 +175,6 @@ namespace G13 {
     // *************************************************************************
 
     void G13_Device::SendEvent(const int type, const int code, const int val) {
-        using Helper::IGUR;
         memset(&device_event, 0, sizeof(device_event));
         gettimeofday(&device_event.time, nullptr);
         device_event.type = type;
@@ -185,7 +184,6 @@ namespace G13 {
     }
 
     void G13_Device::OutputPipeWrite(const std::string& out) const {
-        using Helper::IGUR;
         IGUR(write(output_pipe_fid, out.c_str(), out.size()));
     }
 
@@ -384,8 +382,8 @@ namespace G13 {
 
     void G13_Device::Dump(std::ostream& o, const int detail) {
         o << "G13 id=" << getDeviceIndex() << std::endl;
-        o << "   input_pipe_name=" << Helper::repr(input_pipe_name) << std::endl;
-        o << "   output_pipe_name=" << Helper::repr(output_pipe_name) << std::endl;
+        o << "   input_pipe_name=" << repr(input_pipe_name) << std::endl;
+        o << "   output_pipe_name=" << repr(output_pipe_name) << std::endl;
         o << "   current_profile=" << getCurrentProfileRef().name() << std::endl;
         o << "   current_font=" << getCurrentFontRef().name() << std::endl;
 
@@ -421,10 +419,6 @@ namespace G13 {
     };
 
     void G13_Device::InitCommands() {
-        using Helper::advance_ws;
-        using Helper::ltrim;
-        using Helper::glob2regex;
-        // const char *remainder;
 
         commandAdder add_out(command_table, "out", [this](const char* remainder) {
             getLCDRef().WriteString(remainder);
@@ -658,9 +652,6 @@ namespace G13 {
         const char* remainder = str;
 
         try {
-            using Helper::advance_ws;
-            using Helper::ltrim;
-
             std::string cmd;
             advance_ws(remainder, cmd);
 

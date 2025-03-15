@@ -28,7 +28,7 @@ namespace G13 {
     }
 
     void G13_Profile::dump(std::ostream& o) const {
-        o << "Profile " << Helper::repr(name()) << std::endl;
+        o << "Profile " << repr(name()) << std::endl;
         for (auto& key : _keys) {
             if (key.action()) {
                 o << "   ";

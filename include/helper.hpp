@@ -1,44 +1,15 @@
-/*
- * helper.hpp
- *
- * Miscellaneous helpful little tidbits...
- */
-
-/*
- * Copyright (c) 2015, James Fowler
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files
- * (the "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the
- * following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
- * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 #ifndef HELPER_HPP_
 #define HELPER_HPP_
 
-#include <string>
 #include <cstring>
 #include <iomanip>
 #include <map>
+#include <ostream>
+#include <string>
 
 // *************************************************************************
 
-namespace Helper {
+namespace G13 {
     struct string_repr_out {
         explicit string_repr_out(std::string str) : s(std::move(str)) {}
 
@@ -57,19 +28,15 @@ namespace Helper {
         return v;
     }
 
-    inline string_repr_out repr(const char* s) {
-        return string_repr_out(s);
-    }
-
     inline string_repr_out repr(const std::string& s) {
         return string_repr_out(s);
     }
 
     // *************************************************************************
 
-    class NotFoundException : public std::exception {
+    class NotFoundException final : public std::exception {
     public:
-        virtual const char* what() noexcept {
+        [[nodiscard]] const char* what() const noexcept override {
             return nullptr;
         }
     };
@@ -248,7 +215,7 @@ namespace Helper {
     std::string glob2regex(const char* glob);
 
     // *************************************************************************
-} // namespace Helper
+} // namespace G13
 
 // *************************************************************************
 

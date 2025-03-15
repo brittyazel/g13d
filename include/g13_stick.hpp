@@ -12,10 +12,10 @@
 namespace G13 {
     class G13_Device;
 
-    typedef Helper::Coord<int> G13_StickCoord;
-    typedef Helper::Bounds<int> G13_StickBounds;
-    typedef Helper::Coord<double> G13_ZoneCoord;
-    typedef Helper::Bounds<double> G13_ZoneBounds;
+    typedef Coord<int> G13_StickCoord;
+    typedef Bounds<int> G13_StickBounds;
+    typedef Coord<double> G13_ZoneCoord;
+    typedef Bounds<double> G13_ZoneBounds;
 
     // *************************************************************************
 
