@@ -7,7 +7,6 @@
 
 #include <regex>
 #include "g13_action.hpp"
-#include "g13_device.hpp"
 
 namespace G13 {
     class G13_Key;
