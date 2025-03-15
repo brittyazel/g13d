@@ -5,7 +5,7 @@
 #include "g13_action.hpp"
 #include "g13_main.hpp"
 #include "g13_device.hpp"
-#include "g13_manager.hpp"
+
 
 // *************************************************************************
 namespace G13 {
@@ -14,7 +14,7 @@ namespace G13 {
     G13_Action_Keys::G13_Action_Keys(G13_Device& keypad, const std::string& keys_string) : G13_Action(keypad) {
         auto scan = [](const std::string& in, std::vector<G13_State_Key>& out) {
             for (auto keys = Helper::split<std::vector<std::string>>(in, "+"); auto& key : keys) {
-                auto kval = G13_Manager::FindInputKeyValue(key);
+                auto kval = FindInputKeyValue(key);
                 if (kval.key() == BAD_KEY_VALUE) {
                     throw G13_CommandException("create action unknown key : " + key);
                 }
@@ -33,7 +33,7 @@ namespace G13 {
     G13_Action_Keys::~G13_Action_Keys() = default;
 
     void G13_Action_Keys::act(G13_Device& g13, const bool is_down) {
-        auto downkeys = std::vector(G13_Manager::InputKeyMax(), false);
+        auto downkeys = std::vector(InputKeyMax(), false);
 
         auto send_key = [&](const LINUX_KEY_VALUE key, const bool down) {
             g13.SendEvent(EV_KEY, key, down);
@@ -84,7 +84,7 @@ namespace G13 {
             if (!_keys[i].is_down()) {
                 out << "-";
             }
-            out << G13_Manager::FindInputKeyName(_keys[i].key());
+            out << FindInputKeyName(_keys[i].key());
         }
     }
 

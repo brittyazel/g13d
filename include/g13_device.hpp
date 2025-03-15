@@ -21,7 +21,6 @@ namespace G13 {
     class G13_Profile;
     class G13_Action;
     class G13_Font;
-    class G13_Manager;
 
     typedef std::shared_ptr<G13_Profile> ProfilePtr;
     typedef std::shared_ptr<G13_Action> G13_ActionPtr;

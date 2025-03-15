@@ -5,9 +5,6 @@
 #ifndef G13_KEYS_HPP
 #define G13_KEYS_HPP
 
-#include <string>
-#include <vector>
-
 namespace G13 {
     typedef int G13_KEY_INDEX;
     typedef int LINUX_KEY_VALUE;
