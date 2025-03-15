@@ -5,15 +5,17 @@
 #include "g13_hotplug.hpp"
 #include "g13_main.hpp"
 #include "g13_device.hpp"
-#include "g13_manager.hpp"
+
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <log4cpp/OstreamAppender.hh>
 #include <memory>
 
+#include "g13_log.hpp"
+
 // *************************************************************************
 
 namespace G13 {
-    void G13_Manager::DiscoverG13s(libusb_device** devs, const ssize_t count) {
+    void DiscoverG13s(libusb_device** devs, const ssize_t count) {
         for (int i = 0; i < count; i++) {
             libusb_device_descriptor desc{};
             if (const int ret = libusb_get_device_descriptor(devs[i], &desc); ret != LIBUSB_SUCCESS) {
@@ -29,7 +31,7 @@ namespace G13 {
         }
     }
 
-    int G13_Manager::OpenAndAddG13(libusb_device* dev) {
+    int OpenAndAddG13(libusb_device* dev) {
         libusb_device_handle* usb_handle;
         int error = libusb_open(dev, &usb_handle);
         if (error != LIBUSB_SUCCESS) {
@@ -64,7 +66,7 @@ namespace G13 {
         return 1;
     }
 
-    int LIBUSB_CALL G13_Manager::HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
+    int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
                                                           libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device found during enumeration");
 
@@ -73,7 +75,7 @@ namespace G13 {
         return 1;
     }
 
-    int LIBUSB_CALL G13_Manager::HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
+    int LIBUSB_CALL HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
                                                        libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device connected");
 
@@ -91,7 +93,7 @@ namespace G13 {
         return 0; // Rearm
     }
 
-    int LIBUSB_CALL G13_Manager::HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
+    int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
                                                        libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device disconnected");
         int i = 0;
@@ -109,7 +111,7 @@ namespace G13 {
         return 0; // Rearm
     }
 
-    void G13_Manager::SetupDevice(G13_Device* g13) {
+    void SetupDevice(G13_Device* g13) {
         G13_OUT("Setting up device ");
         g13->RegisterContext(usb_context);
         if (!logoFilename.empty()) {
@@ -125,7 +127,7 @@ namespace G13 {
         }
     }
 
-    void G13_Manager::ArmHotplugCallbacks() {
+    void ArmHotplugCallbacks() {
         G13_DBG("Registering USB hotplug callbacks");
 
         // For currently attached devices

@@ -12,7 +12,7 @@
 #include "g13_device.hpp"
 #include "g13_fonts.hpp"
 #include "g13_log.hpp"
-#include "g13_manager.hpp"
+
 #include "g13_main.hpp"
 #include "g13_profile.hpp"
 #include "g13_stick.hpp"
@@ -98,7 +98,7 @@ namespace G13 {
             create_directories(dir_path);
         }
 
-        umask |= std::stoi(std::string("0") + G13::G13_Manager::getStringConfigValue("umask"), nullptr, 8);
+        umask |= std::stoi(std::string("0") + getStringConfigValue("umask"), nullptr, 8);
         mkfifo(fifo_name, 0666);
         const int fd = open(fifo_name, O_RDWR | O_NONBLOCK);
         chmod(fifo_name, 0777 & ~umask);
@@ -597,7 +597,7 @@ namespace G13 {
         commandAdder add_log_level(command_table, "log_level", [this](const char* remainder) {
             std::string level;
             advance_ws(remainder, level);
-            G13_Manager::SetLogLevel(level);
+            SetLogLevel(level);
         });
 
         commandAdder add_refresh(command_table, "refresh", [this](const char* remainder) {
@@ -695,14 +695,14 @@ namespace G13 {
         SetKeyColor(red, green, blue);
 
         uinput_fid = G13CreateUinput(this);
-        input_pipe_name = G13_Manager::MakePipeName(this, true);
+        input_pipe_name = MakePipeName(this, true);
         input_pipe_fid = G13CreateFifo(input_pipe_name.c_str(), S_IRGRP | S_IROTH);
 
         if (input_pipe_fid == -1) {
             G13_ERR("failed opening input pipe " << input_pipe_name);
         }
 
-        output_pipe_name = G13_Manager::MakePipeName(this, false);
+        output_pipe_name = MakePipeName(this, false);
         output_pipe_fid = G13CreateFifo(output_pipe_name.c_str(), S_IWGRP | S_IWOTH);
 
         if (output_pipe_fid == -1) {

@@ -2,6 +2,9 @@
 // Created by khampf on 13-05-2020.
 //
 
+#include <cassert>
+
+#include "g13_main.hpp"
 #include "g13_profile.hpp"
 
 namespace G13 {
@@ -45,7 +48,7 @@ namespace G13 {
     }
 
     G13_Key* G13_Profile::FindKey(const std::string& keyname) {
-        if (const auto key = G13_Manager::FindG13KeyValue(keyname); static_cast<size_t>(key) < _keys.size()) {
+        if (const auto key = FindG13KeyValue(keyname); static_cast<size_t>(key) < _keys.size()) {
             return &_keys[key];
         }
         return nullptr;

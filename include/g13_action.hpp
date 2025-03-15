@@ -6,18 +6,16 @@
 #define G13_ACTION_HPP
 
 #include "g13_keys.hpp"
-#include "g13_manager.hpp"
+
 #include "g13_stick.hpp"
 #include <memory>
 #include <vector>
 
 namespace G13 {
     class G13_Device;
-    class G13_Manager;
     class G13_Profile;
 
     // typedef std::shared_ptr<G13_Profile> ProfilePtr;
-    // class G13_Manager;
 
     // *************************************************************************
 

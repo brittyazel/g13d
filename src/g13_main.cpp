@@ -1,17 +1,28 @@
+#include <csignal>
 #include <getopt.h>
+#include <libevdev-1.0/libevdev/libevdev.h>
+#include <log4cpp/OstreamAppender.hh>
+#include <memory>
 
-#include "version.hpp"
 #include "g13_main.hpp"
-#include "g13_manager.hpp"
+#include "g13_device.hpp"
+#include "g13_keys.hpp"
+#include "g13_log.hpp"
+#include "helper.hpp"
+#include "version.hpp"
 
 using namespace G13;
 
 int main(const int argc, char* argv[]) {
-    // Start a new instance
-    G13_Manager();
+    running = true;
+    class_id = LIBUSB_HOTPLUG_MATCH_ANY;
+    usb_context = nullptr;
 
-    G13_Manager::start_logging();
-    G13_Manager::SetLogLevel("INFO");
+    InitKeynames();
+
+    start_logging();
+    SetLogLevel("INFO");
+
     G13_OUT("g13d v" << VERSION_STRING << " " << __DATE__ << " " << __TIME__);
 
     // TODO: move out argument parsing
@@ -36,29 +47,29 @@ int main(const int argc, char* argv[]) {
 
         switch (opt) {
         case 'l':
-            G13_Manager::setStringConfigValue("logo", std::string(optarg));
-            G13_Manager::setLogoFilename(std::string(optarg));
+            setStringConfigValue("logo", std::string(optarg));
+            setLogoFilename(std::string(optarg));
             break;
 
         case 'c':
-            G13_Manager::setStringConfigValue("config", std::string(optarg));
+            setStringConfigValue("config", std::string(optarg));
             break;
 
         case 'i':
-            G13_Manager::setStringConfigValue("pipe_in", std::string(optarg));
+            setStringConfigValue("pipe_in", std::string(optarg));
             break;
 
         case 'o':
-            G13_Manager::setStringConfigValue("pipe_out", std::string(optarg));
+            setStringConfigValue("pipe_out", std::string(optarg));
             break;
 
         case 'u':
-            G13_Manager::setStringConfigValue("umask", std::string(optarg));
+            setStringConfigValue("umask", std::string(optarg));
             break;
 
         case 'd':
-            G13_Manager::setStringConfigValue("log_level", std::string(optarg));
-            G13_Manager::SetLogLevel(G13_Manager::getStringConfigValue("log_level"));
+            setStringConfigValue("log_level", std::string(optarg));
+            SetLogLevel(getStringConfigValue("log_level"));
             break;
 
         case 'h': // -h or --help
@@ -68,10 +79,10 @@ int main(const int argc, char* argv[]) {
             break;
         }
     }
-    return G13_Manager::Run();
+    return Run();
 }
 
-void printHelp() {
+void G13::printHelp() {
     constexpr auto indent = 24;
     std::cout << "Allowed options" << std::endl;
     std::cout << std::left << std::setw(indent) << "  --help" << "produce help message" << std::endl;
@@ -83,4 +94,228 @@ void printHelp() {
         std::endl;
     std::cout << std::left << std::setw(indent) << "  --log_level <level>" << "logging level" << std::endl;
     exit(1);
+}
+
+//Old G13_Manager Code
+
+void G13::Cleanup() {
+    G13_OUT("Cleaning up");
+    for (const auto this_handle : usb_hotplug_cb_handle) {
+        libusb_hotplug_deregister_callback(usb_context, this_handle);
+    }
+    // TODO: This might be better with an iterator and also g13s.erase(iter)
+    for (const auto g13 : g13s) {
+        // g13->Cleanup();
+        delete g13;
+    }
+    libusb_exit(usb_context);
+}
+
+void G13::InitKeynames() {
+    int key_index = 0;
+
+    // setup maps to let us convert between strings and G13 key names
+    for (auto name = G13_Key_Tables::G13_KEY_STRINGS; *name; name++) {
+        g13_key_to_name[key_index] = *name;
+        g13_name_to_key[*name] = key_index;
+        G13_DBG("mapping G13 " << *name << " = " << key_index);
+        key_index++;
+    }
+
+    // setup maps to let us convert between strings and linux key names
+    input_key_max = libevdev_event_type_get_max(EV_KEY) + 1;
+    for (auto code = 0; code < input_key_max; code++) {
+        if (const auto keystr = libevdev_event_code_get_name(EV_KEY, code); keystr && !strncmp(keystr, "KEY_", 4)) {
+            input_key_to_name[code] = keystr + 4;
+            input_name_to_key[keystr + 4] = code;
+            G13_DBG("mapping " << keystr + 4 << " " << keystr << "=" << code);
+        }
+    }
+
+    // setup maps to let us convert between strings and linux button names
+    for (auto symbol = G13_Key_Tables::G13_BTN_SEQ; *symbol; symbol++) {
+        auto name = std::string("M" + std::string(*symbol));
+        auto keyname = std::string("BTN_" + std::string(*symbol));
+        if (int code = libevdev_event_code_from_name(EV_KEY, keyname.c_str()); code < 0) {
+            G13_ERR("No input event code found for " << keyname);
+        }
+        else {
+            input_key_to_name[code] = name;
+            input_name_to_key[name] = code;
+            G13_DBG("mapping " << name << " " << keyname << "=" << code);
+        }
+    }
+}
+
+void G13::SignalHandler(const int signal) {
+    G13_OUT("Caught signal " << signal << " (" << strsignal(signal) << ")");
+    running = false;
+    // TODO: Should we break usblib handling with a reset?
+}
+
+std::string G13::getStringConfigValue(const std::string& name) {
+    try {
+        return Helper::find_or_throw(stringConfigValues, name);
+    }
+    catch (...) {
+        return "";
+    }
+}
+
+void G13::setStringConfigValue(const std::string& name, const std::string& value) {
+    G13_DBG("setStringConfigValue " << name << " = " << Helper::repr(value));
+    stringConfigValues[name] = value;
+}
+
+std::string G13::MakePipeName(const G13_Device* usb_device, const bool is_input) {
+    auto pipe_name = [&](const char* param, const char* suffix) -> std::string {
+        if (std::string config_base = getStringConfigValue(param); !config_base.empty()) {
+            if (usb_device->getDeviceIndex() == 0) {
+                return config_base;
+            }
+            return config_base + "-" + std::to_string(usb_device->getDeviceIndex());
+        }
+        return std::string(CONTROL_DIR) + "/g13-" + std::to_string(usb_device->getDeviceIndex()) + suffix;
+    };
+
+    if (is_input) {
+        return pipe_name("pipe_in", "");
+    }
+    return pipe_name("pipe_out", "_out");
+}
+
+LINUX_KEY_VALUE G13::FindG13KeyValue(const std::string& keyname) {
+    const auto i = g13_name_to_key.find(keyname);
+    if (i == g13_name_to_key.end()) {
+        return BAD_KEY_VALUE;
+    }
+    return i->second;
+}
+
+G13_State_Key G13::FindInputKeyValue(const std::string& keyname, bool down) {
+    std::string modified_keyname = keyname;
+
+    // If this is a release action, reverse sense
+    if (!strncmp(keyname.c_str(), "-", 1)) {
+        modified_keyname = keyname.c_str() + 1;
+        down = !down;
+    }
+
+    // if there is a KEY_ prefix, strip it off
+    if (!strncmp(modified_keyname.c_str(), "KEY_", 4)) {
+        modified_keyname = modified_keyname.c_str() + 4;
+    }
+
+    const auto i = input_name_to_key.find(modified_keyname);
+    if (i == input_name_to_key.end()) {
+        return G13_State_Key(BAD_KEY_VALUE);
+    }
+    return G13_State_Key(i->second, down);
+}
+
+std::string G13::FindInputKeyName(const LINUX_KEY_VALUE v) {
+    try {
+        return Helper::find_or_throw(input_key_to_name, v);
+    }
+    catch (...) {
+        return "(unknown linux key)";
+    }
+}
+
+std::string G13::FindG13KeyName(const G13_KEY_INDEX v) {
+    try {
+        return Helper::find_or_throw(g13_key_to_name, v);
+    }
+    catch (...) {
+        return "(unknown G13 key)";
+    }
+}
+
+void G13::DisplayKeys() {
+    G13_OUT("Known keys on G13:");
+    G13_OUT(Helper::map_keys_out(g13_name_to_key));
+
+    G13_OUT("Known keys to map to:");
+    G13_OUT(Helper::map_keys_out(input_name_to_key));
+}
+
+int G13::Run() {
+    DisplayKeys();
+
+    int error = libusb_init(&usb_context);
+    if (error != LIBUSB_SUCCESS) {
+        G13_ERR("libusb initialization error: " << G13_Device::DescribeLibusbErrorCode(error));
+        Cleanup();
+        return EXIT_FAILURE;
+    }
+    libusb_set_option(usb_context, LIBUSB_OPTION_LOG_LEVEL, 3);
+
+    if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)) {
+        const ssize_t cnt = libusb_get_device_list(usb_context, &devs);
+        if (cnt < 0) {
+            G13_ERR("Error while getting device list");
+            Cleanup();
+            return EXIT_FAILURE;
+        }
+
+        DiscoverG13s(devs, cnt);
+        libusb_free_device_list(devs, 1);
+        G13_OUT("Found " << g13s.size() << " G13s");
+        if (g13s.empty()) {
+            G13_ERR("Unable to open any device");
+            Cleanup();
+            return EXIT_FAILURE;
+        }
+    }
+    else {
+        ArmHotplugCallbacks();
+    }
+
+    signal(SIGINT, SignalHandler);
+    signal(SIGTERM, SignalHandler);
+
+    for (const auto g13 : g13s) {
+        // This can not be done from the event handler (will give LIBUSB_ERROR_BUSY)
+        SetupDevice(g13);
+    }
+
+    do {
+        if (g13s.empty()) {
+            G13_OUT("Waiting for device to show up ...");
+            error = libusb_handle_events(usb_context);
+            G13_DBG("USB Event wakeup with " << g13s.size() << " devices registered");
+            if (error != LIBUSB_SUCCESS) {
+                G13_ERR("Error: " << G13_Device::DescribeLibusbErrorCode(error));
+            }
+            else {
+                for (const auto g13 : g13s) {
+                    // This can not be done from the event handler (will give
+                    // LIBUSB_ERROR_BUSY)
+                    SetupDevice(g13);
+                }
+            }
+        }
+
+        // Main loop
+        for (const auto g13 : g13s) {
+            const int status = g13->ReadKeypresses();
+            if (!g13s.empty()) {
+                // Cleanup might have removed the object before this loop has run
+                // TODO: This will not work with multiplt devices and can be better
+                g13->ReadCommandsFromPipe();
+            }
+            if (status < 0) {
+                running = false;
+            }
+        }
+    }
+    while (running);
+
+    Cleanup();
+    G13_OUT("Exit");
+    return EXIT_SUCCESS;
+}
+
+void G13::setLogoFilename(const std::string& newLogoFilename) {
+    logoFilename = newLogoFilename;
 }

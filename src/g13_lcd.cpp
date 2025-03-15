@@ -25,6 +25,8 @@
 #include <fstream>
 #include <log4cpp/Category.hh>
 
+#include "g13_log.hpp"
+
 namespace G13 {
     void G13_Device::LcdInit() const {
         if (const int error = libusb_control_transfer(usb_handle, 0, 9, 1, 0, nullptr, 0, 1000); error != LIBUSB_SUCCESS) {

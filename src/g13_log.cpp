@@ -1,3 +1,5 @@
+#include "g13_log.hpp"
+
 #include "g13_main.hpp"
 #include <log4cpp/OstreamAppender.hh>
 #include <log4cpp/BasicLayout.hh>
@@ -5,7 +7,7 @@
 #include <memory>
 
 namespace G13 {
-    void G13_Manager::start_logging() {
+    void start_logging() {
         auto appender1 = std::make_unique<log4cpp::OstreamAppender>("console", &std::cout);
         appender1->setLayout(new log4cpp::BasicLayout());
         log4cpp::Category& root = log4cpp::Category::getRoot();
@@ -21,11 +23,11 @@ namespace G13 {
         //    sub1.addAppender(appender2.get());
     }
 
-    void G13_Manager::SetLogLevel(const log4cpp::Priority::PriorityLevel lvl) {
+    void SetLogLevel(const log4cpp::Priority::PriorityLevel lvl) {
         G13_OUT("set log level to " << lvl);
     }
 
-    void G13_Manager::SetLogLevel(const std::string& level) {
+    void SetLogLevel(const std::string& level) {
         log4cpp::Category& root = log4cpp::Category::getRoot();
         try {
             const auto numLevel = log4cpp::Priority::getPriorityValue(level);

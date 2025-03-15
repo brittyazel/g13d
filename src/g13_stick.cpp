@@ -1,6 +1,7 @@
 /*
  * This file contains code for managing keys and profiles
  */
+#include "g13_log.hpp"
 #include "g13_main.hpp"
 
 namespace G13 {
