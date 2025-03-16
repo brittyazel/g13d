@@ -13,17 +13,17 @@ license=('MIT')
 depends=('log4cpp')
 provides=('g13d')
 conflicts=('g13d' 'g13' 'g13-git')
-makedepends=('git' 'cmake')
+makedepends=('git' 'meson')
 source=("git+https://github.com/brittyazel/g13d.git")
 sha256sums=('SKIP')
 install=g13d.install
 
 build() {
-    cmake -B build -S "${pkgbase}"
-    cmake --build build --target g13d pbm2lpbm
+    meson setup build "${pkgbase}" --prefix "/usr"
+    meson compile -C build g13d pbm2lpbm
 }
 
 package() {
     # binaries
-    cmake --install build --prefix "${pkgdir}"
+    meson install -C build --destdir "${pkgdir}"
 }

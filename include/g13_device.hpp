@@ -26,6 +26,9 @@ namespace G13 {
 
     constexpr size_t G13_NUM_KEYS = 40;
 
+    static int G13CreateUinput(G13_Device* g13);
+    static int G13CreateFifo(const char* fifo_name, mode_t umask);
+
     class G13_Device {
     public:
         typedef std::function<void(const char*)> COMMAND_FUNCTION;
@@ -102,9 +105,6 @@ namespace G13 {
         libusb_device_handle* usb_handle;
         libusb_device* usb_device;
     };
-
-    static int G13CreateUinput(G13_Device* g13);
-    static int G13CreateFifo(const char* fifo_name, mode_t umask);
 } // namespace G13
 
 #endif // G13_DEVICE_HPP
