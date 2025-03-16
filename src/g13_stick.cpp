@@ -1,8 +1,11 @@
 /*
  * This file contains code for managing keys and profiles
  */
+#include <iomanip>
+
 #include "g13_log.hpp"
 #include "g13_main.hpp"
+#include "g13_stick.hpp"
 
 namespace G13 {
     void G13_Device::parse_joystick(const unsigned char* buf) {

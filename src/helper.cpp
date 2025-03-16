@@ -1,7 +1,7 @@
 #include <functional>
-#include "helper.hpp"
 
-// *************************************************************************
+#include "helper.hpp"
+#include "g13_main.hpp"
 
 namespace G13 {
     void string_repr_out::write_on(std::ostream& o) const {
@@ -30,8 +30,8 @@ namespace G13 {
                 break;
             default:
                 if (const unsigned char c = *cp; c < 32) {
-                    const unsigned char hi = '0' + (c & 0x0fu);
-                    const unsigned char lo = '0' + (static_cast<unsigned char>(c >> 4u) & 0x0fu);
+                    const unsigned char hi = '0' + (c & 0x0F);
+                    const unsigned char lo = '0' + (static_cast<unsigned char>(c >> 4) & 0x0F);
                     o << "\\x" << hi << lo;
                 }
                 else {
@@ -43,7 +43,6 @@ namespace G13 {
 
         o << "\"";
     }
-
 
     // Translate a glob pattern into a regular expression.
     std::string glob2regex(const char* glob) {
@@ -61,12 +60,11 @@ namespace G13 {
             bool nomax(false);
 
             if (*glob == '*' && glob[1] == '*') {
-                // Match descendant?
                 regex += ".";
                 for (glob += 2; *glob == '*'; glob++);
             }
             else {
-                regex += "[^/]"; // Do not match descendant.
+                regex += "[^/]";
                 // Optimize consecutive wildcards gathering min and max counts.
                 for (;; glob++) {
                     if (*glob == '?') {
@@ -74,7 +72,7 @@ namespace G13 {
                     }
                     else if (*glob == '*') {
                         if (glob[1] == '*') {
-                            break; // Stop on descendant matchmark.
+                            break;
                         }
                         nomax = true;
                     }
@@ -94,11 +92,11 @@ namespace G13 {
                 }
             }
             else {
-                regex += std::string("{") + std::to_string(min);
+                regex += "{" + std::to_string(min);
                 if (nomax) {
                     regex += ',';
                 }
-                regex += rbrace;
+                regex += '}';
             }
         };
 
@@ -106,11 +104,9 @@ namespace G13 {
         auto set = [&]() {
             regex += *glob++;
             if (*glob == '^' || *glob == '!') {
-                // Handle negation mark.
                 regex += "^";
                 glob++;
             }
-            // Convert set content.
             while (auto c = *glob) {
                 glob++;
                 if (c == rbracket) {
@@ -182,5 +178,3 @@ namespace G13 {
         return regex + '$';
     }
 } // namespace G13
-
-// *************************************************************************

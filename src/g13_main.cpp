@@ -1,6 +1,7 @@
 #include <csignal>
 #include <getopt.h>
 #include <iostream>
+#include <iomanip>
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <libusb-1.0/libusb.h>
 #include <log4cpp/OstreamAppender.hh>

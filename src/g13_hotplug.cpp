@@ -1,16 +1,15 @@
 //
 // Created by khampf on 16-05-2020.
 //
-
-#include "g13_hotplug.hpp"
-#include "g13_main.hpp"
-#include "g13_device.hpp"
-
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <log4cpp/OstreamAppender.hh>
 #include <memory>
 
+#include "g13_device.hpp"
+#include "g13_hotplug.hpp"
 #include "g13_log.hpp"
+#include "g13_main.hpp"
+
 
 // *************************************************************************
 
