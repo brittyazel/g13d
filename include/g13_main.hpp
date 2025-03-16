@@ -5,8 +5,6 @@
 #include <log4cpp/Priority.hh>
 
 #include "g13_device.hpp"
-#include "g13_keys.hpp"
-#include "g13_log.hpp"
 
 
 namespace G13 {
@@ -27,32 +25,16 @@ namespace G13 {
     void Initialize(int argc, char* argv[]);
     void printHelp();
     int Run();
-    void SetupDevice(G13_Device* g13);
     void Cleanup();
     void setLogoFilename(const std::string& newLogoFilename);
-    int FindG13KeyValue(const std::string& keyname);
-    std::string FindG13KeyName(int v);
-    G13_State_Key FindInputKeyValue(const std::string& keyname, bool down = true);
-    std::string FindInputKeyName(LINUX_KEY_VALUE v);
-    LINUX_KEY_VALUE InputKeyMax();
     std::string getStringConfigValue(const std::string& name);
     void setStringConfigValue(const std::string& name, const std::string& value);
     std::string MakePipeName(const G13_Device* usb_device, bool is_input);
     void start_logging();
     void SetLogLevel(log4cpp::Priority::PriorityLevel lvl);
     void SetLogLevel(const std::string& level);
-    void InitKeynames();
-    void DisplayKeys();
-    void DiscoverG13s(libusb_device** devs, ssize_t count);
+
     void SignalHandler(int);
-    int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
-                                             libusb_hotplug_event event, void* user_data);
-    int LIBUSB_CALL HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
-                                          libusb_hotplug_event event, void* user_data);
-    int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
-                                          libusb_hotplug_event event, void* user_data);
-    int OpenAndAddG13(libusb_device* dev);
-    void ArmHotplugCallbacks();
 
 
     // *************************************************************************
@@ -60,6 +42,7 @@ namespace G13 {
     public:
         explicit G13_CommandException(std::string reason) : reason(std::move(reason)) {}
         [[nodiscard]] const char* what() const noexcept override;
+
     private:
         std::string reason;
     };

@@ -4,11 +4,12 @@
 
 #include <cassert>
 
+#include "g13_key.hpp"
+#include "g13_key_tables.hpp"
 #include "g13_main.hpp"
 #include "g13_profile.hpp"
 
 namespace G13 {
-
     void G13_Profile::_init_keys() {
         // create a G13_Key entry for every key in G13_KEY_SEQ
         int key_index = 0;

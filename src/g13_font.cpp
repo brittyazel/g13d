@@ -1,8 +1,9 @@
-#include "g13_fonts.hpp"
 
 #include <memory>
 #include <utility>
 #include "g13_device.hpp"
+
+#include "g13_font.hpp"
 
 namespace G13 {
     // font data from https://github.com/dhepper/font8x8
@@ -385,7 +386,7 @@ namespace G13 {
             }
         }
         else {
-            memcpy(dest, data, (size_t)width);
+            memcpy(dest, data, width);
         }
         for (unsigned int x = 0; x < width; x++) {
             bits_inverted[x] = ~dest[x];
@@ -410,7 +411,7 @@ namespace G13 {
 
         current_font->InstallFont(font8x8_basic, G13_FontChar::FF_ROTATE, 0);
 
-        const FontPtr fiveXeight(new G13_Font("5x8", 5));
+        const std::shared_ptr<G13_Font> fiveXeight(new G13_Font("5x8", 5));
         fiveXeight->InstallFont(font5x8, 0, 32);
         fonts[fiveXeight->name()] = fiveXeight;
     }

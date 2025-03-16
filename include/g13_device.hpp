@@ -15,14 +15,13 @@
 #include "g13_lcd.hpp"
 #include "g13_profile.hpp"
 #include "g13_stick.hpp"
+#include "g13_font.hpp"
 
 namespace G13 {
-
     class G13_Profile;
     class G13_Font;
 
     typedef std::shared_ptr<G13_Profile> ProfilePtr;
-    typedef std::shared_ptr<G13_Font> FontPtr;
 
     constexpr size_t G13_NUM_KEYS = 40;
 
@@ -31,13 +30,14 @@ namespace G13 {
         typedef std::function<void(const char*)> COMMAND_FUNCTION;
         typedef std::map<std::string, COMMAND_FUNCTION> CommandFunctionTable;
 
-        G13_Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle, int device_index);
+        G13_Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle,
+                   int device_index);
         ~G13_Device();
 
         G13_LCD& getLCDRef();
         G13_Stick& getStickRef();
 
-        FontPtr SwitchToFont(const std::string& name);
+        std::shared_ptr<G13_Font> SwitchToFont(const std::string& name);
         void SwitchToProfile(const std::string& name);
 
         [[nodiscard]] std::vector<std::string> FilteredProfileNames(const std::regex& pattern) const;
@@ -87,8 +87,8 @@ namespace G13 {
         int output_pipe_fid{};
         std::string output_pipe_name;
 
-        std::map<std::string, FontPtr> fonts;
-        FontPtr current_font;
+        std::map<std::string, std::shared_ptr<G13_Font>> fonts;
+        std::shared_ptr<G13_Font> current_font;
         std::map<std::string, ProfilePtr> profiles;
         ProfilePtr current_profile;
         std::vector<std::string> files_currently_loading;
@@ -102,6 +102,8 @@ namespace G13 {
         libusb_device* usb_device;
     };
 
+    static int G13CreateUinput(G13_Device* g13);
+    static int G13CreateFifo(const char* fifo_name, mode_t umask);
 } // namespace G13
 
 #endif // G13_DEVICE_HPP

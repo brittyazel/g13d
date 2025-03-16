@@ -3,15 +3,14 @@
  */
 #include <iomanip>
 
+#include "g13_action.hpp"
+#include "g13_action_keys.hpp"
 #include "g13_log.hpp"
 #include "g13_main.hpp"
 #include "g13_stick.hpp"
+#include "g13_stickzone.hpp"
 
 namespace G13 {
-    void G13_Device::parse_joystick(const unsigned char* buf) {
-        getStickRef().ParseJoystick(buf);
-    }
-
     G13_Stick::G13_Stick(G13_Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255), m_center_pos(127, 127),
                                                m_north_pos(127, 0) {
         m_stick_mode = STICK_KEYS;
@@ -88,39 +87,6 @@ namespace G13 {
             zone.dump(out);
             out << std::endl;
         }
-    }
-
-    void G13_StickZone::dump(std::ostream& out) const {
-        out << "   " << std::setw(20) << name() << "   " << _bounds << "  ";
-        if (action()) {
-            action()->dump(out);
-        }
-        else {
-            out << " (no action)";
-        }
-    }
-
-    void G13_StickZone::test(const G13_ZoneCoord& loc) {
-        if (!_action)
-            return;
-        const bool prior_active = _active;
-        _active = _bounds.contains(loc);
-        if (!_active) {
-            if (prior_active) {
-                // cout << "exit stick zone " << m_name << std::endl;
-                _action->act(false);
-            }
-        }
-        else {
-            // cout << "in stick zone " << m_name << std::endl;
-            _action->act(true);
-        }
-    }
-
-    G13_StickZone::G13_StickZone(G13_Stick& stick, const std::string& name, const G13_ZoneBounds& b,
-                                 const std::shared_ptr<G13_Action>& action) : G13_Actionable(stick, name), _bounds(b),
-                                                                _active(false) {
-        G13_Actionable::set_action(action); // Call to virtual from ctor!
     }
 
     void G13_Stick::ParseJoystick(const unsigned char* buf) {

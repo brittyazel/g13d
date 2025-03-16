@@ -4,10 +4,10 @@ project(g13d)
 set(CMAKE_CXX_STANDARD 23)
 
 option(DEBUG "Compile for debugging" OFF)
-if(DEBUG)
-        add_compile_options(-g)
-        add_link_options(-g)
-endif()
+if (DEBUG)
+    add_compile_options(-g)
+    add_link_options(-g)
+endif ()
 
 set(CONTROL_DIR "/run/g13d" CACHE STRING "Absolute directory of default pipe files (/run/g13d/)")
 add_definitions(-DCONTROL_DIR="${CONTROL_DIR}")
@@ -19,15 +19,26 @@ add_executable(g13d
         src/g13_main.cpp
         include/g13_actionable.hpp
         include/g13_action.hpp
-        src/g13_action.cpp
+        include/g13_action_keys.hpp
+        src/g13_action_keys.cpp
+        include/g13_action_pipeout.hpp
+        src/g13_action_pipeout.cpp
+        include/g13_stickzone.hpp
+        src/g13_stickzone.cpp
+        include/g13_action_command.hpp
+        src/g13_action_command.cpp
         include/g13_device.hpp
         src/g13_device.cpp
-        include/g13_fonts.hpp
-        src/g13_fonts.cpp
+        include/g13_font.hpp
+        src/g13_font.cpp
         include/g13_hotplug.hpp
         src/g13_hotplug.cpp
-        include/g13_keys.hpp
-        src/g13_keys.cpp
+        include/g13_key_tables.hpp
+        include/g13_state_key.hpp
+        src/g13_state_key.cpp
+        src/g13_key_tables.cpp
+        include/g13_key.hpp
+        src/g13_key.cpp
         include/g13_lcd.hpp
         src/g13_lcd.cpp
         include/g13_log.hpp

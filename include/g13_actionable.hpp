@@ -1,10 +1,10 @@
 #ifndef G13_ACTIONABLE_HPP
 #define G13_ACTIONABLE_HPP
 
-#include "g13_action.hpp"
+#include <memory>
+#include <string>
 
 namespace G13 {
-
     class G13_Action;
 
     /// Template class to hold a reference to the parent object
@@ -36,7 +36,6 @@ namespace G13 {
     private:
         PARENT_T* _parent_ptr;
     };
-
 } // namespace G13
 
 #endif // G13_ACTIONABLE_HPP

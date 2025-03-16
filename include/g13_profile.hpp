@@ -6,7 +6,8 @@
 #define G13_PROFILE_HPP
 
 #include <regex>
-#include "g13_action.hpp"
+
+#include "g13_key.hpp"
 
 namespace G13 {
     class G13_Key;

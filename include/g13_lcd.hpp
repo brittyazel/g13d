@@ -40,7 +40,7 @@ namespace G13 {
         }
 
         static unsigned image_byte_offset(const unsigned row, const unsigned col) {
-            return col + (row / 8) * G13_LCD_BYTES_PER_ROW * 8;
+            return col + row / 8 * G13_LCD_BYTES_PER_ROW * 8;
         }
 
         // void image_setpixel(unsigned row, unsigned col);

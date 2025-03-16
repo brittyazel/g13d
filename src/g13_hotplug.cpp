@@ -66,7 +66,7 @@ namespace G13 {
     }
 
     int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
-                                                          libusb_hotplug_event event, void* user_data) {
+                                             libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device found during enumeration");
 
         // Call this as it would have been detected on connection later
@@ -75,7 +75,7 @@ namespace G13 {
     }
 
     int LIBUSB_CALL HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
-                                                       libusb_hotplug_event event, void* user_data) {
+                                          libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device connected");
 
         // Just make sure we have not been called multiple times
@@ -93,7 +93,7 @@ namespace G13 {
     }
 
     int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
-                                                       libusb_hotplug_event event, void* user_data) {
+                                          libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device disconnected");
         int i = 0;
         for (auto iter = g13s.begin(); iter != g13s.end(); ++i) {

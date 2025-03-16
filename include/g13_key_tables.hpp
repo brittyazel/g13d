@@ -2,18 +2,11 @@
 // Created by khampf on 07-05-2020.
 //
 
-#ifndef G13_KEYS_HPP
-#define G13_KEYS_HPP
+#ifndef G13_KEY_TABLES_HPP
+#define G13_KEY_TABLES_HPP
 
 namespace G13 {
-    typedef int G13_KEY_INDEX;
-    typedef int LINUX_KEY_VALUE;
-    constexpr LINUX_KEY_VALUE BAD_KEY_VALUE = -1;
-
-
-    /*!
-     * Various static key tables.
-     */
+    /// Various static key tables
     class G13_Key_Tables {
     public:
         /*! sequence containing the
@@ -40,29 +33,5 @@ namespace G13 {
          */
         static const char* G13_BTN_SEQ[]; // formerly M_INPUT_BTN_SEQ
     };
-
-
-    /*!
-     * a key code with up/down indicator
-     */
-    class G13_State_Key {
-    public:
-        explicit G13_State_Key(const LINUX_KEY_VALUE key = 0, const bool down = true) {
-            _key = key;
-            _down = down;
-        }
-
-        [[nodiscard]] LINUX_KEY_VALUE key() const {
-            return _key;
-        }
-
-        [[nodiscard]] bool is_down() const {
-            return _down;
-        }
-
-    private:
-        LINUX_KEY_VALUE _key;
-        bool _down;
-    };
 } // namespace G13
-#endif // G13_KEYS_HPP
+#endif // G13_KEY_TABLES_HPP

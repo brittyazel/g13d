@@ -41,12 +41,6 @@ namespace G13 {
         [[nodiscard]] std::vector<std::string> FilteredZoneNames(const std::regex& pattern) const;
         void RemoveZone(const G13_StickZone& zone);
 
-        /*
-          [[nodiscard]] const std::vector<G13_StickZone> &zones() const {
-            return m_zones;
-          }
-        */
-
         void dump(std::ostream&) const;
 
     protected:

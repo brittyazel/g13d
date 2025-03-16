@@ -82,7 +82,7 @@ namespace G13 {
         constexpr char lbrace = '{';
         constexpr char rbrace = '}';
 
-        auto wildcard = [&]() {
+        auto wildcard = [&] {
             unsigned int min(0);
             bool nomax(false);
 
@@ -125,7 +125,7 @@ namespace G13 {
             }
         };
 
-        auto set = [&]() {
+        auto set = [&] {
             regex += *glob++;
             if (*glob == '^' || *glob == '!') {
                 regex += "^";
@@ -150,7 +150,7 @@ namespace G13 {
         };
 
         std::function<void(bool)> terms;
-        auto group = [&]() {
+        auto group = [&] {
             regex += lparent;
             for (glob++; *glob;) {
                 if (*glob == ',') {

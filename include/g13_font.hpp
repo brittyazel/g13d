@@ -2,17 +2,16 @@
 // Created by khampf on 07-05-2020.
 //
 
-#ifndef G13_FONTS_HPP
-#define G13_FONTS_HPP
+#ifndef G13_FONT_HPP
+#define G13_FONT_HPP
 
 #include <cstring>
 #include <memory>
 #include <string>
 
 namespace G13 {
-    class G13_Font;
-
-    typedef std::shared_ptr<G13_Font> FontPtr;
+    extern unsigned char font8x8_basic[128][8];
+    extern unsigned char font5x8[][5];
 
     class G13_FontChar {
     public:
@@ -57,9 +56,6 @@ namespace G13 {
         unsigned int m_width;
 
         G13_FontChar m_chars[256];
-
-        // unsigned char font_basic[256][8];
-        // unsigned char font_inverted[256][8];
     };
 } // namespace G13
-#endif // G13_FONTS_HPP
+#endif // G13_FONT_HPP

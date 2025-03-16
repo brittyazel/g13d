@@ -1,16 +1,14 @@
 //
-// Created by khampf on 07-05-2020.
+// Created by britt on 3/15/25.
 //
 
 #include "g13_action.hpp"
+#include "g13_action_keys.hpp"
 #include "g13_device.hpp"
+#include "g13_log.hpp"
 #include "g13_main.hpp"
 
 namespace G13 {
-    // *************************************************************************
-
-    G13_Action::~G13_Action() = default;
-
     G13_Action_Keys::G13_Action_Keys(G13_Device& keypad, const std::string& keys_string) : G13_Action(keypad) {
         auto scan = [](const std::string& in, std::vector<G13_State_Key>& out) {
             for (auto keys = split<std::vector<std::string>>(in, "+"); auto& key : keys) {
@@ -87,35 +85,4 @@ namespace G13 {
             out << FindInputKeyName(_keys[i].key());
         }
     }
-
-    G13_Action_PipeOut::G13_Action_PipeOut(G13_Device& keypad, const std::string& out) : G13_Action(keypad),
-        _out(out + "\n") {}
-
-    G13_Action_PipeOut::~G13_Action_PipeOut() = default;
-
-    void G13_Action_PipeOut::act(G13_Device& kp, const bool is_down) {
-        if (is_down) {
-            kp.OutputPipeWrite(_out);
-        }
-    }
-
-    void G13_Action_PipeOut::dump(std::ostream& o) const {
-        o << "WRITE PIPE : " << repr(_out);
-    }
-
-    G13_Action_Command::G13_Action_Command(G13_Device& keypad, std::string cmd) : G13_Action(keypad),
-        _cmd(std::move(cmd)) {}
-
-    G13_Action_Command::~G13_Action_Command() = default;
-
-    void G13_Action_Command::act(G13_Device& kp, const bool is_down) {
-        if (is_down) {
-            keypad().Command(_cmd.c_str());
-        }
-    }
-
-    void G13_Action_Command::dump(std::ostream& o) const {
-        o << "COMMAND : " << repr(_cmd);
-    }
 } // namespace G13
-

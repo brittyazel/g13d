@@ -2,9 +2,7 @@
  * This file contains code for managing keys and profiles
  */
 
-#include "g13_main.hpp"
-#include "g13_device.hpp"
-#include "g13_keys.hpp"
+#include "g13_key_tables.hpp"
 
 namespace G13 {
     const char* G13_Key_Tables::G13_KEY_STRINGS[] = {
@@ -31,27 +29,4 @@ namespace G13 {
             "LEFT", "RIGHT", "MIDDLE", "SIDE", "EXTRA",
             nullptr
         };
-
-    void G13_Key::dump(std::ostream& o) const {
-        o << FindG13KeyName(index()) << "(" << index() << ") : ";
-        if (action()) {
-            action()->dump(o);
-        }
-        else {
-            o << "(no action)";
-        }
-    }
-
-    // *************************************************************************
-
-    void G13_Key::ParseKey(const unsigned char* byte, G13_Device* g13) const {
-        // state = true if key is pressed
-        if (const bool state = byte[_index.offset] & _index.mask;
-            g13->updateKeyState(_index.index, state) && _action) {
-            // If the key state has changed and if we have an action, execute the action
-            _action->act(*g13, state);
-        }
-    }
-
-    // *************************************************************************
 } // namespace G13

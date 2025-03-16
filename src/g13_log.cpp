@@ -1,10 +1,11 @@
-#include "g13_log.hpp"
 
-#include "g13_main.hpp"
 #include <log4cpp/OstreamAppender.hh>
 #include <log4cpp/BasicLayout.hh>
 #include <log4cpp/Category.hh>
 #include <memory>
+
+#include "g13_log.hpp"
+#include "g13_main.hpp"
 
 namespace G13 {
     void start_logging() {

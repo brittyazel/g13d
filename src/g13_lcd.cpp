@@ -20,7 +20,7 @@
 
 #include "g13_main.hpp"
 #include "g13_device.hpp"
-#include "g13_fonts.hpp"
+#include "g13_font.hpp"
 #include "logo.hpp"
 #include <fstream>
 #include <log4cpp/Category.hh>
@@ -28,59 +28,11 @@
 #include "g13_log.hpp"
 
 namespace G13 {
-    void G13_Device::LcdInit() const {
-        if (const int error = libusb_control_transfer(usb_handle, 0, 9, 1, 0, nullptr, 0, 1000); error != LIBUSB_SUCCESS) {
-            G13_ERR("Error when initializing LCD endpoint: " << G13_Device::DescribeLibusbErrorCode(error));
-        }
-        else {
-            LcdWrite(g13_logo, sizeof(g13_logo));
-        }
-    }
-
-    void G13_Device::LcdWrite(const unsigned char* data, const size_t size) const {
-        if (size != G13_LCD_BUFFER_SIZE) {
-            G13_LOG(
-                log4cpp::Priority::ERROR << "Invalid LCD data size " << size << ", should be " << G13_LCD_BUFFER_SIZE);
-            return;
-        }
-
-        unsigned char buffer[G13_LCD_BUFFER_SIZE + 32] = {};
-        buffer[0] = 0x03;
-        memcpy(buffer + 32, data, G13_LCD_BUFFER_SIZE);
-        int bytes_written;
-
-        const int error = libusb_interrupt_transfer(usb_handle, LIBUSB_ENDPOINT_OUT | G13_LCD_ENDPOINT, buffer,
-                                                    G13_LCD_BUFFER_SIZE + 32, &bytes_written, 1000);
-
-        if (error) {
-            G13_LOG(
-                log4cpp::Priority::ERROR << "Error when transferring image: " << DescribeLibusbErrorCode(error) << ", "
-                << bytes_written << " bytes written");
-        }
-    }
-
-    void G13_Device::LcdWriteFile(const std::string& filename) const {
-        std::ifstream filestr;
-
-        filestr.open(filename.c_str());
-        std::filebuf* pbuf = filestr.rdbuf();
-
-        const size_t size = pbuf->pubseekoff(0, std::ios::end, std::ios::in);
-        pbuf->pubseekpos(0, std::ios::in);
-
-        char buffer[size];
-
-        pbuf->sgetn(buffer, static_cast<long>(size));
-
-        filestr.close();
-        LcdWrite(reinterpret_cast<unsigned char*>(buffer), size);
-    }
-
     void G13_LCD::Image(const unsigned char* data, const int size) const {
         m_keypad.LcdWrite(data, size);
     }
 
-    G13_LCD::G13_LCD(G13_Device& keypad) : m_keypad(keypad), image_buf{} {
+    G13_LCD::G13_LCD(G13_Device& keypad) : m_keypad(keypad) {
         cursor_col = 0;
         cursor_row = 0;
         text_mode = 0;
@@ -163,7 +115,7 @@ namespace G13 {
                 }
             }
             else if (*str == '\t') {
-                cursor_col += 4 - (cursor_col % 4);
+                cursor_col += 4 - cursor_col % 4;
                 if (++cursor_col >= G13_LCD_COLUMNS) {
                     cursor_col = 0;
                     if (++cursor_row >= G13_LCD_TEXT_ROWS) {

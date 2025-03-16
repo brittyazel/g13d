@@ -10,18 +10,23 @@
 #include <vector>
 
 #include "g13_device.hpp"
-#include "g13_fonts.hpp"
+#include "g13_action_command.hpp"
+#include "g13_action_keys.hpp"
+#include "g13_action_pipeout.hpp"
+#include "g13_font.hpp"
 #include "g13_log.hpp"
-
 #include "g13_main.hpp"
 #include "g13_profile.hpp"
 #include "g13_stick.hpp"
+#include "g13_stickzone.hpp"
+#include "logo.hpp"
 
 namespace G13 {
     // *************************************************************************
 
     // Constructor
-    G13_Device::G13_Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle, const int device_index)
+    G13_Device::G13_Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle,
+                           const int device_index)
         : device_index(device_index),
           usb_context(usb_context),
           uinput_fid(-1),
@@ -105,7 +110,7 @@ namespace G13 {
         return fd;
     }
 
-    int G13CreateUinput(G13_Device* g13) {
+    static int G13CreateUinput(G13_Device* g13) {
         uinput_user_dev uinp{};
         const char* dev_uinput_fname = access("/dev/input/uinput", F_OK) == 0
                                            ? "/dev/input/uinput"
@@ -327,8 +332,8 @@ namespace G13 {
         }
     }
 
-    FontPtr G13_Device::SwitchToFont(const std::string& name) {
-        FontPtr font = fonts[name];
+    std::shared_ptr<G13_Font> G13_Device::SwitchToFont(const std::string& name) {
+        std::shared_ptr<G13_Font> font = fonts[name];
         if (font) {
             current_font = font;
         }
@@ -415,11 +420,10 @@ namespace G13 {
         commandAdder& operator+=(G13_Device::COMMAND_FUNCTION f) {
             _t[_name] = std::move(f);
             return *this;
-        };
+        }
     };
 
     void G13_Device::InitCommands() {
-
         commandAdder add_out(command_table, "out", [this](const char* remainder) {
             getLCDRef().WriteString(remainder);
         });
@@ -540,7 +544,6 @@ namespace G13 {
             advance_ws(remainder, operation);
             advance_ws(remainder, zonename);
             if (operation == "add") {
-                /* G13_StickZone* zone = */
                 getStickRef().zone(zonename, true);
             }
             else {
@@ -709,6 +712,59 @@ namespace G13 {
         close(uinput_fid);
         libusb_release_interface(usb_handle, 0);
         libusb_close(usb_handle);
+    }
+
+    void G13_Device::parse_joystick(const unsigned char* buf) {
+        getStickRef().ParseJoystick(buf);
+    }
+
+    void G13_Device::LcdInit() const {
+        if (const int error = libusb_control_transfer(usb_handle, 0, 9, 1, 0, nullptr, 0, 1000); error !=
+            LIBUSB_SUCCESS) {
+            G13_ERR("Error when initializing LCD endpoint: " << G13_Device::DescribeLibusbErrorCode(error));
+            }
+        else {
+            LcdWrite(g13_logo, sizeof(g13_logo));
+        }
+    }
+
+    void G13_Device::LcdWrite(const unsigned char* data, const size_t size) const {
+        if (size != G13_LCD_BUFFER_SIZE) {
+            G13_LOG(
+                log4cpp::Priority::ERROR << "Invalid LCD data size " << size << ", should be " << G13_LCD_BUFFER_SIZE);
+            return;
+        }
+
+        unsigned char buffer[G13_LCD_BUFFER_SIZE + 32] = {};
+        buffer[0] = 0x03;
+        memcpy(buffer + 32, data, G13_LCD_BUFFER_SIZE);
+        int bytes_written;
+
+        const int error = libusb_interrupt_transfer(usb_handle, LIBUSB_ENDPOINT_OUT | G13_LCD_ENDPOINT, buffer,
+                                                    G13_LCD_BUFFER_SIZE + 32, &bytes_written, 1000);
+
+        if (error) {
+            G13_LOG(
+                log4cpp::Priority::ERROR << "Error when transferring image: " << DescribeLibusbErrorCode(error) << ", "
+                << bytes_written << " bytes written");
+        }
+    }
+
+    void G13_Device::LcdWriteFile(const std::string& filename) const {
+        std::ifstream filestr;
+
+        filestr.open(filename.c_str());
+        std::filebuf* pbuf = filestr.rdbuf();
+
+        const size_t size = pbuf->pubseekoff(0, std::ios::end, std::ios::in);
+        pbuf->pubseekpos(0, std::ios::in);
+
+        char buffer[size];
+
+        pbuf->sgetn(buffer, static_cast<long>(size));
+
+        filestr.close();
+        LcdWrite(reinterpret_cast<unsigned char*>(buffer), size);
     }
 
 } // namespace G13
