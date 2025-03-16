@@ -118,7 +118,7 @@ namespace G13 {
     }
 
     G13_StickZone::G13_StickZone(G13_Stick& stick, const std::string& name, const G13_ZoneBounds& b,
-                                 const G13_ActionPtr& action) : G13_Actionable(stick, name), _bounds(b),
+                                 const std::shared_ptr<G13_Action>& action) : G13_Actionable(stick, name), _bounds(b),
                                                                 _active(false) {
         G13_Actionable::set_action(action); // Call to virtual from ctor!
     }

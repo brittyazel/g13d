@@ -363,7 +363,7 @@ namespace G13 {
         return profile;
     }
 
-    G13_ActionPtr G13_Device::MakeAction(const std::string& action) {
+    std::shared_ptr<G13_Action> G13_Device::MakeAction(const std::string& action) {
         if (action.empty()) {
             throw G13_CommandException("empty action string");
         }

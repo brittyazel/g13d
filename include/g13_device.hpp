@@ -19,11 +19,9 @@
 namespace G13 {
 
     class G13_Profile;
-    class G13_Action;
     class G13_Font;
 
     typedef std::shared_ptr<G13_Profile> ProfilePtr;
-    typedef std::shared_ptr<G13_Action> G13_ActionPtr;
     typedef std::shared_ptr<G13_Font> FontPtr;
 
     constexpr size_t G13_NUM_KEYS = 40;
@@ -53,7 +51,7 @@ namespace G13 {
         int ReadKeypresses();
         void parse_joystick(const unsigned char* buf);
 
-        G13_ActionPtr MakeAction(const std::string& action);
+        std::shared_ptr<G13_Action> MakeAction(const std::string& action);
         void SetKeyColor(int red, int green, int blue) const;
         void SetModeLeds(int leds) const;
         void SendEvent(int type, int code, int val);

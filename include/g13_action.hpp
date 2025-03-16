@@ -5,11 +5,12 @@
 #ifndef G13_ACTION_HPP
 #define G13_ACTION_HPP
 
-#include "g13_keys.hpp"
-
-#include "g13_stick.hpp"
 #include <memory>
 #include <vector>
+
+#include "g13_actionable.hpp"
+#include "g13_keys.hpp"
+#include "g13_stick.hpp"
 
 namespace G13 {
     class G13_Device;
@@ -37,7 +38,6 @@ namespace G13 {
         G13_Device& _keypad;
     };
 
-    typedef std::shared_ptr<G13_Action> G13_ActionPtr;
 
     /// Action to send one or more keystrokes
     class G13_Action_Keys final : public G13_Action {
@@ -75,36 +75,6 @@ namespace G13 {
         void dump(std::ostream&) const override;
 
         std::string _cmd;
-    };
-
-    /// Template class to hold a reference to the parent object
-    template <class PARENT_T>
-    class G13_Actionable {
-    public:
-        G13_Actionable(PARENT_T& parent_arg, std::string name) : _name(std::move(name)), _parent_ptr(&parent_arg) {}
-
-        virtual ~G13_Actionable() {
-            _parent_ptr = nullptr;
-        }
-
-        [[nodiscard]] G13_ActionPtr action() const {
-            return _action;
-        }
-
-        [[nodiscard]] const std::string& name() const {
-            return _name;
-        }
-
-        virtual void set_action(const G13_ActionPtr& action) {
-            _action = action;
-        }
-
-    protected:
-        std::string _name;
-        G13_ActionPtr _action;
-
-    private:
-        PARENT_T* _parent_ptr;
     };
 
 
@@ -148,7 +118,7 @@ namespace G13 {
     /// Manages the bindings for a G13 stick
     class G13_StickZone final : public G13_Actionable<G13_Stick> {
     public:
-        G13_StickZone(G13_Stick&, const std::string& name, const G13_ZoneBounds&, const G13_ActionPtr& = nullptr);
+        G13_StickZone(G13_Stick&, const std::string& name, const G13_ZoneBounds&, const std::shared_ptr<G13_Action>& = nullptr);
 
         bool operator==(const G13_StickZone& other) const {
             return _name == other._name;

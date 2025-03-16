@@ -17,6 +17,7 @@ add_executable(g13d
         include/logo.hpp
         include/g13_main.hpp
         src/g13_main.cpp
+        include/g13_actionable.hpp
         include/g13_action.hpp
         src/g13_action.cpp
         include/g13_device.hpp
