@@ -1,6 +1,8 @@
 //
 // Created by khampf on 07-05-2020.
 //
+// Created by Britt Yazel on 03-16-2025.
+//
 
 #include <filesystem>
 #include <fstream>
@@ -14,6 +16,8 @@
 #include "g13_action_keys.hpp"
 #include "g13_action_pipeout.hpp"
 #include "g13_font.hpp"
+#include "g13_font_char.hpp"
+#include "g13_font_family.hpp"
 #include "g13_log.hpp"
 #include "g13_main.hpp"
 #include "g13_profile.hpp"
@@ -722,7 +726,7 @@ namespace G13 {
         if (const int error = libusb_control_transfer(usb_handle, 0, 9, 1, 0, nullptr, 0, 1000); error !=
             LIBUSB_SUCCESS) {
             G13_ERR("Error when initializing LCD endpoint: " << G13_Device::DescribeLibusbErrorCode(error));
-            }
+        }
         else {
             LcdWrite(g13_logo, sizeof(g13_logo));
         }
@@ -767,4 +771,14 @@ namespace G13 {
         LcdWrite(reinterpret_cast<unsigned char*>(buffer), size);
     }
 
+    void G13_Device::InitFonts() {
+        current_font = std::make_shared<G13_Font>("8x8", 8);
+        fonts[current_font->name()] = current_font;
+
+        current_font->InstallFont(font8x8_basic, G13_FontChar::FF_ROTATE, 0);
+
+        const std::shared_ptr<G13_Font> fiveXeight(new G13_Font("5x8", 5));
+        fiveXeight->InstallFont(font5x8, 0, 32);
+        fonts[fiveXeight->name()] = fiveXeight;
+    }
 } // namespace G13

@@ -31,6 +31,9 @@ add_executable(g13d
         src/g13_device.cpp
         include/g13_font.hpp
         src/g13_font.cpp
+        include/g13_font_char.hpp
+        src/g13_font_char.cpp
+        include/g13_font_family.hpp
         include/g13_hotplug.hpp
         src/g13_hotplug.cpp
         include/g13_key_tables.hpp

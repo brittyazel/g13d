@@ -1,4 +1,7 @@
-// version.hpp
+//
+// Created by Britt Yazel on 03-16-2025.
+//
+
 #ifndef VERSION_HPP
 #define VERSION_HPP
 

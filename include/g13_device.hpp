@@ -1,6 +1,7 @@
 //
 // Created by khampf on 07-05-2020.
 //
+
 #ifndef G13_DEVICE_HPP
 #define G13_DEVICE_HPP
 

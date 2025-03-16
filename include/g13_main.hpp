@@ -1,3 +1,7 @@
+//
+// Created by Britt Yazel on 03-16-2025.
+//
+
 #ifndef G13_MAIN_HPP_
 #define G13_MAIN_HPP_
 
@@ -13,6 +17,9 @@ namespace G13 {
     constexpr size_t G13_REPORT_SIZE = 8;
     constexpr size_t G13_KEY_ENDPOINT = 1;
     constexpr size_t G13_LCD_ENDPOINT = 2;
+
+    static std::map<std::string, std::string> stringConfigValues;
+    static bool running;
 
     extern libusb_context* usb_context;
     extern std::vector<G13_Device*> g13s;

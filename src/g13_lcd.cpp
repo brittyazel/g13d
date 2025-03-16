@@ -1,3 +1,7 @@
+//
+// Created by Britt Yazel on 03-16-2025.
+//
+
 /*
          pixels are mapped rather strangely for G13 buffer...
 
@@ -21,7 +25,6 @@
 #include "g13_main.hpp"
 #include "g13_device.hpp"
 #include "g13_font.hpp"
-#include "logo.hpp"
 #include <fstream>
 #include <log4cpp/Category.hh>
 

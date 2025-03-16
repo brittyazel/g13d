@@ -15,16 +15,13 @@ namespace G13 {
         G13_StickZone(G13_Stick&, const std::string& name, const G13_ZoneBounds&,
                       const std::shared_ptr<G13_Action>& = nullptr);
 
+        void dump(std::ostream&) const;
+        void test(const G13_ZoneCoord& loc);
+        void set_bounds(const G13_ZoneBounds& bounds);
+
+        //Operator Overload
         bool operator==(const G13_StickZone& other) const {
             return _name == other._name;
-        }
-
-        void dump(std::ostream&) const;
-
-        void test(const G13_ZoneCoord& loc);
-
-        void set_bounds(const G13_ZoneBounds& bounds) {
-            _bounds = bounds;
         }
 
     protected:

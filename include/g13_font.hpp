@@ -1,60 +1,40 @@
 //
-// Created by khampf on 07-05-2020.
+// Created by Britt Yazel on 03-16-2025.
 //
 
 #ifndef G13_FONT_HPP
 #define G13_FONT_HPP
 
-#include <cstring>
 #include <memory>
 #include <string>
 
+#include "g13_font_char.hpp"
+
 namespace G13 {
-    extern unsigned char font8x8_basic[128][8];
-    extern unsigned char font5x8[][5];
-
-    class G13_FontChar {
-    public:
-        static constexpr int CHAR_BUF_SIZE = 8;
-
-        enum FONT_FLAGS { FF_ROTATE = 0x01 };
-
-        G13_FontChar() {
-            memset(bits_regular, 0, CHAR_BUF_SIZE);
-            memset(bits_inverted, 0, CHAR_BUF_SIZE);
-        }
-
-        void SetCharacter(const unsigned char* data, unsigned int width, unsigned flags);
-        unsigned char bits_regular[CHAR_BUF_SIZE]{};
-        unsigned char bits_inverted[CHAR_BUF_SIZE]{};
-    };
-
     class G13_Font {
     public:
         G13_Font();
         explicit G13_Font(std::string name, unsigned int width = 8);
 
-        // void SetCharacter(unsigned int c, unsigned char* data);
+        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] unsigned int width() const;
+        [[nodiscard]] const G13_FontChar& char_data(unsigned int x) const;
+
+        template <typename T, size_t size>
+        static size_t GetFontCharacterCount(T (&)[size]) {
+            return size;
+        }
 
         template <class ARRAY_T, class FLAGST>
-        void InstallFont(ARRAY_T& data, FLAGST flags, int first = 0);
-
-        [[nodiscard]] const std::string& name() const {
-            return m_name;
-        }
-
-        [[nodiscard]] unsigned int width() const {
-            return m_width;
-        }
-
-        [[nodiscard]] const G13_FontChar& char_data(const unsigned int x) const {
-            return m_chars[x];
+        void InstallFont(ARRAY_T& data, FLAGST flags, const int first) {
+            for (size_t i = 0; i < GetFontCharacterCount(data); i++) {
+                m_chars[i + first].SetCharacter(&data[i][0], m_width, flags);
+            }
         }
 
     protected:
         std::string m_name;
         unsigned int m_width;
-
         G13_FontChar m_chars[256];
     };
 } // namespace G13

@@ -10,6 +10,15 @@
 #include "g13_profile.hpp"
 
 namespace G13 {
+    G13_Profile::G13_Profile(G13_Device& keypad, std::string name_arg) :
+        _keypad(keypad), _name(std::move(name_arg)) {
+        _init_keys();
+    }
+
+    G13_Profile::G13_Profile(const G13_Profile& other, std::string name_arg) :
+        _keypad(other._keypad), _keys(other._keys), _name(std::move(name_arg)) {}
+
+
     void G13_Profile::_init_keys() {
         // create a G13_Key entry for every key in G13_KEY_SEQ
         int key_index = 0;
@@ -63,5 +72,9 @@ namespace G13 {
                 if (std::regex_match(key.name(), pattern))
                     names.emplace_back(key.name());
         return names;
+    }
+
+    const std::string& G13_Profile::name() const {
+        return _name;
     }
 } // namespace G1pattern

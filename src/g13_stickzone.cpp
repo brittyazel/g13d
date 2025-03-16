@@ -1,6 +1,7 @@
 //
 // Created by britt on 3/15/25.
 //
+
 #include <iomanip>
 
 #include "g13_action.hpp"
@@ -10,7 +11,6 @@ namespace G13 {
     G13_StickZone::G13_StickZone(G13_Stick& stick, const std::string& name, const G13_ZoneBounds& b,
                                  const std::shared_ptr<G13_Action>& action) :
         G13_Actionable(stick, name), _bounds(b), _active(false) {
-
         G13_Actionable::set_action(action); // Call to virtual from ctor!
     }
 
@@ -39,5 +39,9 @@ namespace G13 {
             // cout << "in stick zone " << m_name << std::endl;
             _action->act(true);
         }
+    }
+
+    void G13_StickZone::set_bounds(const G13_ZoneBounds& bounds) {
+        _bounds = bounds;
     }
 } // namespace G13

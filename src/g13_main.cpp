@@ -1,3 +1,7 @@
+//
+// Created by Britt Yazel on 03-16-2025.
+//
+
 #include <csignal>
 #include <getopt.h>
 #include <iostream>
@@ -24,17 +28,13 @@ int main(const int argc, char* argv[]) {
 
 // Main namespace
 namespace G13 {
-    // definitions
+    // declarations
     libusb_context* usb_context = nullptr;
     std::vector<G13_Device*> g13s = {};
     libusb_hotplug_callback_handle usb_hotplug_cb_handle[3] = {};
     libusb_device** devs = nullptr;
     std::string logoFilename;
     const int class_id = LIBUSB_HOTPLUG_MATCH_ANY;
-
-    static std::map<std::string, std::string> stringConfigValues;
-
-    static bool running;
 
     void Initialize(const int argc, char* argv[]) {
         InitKeynames();
