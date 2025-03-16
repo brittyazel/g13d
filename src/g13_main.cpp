@@ -136,6 +136,10 @@ namespace G13 {
         libusb_exit(usb_context);
     }
 
+    const char* G13_CommandException::what() const noexcept {
+        return reason.c_str();
+    }
+
     void InitKeynames() {
         int key_index = 0;
 

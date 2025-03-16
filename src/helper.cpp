@@ -1,9 +1,11 @@
+#include <cstring>
 #include <functional>
 
 #include "helper.hpp"
-#include "g13_main.hpp"
 
 namespace G13 {
+    string_repr_out::string_repr_out(std::string str) : s(std::move(str)) {}
+
     void string_repr_out::write_on(std::ostream& o) const {
         o << "\"";
         const char* cp = s.c_str();
@@ -44,7 +46,33 @@ namespace G13 {
         o << "\"";
     }
 
-    // Translate a glob pattern into a regular expression.
+    std::ostream& operator<<(std::ostream& o, const string_repr_out& sro) {
+        sro.write_on(o);
+        return o;
+    }
+
+    string_repr_out repr(const std::string& s) {
+        return string_repr_out(s);
+    }
+
+    const char* NotFoundException::what() const noexcept {
+        return "Element not found";
+    }
+
+    const char* ltrim(const char* string, const char* ws) {
+        return string + strspn(string, ws);
+    }
+
+    const char* advance_ws(const char*& source, std::string& dest) {
+        source = ltrim(source);
+        const size_t l = strcspn(source, "# \t");
+        dest = std::string(source, l);
+        source = !source[l] || source[l] == '#' ? "" : source + l + 1;
+        return source;
+    }
+
+    void IGUR(...) {}
+
     std::string glob2regex(const char* glob) {
         std::string regex("^");
         constexpr char lparent = '(';
@@ -54,7 +82,6 @@ namespace G13 {
         constexpr char lbrace = '{';
         constexpr char rbrace = '}';
 
-        // Translate wildcards '*', '**' and '?'.
         auto wildcard = [&]() {
             unsigned int min(0);
             bool nomax(false);
@@ -65,7 +92,6 @@ namespace G13 {
             }
             else {
                 regex += "[^/]";
-                // Optimize consecutive wildcards gathering min and max counts.
                 for (;; glob++) {
                     if (*glob == '?') {
                         min++;
@@ -82,7 +108,6 @@ namespace G13 {
                 }
             }
 
-            // Generate repetition counts.
             if (!min) {
                 regex += '*';
             }
@@ -100,7 +125,6 @@ namespace G13 {
             }
         };
 
-        // Translate [] sets.
         auto set = [&]() {
             regex += *glob++;
             if (*glob == '^' || *glob == '!') {
@@ -125,7 +149,6 @@ namespace G13 {
             regex += rbracket;
         };
 
-        // Translate {,} groups.
         std::function<void(bool)> terms;
         auto group = [&]() {
             regex += lparent;
@@ -145,7 +168,6 @@ namespace G13 {
             regex += rparent;
         };
 
-        // Translate a sequence of terms.
         terms = [&](const bool ingroup) {
             while (*glob) {
                 if (ingroup && (*glob == ',' || *glob == rbrace)) {

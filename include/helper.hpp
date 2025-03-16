@@ -1,7 +1,6 @@
 #ifndef HELPER_HPP_
 #define HELPER_HPP_
 
-#include <cstring>
 #include <map>
 #include <ostream>
 #include <string>
@@ -9,30 +8,23 @@
 
 namespace G13 {
     struct string_repr_out {
-        explicit string_repr_out(std::string str) : s(std::move(str)) {}
+        explicit string_repr_out(std::string str);
         void write_on(std::ostream& o) const;
         std::string s;
     };
 
-    inline std::ostream& operator<<(std::ostream& o, const string_repr_out& sro) {
-        sro.write_on(o);
-        return o;
-    }
+    std::ostream& operator<<(std::ostream& o, const string_repr_out& sro);
 
     template <class T>
     const T& repr(const T& v) {
         return v;
     }
 
-    inline string_repr_out repr(const std::string& s) {
-        return string_repr_out(s);
-    }
+    string_repr_out repr(const std::string& s);
 
     class NotFoundException final : public std::exception {
     public:
-        [[nodiscard]] const char* what() const noexcept override {
-            return "Element not found";
-        }
+        [[nodiscard]] const char* what() const noexcept override;
     };
 
     template <class KEYT, class VALT>
@@ -56,11 +48,66 @@ namespace G13 {
     template <class T>
     class Coord {
     public:
-        Coord() : x(), y() {}
-        Coord(T _x, T _y) : x(_x), y(_y) {}
+        Coord();
+        Coord(T _x, T _y);
         T x;
         T y;
     };
+
+    template <class T>
+    std::ostream& operator<<(std::ostream& o, const Coord<T>& c);
+
+    template <class T>
+    class Bounds {
+    public:
+        using CT = Coord<T>;
+
+        Bounds(const CT& _tl, const CT& _br);
+        Bounds(T x1, T y1, T x2, T y2);
+
+        bool contains(const CT& pos) const;
+        void expand(const CT& pos);
+
+        CT tl;
+        CT br;
+    };
+
+    template <class T>
+    std::ostream& operator<<(std::ostream& o, const Bounds<T>& b);
+
+    const char* ltrim(const char* string, const char* ws = " \t");
+    const char* advance_ws(const char*& source, std::string& dest);
+
+    template <class MAP_T>
+    struct _map_keys_out {
+        _map_keys_out(const MAP_T& c, std::string s);
+        const MAP_T& container;
+        std::string sep;
+    };
+
+    template <class STREAM_T, class MAP_T>
+    STREAM_T& operator<<(STREAM_T& o, const _map_keys_out<MAP_T>& _mko);
+
+    template <class MAP_T>
+    _map_keys_out<MAP_T> map_keys_out(const MAP_T& c, const std::string& sep = " ");
+
+    struct split_t {
+        enum empties_t { empties_ok, no_empties };
+    };
+
+    template <typename Container>
+    Container split(const typename Container::value_type& srcStr, const typename Container::value_type& delimiters,
+                    split_t::empties_t empties = split_t::empties_ok);
+
+    void IGUR(...);
+
+    std::string glob2regex(const char* glob);
+
+    template <class T>
+    Coord<T>::Coord() : x(), y() {}
+
+    template <class T>
+    Coord<T>::Coord(T _x, T _y) : x(_x), y(_y) {}
 
     template <class T>
     std::ostream& operator<<(std::ostream& o, const Coord<T>& c) {
@@ -69,27 +116,23 @@ namespace G13 {
     }
 
     template <class T>
-    class Bounds {
-    public:
-        using CT = Coord<T>;
+    Bounds<T>::Bounds(const CT& _tl, const CT& _br) : tl(_tl), br(_br) {}
 
-        Bounds(const CT& _tl, const CT& _br) : tl(_tl), br(_br) {}
-        Bounds(T x1, T y1, T x2, T y2) : tl(x1, y1), br(x2, y2) {}
+    template <class T>
+    Bounds<T>::Bounds(T x1, T y1, T x2, T y2) : tl(x1, y1), br(x2, y2) {}
 
-        bool contains(const CT& pos) const {
-            return tl.x <= pos.x && tl.y <= pos.y && pos.x <= br.x && pos.y <= br.y;
-        }
+    template <class T>
+    bool Bounds<T>::contains(const CT& pos) const {
+        return tl.x <= pos.x && tl.y <= pos.y && pos.x <= br.x && pos.y <= br.y;
+    }
 
-        void expand(const CT& pos) {
-            if (pos.x < tl.x) tl.x = pos.x;
-            if (pos.y < tl.y) tl.y = pos.y;
-            if (pos.x > br.x) br.x = pos.x;
-            if (pos.y > br.y) br.y = pos.y;
-        }
-
-        CT tl;
-        CT br;
-    };
+    template <class T>
+    void Bounds<T>::expand(const CT& pos) {
+        if (pos.x < tl.x) tl.x = pos.x;
+        if (pos.y < tl.y) tl.y = pos.y;
+        if (pos.x > br.x) br.x = pos.x;
+        if (pos.y > br.y) br.y = pos.y;
+    }
 
     template <class T>
     std::ostream& operator<<(std::ostream& o, const Bounds<T>& b) {
@@ -97,24 +140,8 @@ namespace G13 {
         return o;
     }
 
-    inline const char* ltrim(const char* string, const char* ws = " \t") {
-        return string + strspn(string, ws);
-    }
-
-    inline const char* advance_ws(const char*& source, std::string& dest) {
-        source = ltrim(source);
-        const size_t l = strcspn(source, "# \t");
-        dest = std::string(source, l);
-        source = !source[l] || source[l] == '#' ? "" : source + l + 1;
-        return source;
-    }
-
     template <class MAP_T>
-    struct _map_keys_out {
-        _map_keys_out(const MAP_T& c, std::string s) : container(c), sep(std::move(s)) {}
-        const MAP_T& container;
-        std::string sep;
-    };
+    _map_keys_out<MAP_T>::_map_keys_out(const MAP_T& c, std::string s) : container(c), sep(std::move(s)) {}
 
     template <class STREAM_T, class MAP_T>
     STREAM_T& operator<<(STREAM_T& o, const _map_keys_out<MAP_T>& _mko) {
@@ -132,17 +159,13 @@ namespace G13 {
     }
 
     template <class MAP_T>
-    _map_keys_out<MAP_T> map_keys_out(const MAP_T& c, const std::string& sep = " ") {
+    _map_keys_out<MAP_T> map_keys_out(const MAP_T& c, const std::string& sep) {
         return _map_keys_out<MAP_T>(c, sep);
     }
 
-    struct split_t {
-        enum empties_t { empties_ok, no_empties };
-    };
-
     template <typename Container>
     Container split(const typename Container::value_type& srcStr, const typename Container::value_type& delimiters,
-                    const split_t::empties_t empties = split_t::empties_ok) {
+                    const split_t::empties_t empties) {
         Container result;
         auto next = static_cast<size_t>(-1);
         do {
@@ -160,10 +183,6 @@ namespace G13 {
         while (next != Container::value_type::npos);
         return result;
     }
-
-    inline void IGUR(...) {}
-
-    std::string glob2regex(const char* glob);
 } // namespace G13
 
 #endif // HELPER_HPP_

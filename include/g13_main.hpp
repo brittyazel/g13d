@@ -1,5 +1,5 @@
-#ifndef G13_H_
-#define G13_H_
+#ifndef G13_MAIN_HPP_
+#define G13_MAIN_HPP_
 
 #include <libusb-1.0/libusb.h>
 #include <log4cpp/Priority.hh>
@@ -8,13 +8,11 @@
 #include "g13_keys.hpp"
 #include "g13_log.hpp"
 
-// *************************************************************************
 
 namespace G13 {
     constexpr size_t G13_VENDOR_ID = 0x046d;
     constexpr size_t G13_PRODUCT_ID = 0xc21c;
     constexpr size_t G13_REPORT_SIZE = 8;
-
     constexpr size_t G13_KEY_ENDPOINT = 1;
     constexpr size_t G13_LCD_ENDPOINT = 2;
 
@@ -26,9 +24,7 @@ namespace G13 {
     extern const int class_id;
 
 
-    // *************************************************************************
-
-    void Initialize(const int argc, char* argv[]);
+    void Initialize(int argc, char* argv[]);
     void printHelp();
     int Run();
     void SetupDevice(G13_Device* g13);
@@ -62,16 +58,11 @@ namespace G13 {
     // *************************************************************************
     class G13_CommandException final : public std::exception {
     public:
-        explicit G13_CommandException(std::string reason) : _reason(std::move(reason)) {}
-        ~G13_CommandException() noexcept override = default;
-
-        [[nodiscard]] const char* what() const noexcept override {
-            return _reason.c_str();
-        }
-
+        explicit G13_CommandException(std::string reason) : reason(std::move(reason)) {}
+        [[nodiscard]] const char* what() const noexcept override;
     private:
-        std::string _reason;
+        std::string reason;
     };
 } // namespace G13
 
-#endif  // G13_H_
+#endif  // G13_MAIN_HPP_
