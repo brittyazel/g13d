@@ -19,7 +19,6 @@ namespace G13 {
     constexpr size_t G13_LCD_ENDPOINT = 2;
 
     static std::map<std::string, std::string> stringConfigValues;
-    static bool running;
 
     extern libusb_context* usb_context;
     extern std::vector<G13_Device*> g13s;

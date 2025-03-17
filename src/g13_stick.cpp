@@ -22,12 +22,12 @@ namespace G13 {
                                      std::make_shared<G13_Action_Keys>(keypad, "KEY_" + name)));
         };
 
-        add_zone("UP", 0.0, 0.1, 1.0, 0.3);
-        add_zone("DOWN", 0.0, 0.7, 1.0, 0.9);
-        add_zone("LEFT", 0.0, 0.0, 0.2, 1.0);
-        add_zone("RIGHT", 0.8, 0.0, 1.0, 1.0);
-        add_zone("PAGEUP", 0.0, 0.0, 1.0, 0.1);
-        add_zone("PAGEDOWN", 0.0, 0.9, 1.0, 1.0);
+        // The joystick is inverted, so UP is the bottom of the stick facing the user.
+        // Zone boundary coordinates are based on a floating point value from 0.0 (top/left) to 1.0 (bottom/right).
+        add_zone("UP", 0.0, 0.0, 1.0, 0.3);
+        add_zone("DOWN", 0.0, 0.7, 1.0, 1.0);
+        add_zone("LEFT", 0.0, 0.0, 0.3, 1.0);
+        add_zone("RIGHT", 0.7, 0.0, 1.0, 1.0);
     }
 
     G13_StickZone* G13_Stick::zone(const std::string& name, const bool create) {

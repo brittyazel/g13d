@@ -26,8 +26,8 @@ namespace G13 {
 
     constexpr size_t G13_NUM_KEYS = 40;
 
-    static int G13CreateUinput(G13_Device* g13);
-    static int G13CreateFifo(const char* fifo_name, mode_t umask);
+    int G13CreateUinput(G13_Device* g13);
+    int G13CreateFifo(const char* fifo_name, mode_t umask);
 
     class G13_Device {
     public:

@@ -98,7 +98,7 @@ namespace G13 {
         return description;
     }
 
-    static int G13CreateFifo(const char* fifo_name, mode_t umask) {
+    int G13CreateFifo(const char* fifo_name, mode_t umask) {
         // Extract the directory path from the FIFO path
         const std::filesystem::path fifo_path(fifo_name);
 
@@ -114,7 +114,7 @@ namespace G13 {
         return fd;
     }
 
-    static int G13CreateUinput(G13_Device* g13) {
+    int G13CreateUinput(G13_Device* g13) {
         uinput_user_dev uinp{};
         const char* dev_uinput_fname = access("/dev/input/uinput", F_OK) == 0
                                            ? "/dev/input/uinput"
@@ -307,7 +307,7 @@ namespace G13 {
             auto end = static_cast<int>(input_pipe_fifo.length());
             char buf[1024 * 1024];
             memcpy(buf, input_pipe_fifo.c_str(), end);
-            ret = static_cast<int>(read(input_pipe_fid, buf + end, sizeof buf - end));
+            ret = static_cast<int>(read(input_pipe_fid, buf + end, sizeof(buf) - end));
             G13_LOG(log4cpp::Priority::DEBUG << "read " << ret << " characters");
 
             if (ret < 0) {}
@@ -317,8 +317,8 @@ namespace G13 {
                 getLCDRef().Image(reinterpret_cast<unsigned char*>(buf), ret + end);
             }
             else {
-                size_t beg = 0;
-                for (ret += end; end < static_cast<size_t>(ret); end++) {
+                int beg = 0;
+                for (ret += end; end < ret; end++) {
                     if (buf[end] == '\r' || buf[end] == '\n') {
                         if (end != beg) {
                             buf[end] = '\0';
@@ -328,7 +328,7 @@ namespace G13 {
                     }
                 }
                 input_pipe_fifo.clear();
-                if (ret - beg < sizeof buf) {
+                if (ret - beg < static_cast<int>(sizeof(buf))) {
                     // Drop too long lines.
                     input_pipe_fifo = std::string(buf + beg, ret - beg);
                 }
@@ -567,6 +567,7 @@ namespace G13 {
                     if (endptr == remainder) {
                         throw G13_CommandException("bad bounds format");
                     }
+                    G13_OUT("Setting bounds " << x1 << " " << y1 << " " << x2 << " " << y2);
                     zone->set_bounds(G13_ZoneBounds(x1, y1, x2, y2));
                 }
                 else if (operation == "del") {

@@ -10,6 +10,10 @@
 #include "g13_main.hpp"
 
 namespace G13 {
+
+    //definitions
+    LINUX_KEY_VALUE input_key_max;
+
     void G13_Key::dump(std::ostream& o) const {
         o << FindG13KeyName(index()) << "(" << index() << ") : ";
         if (action()) {

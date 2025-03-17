@@ -21,6 +21,7 @@
 #                DOWN
 
 rgb 150 200 200
+stickmode KEYS
 
 bind G1 KEY_1
 bind G2 KEY_2
@@ -45,10 +46,11 @@ bind G20 KEY_LEFTCTRL
 bind G21 KEY_LEFTALT
 bind G22 KEY_SPACE
 
-bind STICK_UP KEY_W
-bind STICK_LEFT KEY_A
-bind STICK_DOWN KEY_S
-bind STICK_RIGHT KEY_D
+bind STICK_UP UP
+bind STICK_LEFT LEFT
+bind STICK_DOWN DOWN
+bind STICK_RIGHT RIGHT
+
 bind LEFT KEY_5
 bind DOWN KEY_6
 bind TOP KEY_7

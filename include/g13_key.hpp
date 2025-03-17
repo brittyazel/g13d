@@ -52,7 +52,6 @@ namespace G13 {
     static std::map<std::string, G13_KEY_INDEX> g13_name_to_key;
     static std::map<LINUX_KEY_VALUE, std::string> input_key_to_name;
     static std::map<std::string, LINUX_KEY_VALUE> input_name_to_key;
-    static LINUX_KEY_VALUE input_key_max;
 
     LINUX_KEY_VALUE InputKeyMax();
     int FindG13KeyValue(const std::string& keyname);

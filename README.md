@@ -133,9 +133,9 @@ del       | remove zone named *zonename*
 action    | set action for zone, see [Actions]  
 bounds    | set boundaries for zone, *args* are X1, Y1, X2, Y2, where X1/Y1 are top left corner, X2/Y2 are bottom right corner 
 
-Default created zones are STICK_LEFT, STICK_RIGHT, STICK_UP, STICK_DOWN, STICK_PAGEUP and STICK_PAGEDOWN.
+Default created zones are STICK_LEFT, STICK_RIGHT, STICK_UP, and STICK_DOWN.
 
-Zone boundary coordinates are based on a floating point value from 0.0 (top/left) to 1.0 (bottom/right).  When the 
+Zone boundary coordinates are based on a floating point value from 0.0 (top/left) to 1.0 (bottom/right), which is upside down to the user. When the 
 stick enters the boundary area, the zone's action ***down*** activity will be fired.  On exiting the boundary, the
 action ***up*** activity will be fired.  
 
