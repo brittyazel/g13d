@@ -25,9 +25,9 @@ namespace G13 {
     enum stick_mode_t {
         STICK_ABSOLUTE,
         STICK_KEYS,
-        STICK_CALCENTER,
-        STICK_CALBOUNDS,
-        STICK_CALNORTH
+        STICK_CALIB_CENTER,
+        STICK_CALIB_BOUNDS,
+        STICK_CALIB_NORTH
     };
 
     class G13_Stick {
@@ -57,6 +57,6 @@ namespace G13 {
 
         stick_mode_t m_stick_mode;
     };
-} // namespace G13
+}
 
 #endif // G13_STICK_HPP

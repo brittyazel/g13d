@@ -12,4 +12,11 @@
 #define G13_DBG(message) log4cpp::Category::getRoot() << log4cpp::Priority::DEBUG << message
 #define G13_OUT(message) log4cpp::Category::getRoot() << log4cpp::Priority::INFO << message
 
+namespace G13 {
+    void start_logging();
+    void stop_logging();
+    void SetLogLevel(log4cpp::Priority::PriorityLevel lvl);
+    void SetLogLevel(const std::string& level);
+}
+
 #endif //G13_LOG_HPP

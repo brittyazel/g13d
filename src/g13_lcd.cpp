@@ -96,7 +96,7 @@ namespace G13 {
             }
         }
 
-        const unsigned offset = image_byte_offset(row * G13_LCD_TEXT_CHEIGHT, col);
+        const unsigned offset = image_byte_offset(row * G13_LCD_TEXT_CHAR_HEIGHT, col);
 
         if (text_mode) {
             memcpy(&image_buf[offset], &m_keypad.getCurrentFontRef().char_data(c).bits_inverted,
@@ -166,4 +166,4 @@ namespace G13 {
         image_send();
     }
     */
-} // namespace G13
+}

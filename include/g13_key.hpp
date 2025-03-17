@@ -61,6 +61,6 @@ namespace G13 {
     void DisplayKeys();
     void InitKeynames();
 
-} // namespace G13
+}
 
 #endif //G13_KEY_HPP

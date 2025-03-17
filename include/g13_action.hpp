@@ -32,5 +32,5 @@ namespace G13 {
     private:
         G13_Device& _keypad;
     };
-} // namespace G13
+}
 #endif // G13_ACTION_HPP

@@ -36,10 +36,6 @@ namespace G13 {
     std::string getStringConfigValue(const std::string& name);
     void setStringConfigValue(const std::string& name, const std::string& value);
     std::string MakePipeName(const G13_Device* usb_device, bool is_input);
-    void start_logging();
-    void SetLogLevel(log4cpp::Priority::PriorityLevel lvl);
-    void SetLogLevel(const std::string& level);
-
     void SignalHandler(int);
 
 
@@ -52,6 +48,6 @@ namespace G13 {
     private:
         std::string reason;
     };
-} // namespace G13
+}
 
 #endif  // G13_MAIN_HPP_

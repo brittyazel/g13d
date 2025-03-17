@@ -17,4 +17,4 @@ namespace G13 {
     bool G13_State_Key::is_down() const {
         return _key;
     }
-} // namespace G13
+}

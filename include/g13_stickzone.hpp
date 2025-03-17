@@ -28,6 +28,6 @@ namespace G13 {
         G13_ZoneBounds _bounds;
         bool _active;
     };
-} // namespace G13
+}
 
 #endif //G13_STICKZONE_HPP

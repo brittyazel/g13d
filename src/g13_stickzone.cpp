@@ -31,12 +31,10 @@ namespace G13 {
         _active = _bounds.contains(loc);
         if (!_active) {
             if (prior_active) {
-                // cout << "exit stick zone " << m_name << std::endl;
                 _action->act(false);
             }
         }
         else {
-            // cout << "in stick zone " << m_name << std::endl;
             _action->act(true);
         }
     }
@@ -44,4 +42,4 @@ namespace G13 {
     void G13_StickZone::set_bounds(const G13_ZoneBounds& bounds) {
         _bounds = bounds;
     }
-} // namespace G13
+}

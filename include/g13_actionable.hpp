@@ -40,6 +40,6 @@ namespace G13 {
     private:
         PARENT_T* _parent_ptr;
     };
-} // namespace G13
+}
 
 #endif // G13_ACTIONABLE_HPP

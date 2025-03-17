@@ -38,6 +38,6 @@ namespace G13 {
 
         void _init_keys();
     };
-} // namespace G13
+}
 
 #endif // G13_PROFILE_HPP

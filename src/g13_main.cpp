@@ -105,15 +105,27 @@ namespace G13 {
 
     void Cleanup() {
         G13_OUT("Cleaning up");
+
         for (const auto this_handle : usb_hotplug_cb_handle) {
-            libusb_hotplug_deregister_callback(usb_context, this_handle);
+            if (this_handle) {
+                libusb_hotplug_deregister_callback(usb_context, this_handle);
+            }
         }
         // TODO: This might be better with an iterator and also g13s.erase(iter)
         for (const auto g13 : g13s) {
-            // g13->Cleanup();
+            //g13->Cleanup();
             delete g13;
         }
-        libusb_exit(usb_context);
+        g13s.clear();
+
+        // Exit libusb context
+        if (usb_context) {
+            libusb_exit(usb_context);
+            usb_context = nullptr;
+        }
+
+        // Stop logging
+        stop_logging();
     }
 
     void printHelp() {
@@ -224,7 +236,7 @@ namespace G13 {
                 const int status = g13->ReadKeypresses();
                 if (!g13s.empty()) {
                     // Cleanup might have removed the object before this loop has run
-                    // TODO: This will not work with multiplt devices and can be better
+                    // TODO: This will not work with multiple devices and can be better
                     g13->ReadCommandsFromPipe();
                 }
                 if (status < 0) {
@@ -259,4 +271,4 @@ namespace G13 {
         logoFilename = newLogoFilename;
     }
 
-} // namespace G13
+}

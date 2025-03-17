@@ -20,4 +20,4 @@ namespace G13 {
     void G13_Action_PipeOut::dump(std::ostream& o) const {
         o << "WRITE PIPE : " << repr(_out);
     }
-} // namespace G13
+}

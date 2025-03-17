@@ -20,6 +20,6 @@ namespace G13 {
         LINUX_KEY_VALUE _key;
         bool _down;
     };
-} // namespace G13
+}
 
 #endif //G13_STATE_KEY_HPP

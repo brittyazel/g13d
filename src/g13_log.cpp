@@ -27,6 +27,10 @@ namespace G13 {
         //    sub1.addAppender(appender2.get());
     }
 
+    void stop_logging() {
+        log4cpp::Category::shutdown();
+    }
+
     void SetLogLevel(const log4cpp::Priority::PriorityLevel lvl) {
         G13_OUT("set log level to " << lvl);
     }
@@ -41,4 +45,4 @@ namespace G13 {
             G13_ERR("unknown log level " << level);
         }
     }
-} // namespace G13
+}

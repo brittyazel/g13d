@@ -187,6 +187,6 @@ namespace G13 {
         while (next != Container::value_type::npos);
         return result;
     }
-} // namespace G13
+}
 
 #endif // HELPER_HPP_

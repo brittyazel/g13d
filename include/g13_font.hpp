@@ -37,5 +37,5 @@ namespace G13 {
         unsigned int m_width;
         G13_FontChar m_chars[256];
     };
-} // namespace G13
+}
 #endif // G13_FONT_HPP

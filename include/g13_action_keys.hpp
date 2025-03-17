@@ -22,8 +22,8 @@ namespace G13 {
         void dump(std::ostream&) const override;
 
         std::vector<G13_State_Key> _keys;
-        std::vector<G13_State_Key> _keysup;
+        std::vector<G13_State_Key> _keys_up;
     };
-} // namespace G13
+}
 
 #endif //G13_ACTION_KEYS_HPP

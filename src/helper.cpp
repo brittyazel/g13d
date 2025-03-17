@@ -203,4 +203,4 @@ namespace G13 {
         }
         return regex + '$';
     }
-} // namespace G13
+}

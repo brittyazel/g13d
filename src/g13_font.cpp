@@ -22,4 +22,4 @@ namespace G13 {
     const G13_FontChar& G13_Font::char_data(const unsigned int x) const {
         return m_chars[x];
     }
-} // namespace G13
+}

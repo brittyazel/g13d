@@ -11,8 +11,8 @@
 #include "g13_stickzone.hpp"
 
 namespace G13 {
-    G13_Stick::G13_Stick(G13_Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255), m_center_pos(127, 127),
-                                               m_north_pos(127, 0) {
+    G13_Stick::G13_Stick(G13_Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255),
+                                               m_center_pos(127, 127), m_north_pos(127, 0) {
         m_stick_mode = STICK_KEYS;
 
         auto add_zone = [this, &keypad](const std::string& name, const double x1, const double y1, const double x2,
@@ -58,19 +58,19 @@ namespace G13 {
         if (m == m_stick_mode) {
             return;
         }
-        if (m_stick_mode == STICK_CALCENTER || m_stick_mode == STICK_CALBOUNDS || m_stick_mode == STICK_CALNORTH) {
+        if (m_stick_mode == STICK_CALIB_CENTER || m_stick_mode == STICK_CALIB_BOUNDS || m_stick_mode == STICK_CALIB_NORTH) {
             RecalcCalibrated();
         }
         m_stick_mode = m;
         switch (m_stick_mode) {
-        case STICK_CALBOUNDS:
+        case STICK_CALIB_BOUNDS:
             m_bounds.tl = G13_StickCoord(255, 255);
             m_bounds.br = G13_StickCoord(0, 0);
             break;
         case STICK_ABSOLUTE:
         case STICK_KEYS:
-        case STICK_CALCENTER:
-        case STICK_CALNORTH:
+        case STICK_CALIB_CENTER:
+        case STICK_CALIB_NORTH:
             break;
         }
     }
@@ -95,15 +95,15 @@ namespace G13 {
 
         // update targets if we're in calibration mode
         switch (m_stick_mode) {
-        case STICK_CALCENTER:
+        case STICK_CALIB_CENTER:
             m_center_pos = m_current_pos;
             return;
 
-        case STICK_CALNORTH:
+        case STICK_CALIB_NORTH:
             m_north_pos = m_current_pos;
             return;
 
-        case STICK_CALBOUNDS:
+        case STICK_CALIB_BOUNDS:
             m_bounds.expand(m_current_pos);
             return;
 
@@ -151,4 +151,4 @@ namespace G13 {
              SendEvent(g13->uinput_file, EV_REL, REL_Y, stick_y/16 - 8);*/
         }
     }
-} // namespace G13
+}

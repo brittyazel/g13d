@@ -12,19 +12,20 @@ namespace G13 {
     G13_Action_Keys::G13_Action_Keys(G13_Device& keypad, const std::string& keys_string) : G13_Action(keypad) {
         auto scan = [](const std::string& in, std::vector<G13_State_Key>& out) {
             for (auto keys = split<std::vector<std::string>>(in, "+"); auto& key : keys) {
-                auto kval = FindInputKeyValue(key);
-                if (kval.key() == BAD_KEY_VALUE) {
+                auto keyVal = FindInputKeyValue(key);
+                if (keyVal.key() == BAD_KEY_VALUE) {
                     throw G13_CommandException("create action unknown key : " + key);
                 }
-                out.push_back(kval);
+                out.push_back(keyVal);
             }
         };
 
-        const auto keydownup = split<std::vector<std::string>>(keys_string, " ");
+        const auto key_down_up = split<std::vector<std::string>>(keys_string, " ");
 
-        scan(keydownup[0], _keys);
-        if (keydownup.size() > 1) {
-            scan(keydownup[1], _keysup);
+        scan(key_down_up[0], _keys);
+
+        if (key_down_up.size() > 1) {
+            scan(key_down_up[1], _keys_up);
         }
     }
 
@@ -58,17 +59,17 @@ namespace G13 {
 
         if (is_down) {
             send_keys(_keys);
-            if (!_keysup.empty())
+            if (!_keys_up.empty())
                 release_keys(_keys);
         }
-        else if (_keysup.empty()) {
+        else if (_keys_up.empty()) {
             for (auto& key : _keys)
                 downkeys[key.key()] = key.is_down();
             release_keys(_keys);
         }
         else {
-            send_keys(_keysup);
-            release_keys(_keysup);
+            send_keys(_keys_up);
+            release_keys(_keys_up);
         }
     }
 
@@ -85,4 +86,4 @@ namespace G13 {
             out << FindInputKeyName(_keys[i].key());
         }
     }
-} // namespace G13
+}

@@ -15,8 +15,8 @@ namespace G13 {
     constexpr size_t G13_LCD_ROWS = 48;
     constexpr size_t G13_LCD_BYTES_PER_ROW = G13_LCD_COLUMNS / 8;
     constexpr size_t G13_LCD_BUF_SIZE = G13_LCD_ROWS * G13_LCD_BYTES_PER_ROW;
-    constexpr size_t G13_LCD_TEXT_CHEIGHT = 8;
-    constexpr size_t G13_LCD_TEXT_ROWS = 160 / G13_LCD_TEXT_CHEIGHT;
+    constexpr size_t G13_LCD_TEXT_CHAR_HEIGHT = 8;
+    constexpr size_t G13_LCD_TEXT_ROWS = 160 / G13_LCD_TEXT_CHAR_HEIGHT;
 
     class G13_LCD {
     public:
@@ -50,5 +50,5 @@ namespace G13 {
         void WriteString(const char* str);
         void WritePos(int row, int col);
     };
-} // namespace G13
+}
 #endif // G13_LCD_HPP

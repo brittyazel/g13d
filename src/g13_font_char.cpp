@@ -29,4 +29,4 @@ namespace G13 {
             bits_inverted[x] = ~dest[x];
         }
     }
-} // namespace G13
+}

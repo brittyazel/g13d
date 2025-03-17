@@ -20,7 +20,7 @@ namespace G13 {
 
 
     void G13_Profile::_init_keys() {
-        // create a G13_Key entry for every key in G13_KEY_SEQ
+        // create a G13_Key entry for every key in G13_KEY_STRINGS
         int key_index = 0;
         // std::string str = G13_Key_Tables::G13_KEY_STRINGS[0];
 
@@ -30,8 +30,8 @@ namespace G13 {
         }
         assert(_keys.size() == G13_NUM_KEYS);
 
-        // now disable testing for keys in G13_NONPARSED_KEY_SEQ
-        for (auto symbol = G13_Key_Tables::G13_NONPARSED_KEYS; *symbol; symbol++) {
+        // now disable testing for keys in G13_NON_PARSED_KEYS
+        for (auto symbol = G13_Key_Tables::G13_NON_PARSED_KEYS; *symbol; symbol++) {
             G13_Key* key = FindKey(*symbol);
             key->_should_parse = false;
         }

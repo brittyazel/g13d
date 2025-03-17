@@ -30,14 +30,9 @@ namespace G13 {
 
     // Constructor
     G13_Device::G13_Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle,
-                           const int device_index)
-        : device_index(device_index),
-          usb_context(usb_context),
-          uinput_fid(-1),
-          lcd(*this),
-          stick(*this),
-          usb_handle(usb_handle),
-          usb_device(usb_device) {
+                           const int device_index) : device_index(device_index), usb_context(usb_context),
+                                                     uinput_fid(-1), lcd(*this), stick(*this),
+                                                     usb_handle(usb_handle), usb_device(usb_device) {
         current_profile = std::make_shared<G13_Profile>(*this, "default");
         profiles["default"] = current_profile;
 
@@ -115,49 +110,43 @@ namespace G13 {
     }
 
     int G13CreateUinput(G13_Device* g13) {
-        uinput_user_dev uinp{};
-        const char* dev_uinput_fname = access("/dev/input/uinput", F_OK) == 0
-                                           ? "/dev/input/uinput"
-                                           : access("/dev/uinput", F_OK) == 0
-                                           ? "/dev/uinput"
-                                           : nullptr;
-        if (!dev_uinput_fname) {
+        uinput_user_dev new_uinput{};
+        const char* dev_uinput_filename = access("/dev/input/uinput", F_OK) == 0
+                                              ? "/dev/input/uinput"
+                                              : access("/dev/uinput", F_OK) == 0
+                                              ? "/dev/uinput"
+                                              : nullptr;
+        if (!dev_uinput_filename) {
             G13_ERR("Could not find an uinput device");
             return -1;
         }
-        if (access(dev_uinput_fname, W_OK) != 0) {
-            G13_ERR(dev_uinput_fname << " doesn't grant write permissions");
+        if (access(dev_uinput_filename, W_OK) != 0) {
+            G13_ERR(dev_uinput_filename << " doesn't grant write permissions");
             return -1;
         }
-        const int ufile = open(dev_uinput_fname, O_WRONLY | O_NDELAY);
+        const int ufile = open(dev_uinput_filename, O_WRONLY | O_NDELAY);
         if (ufile <= 0) {
             G13_ERR("Could not open uinput");
             return -1;
         }
-        memset(&uinp, 0, sizeof(uinp));
+        memset(&new_uinput, 0, sizeof(new_uinput));
         constexpr char name[] = "G13";
-        memcpy(uinp.name, name, sizeof(name));
-        uinp.id.version = 1;
-        uinp.id.bustype = BUS_USB;
-        uinp.id.product = G13_PRODUCT_ID;
-        uinp.id.vendor = G13_VENDOR_ID;
-        uinp.absmin[ABS_X] = 0;
-        uinp.absmin[ABS_Y] = 0;
-        uinp.absmax[ABS_X] = 0xff;
-        uinp.absmax[ABS_Y] = 0xff;
-        //  uinp.absfuzz[ABS_X] = 4;
-        //  uinp.absfuzz[ABS_Y] = 4;
-        //  uinp.absflat[ABS_X] = 0x80;
-        //  uinp.absflat[ABS_Y] = 0x80;
+        memcpy(new_uinput.name, name, sizeof(name));
+        new_uinput.id.version = 1;
+        new_uinput.id.bustype = BUS_USB;
+        new_uinput.id.product = G13_PRODUCT_ID;
+        new_uinput.id.vendor = G13_VENDOR_ID;
+        new_uinput.absmin[ABS_X] = 0;
+        new_uinput.absmin[ABS_Y] = 0;
+        new_uinput.absmax[ABS_X] = 0xff;
+        new_uinput.absmax[ABS_Y] = 0xff;
 
         ioctl(ufile, UI_SET_EVBIT, EV_KEY);
         ioctl(ufile, UI_SET_EVBIT, EV_ABS);
-        /*  ioctl(ufile, UI_SET_EVBIT, EV_REL);*/
         ioctl(ufile, UI_SET_MSCBIT, MSC_SCAN);
         ioctl(ufile, UI_SET_ABSBIT, ABS_X);
         ioctl(ufile, UI_SET_ABSBIT, ABS_Y);
-        /*  ioctl(ufile, UI_SET_RELBIT, REL_X);
-         ioctl(ufile, UI_SET_RELBIT, REL_Y);*/
+
         for (int i = 0; i < 256; i++) {
             ioctl(ufile, UI_SET_KEYBIT, i);
         }
@@ -168,13 +157,13 @@ namespace G13 {
         }
         ioctl(ufile, UI_SET_KEYBIT, BTN_THUMB);
 
-        ssize_t retcode = write(ufile, &uinp, sizeof(uinp));
-        if (retcode < 0) {
-            G13_ERR("Could not write to uinput device (" << retcode << ")");
+        ssize_t return_code = write(ufile, &new_uinput, sizeof(new_uinput));
+        if (return_code < 0) {
+            G13_ERR("Could not write to uinput device (" << return_code << ")");
             return -1;
         }
-        retcode = ioctl(ufile, UI_DEV_CREATE);
-        if (retcode) {
+        return_code = ioctl(ufile, UI_DEV_CREATE);
+        if (return_code) {
             G13_ERR("Error creating uinput device for G13");
             return -1;
         }
@@ -303,34 +292,34 @@ namespace G13 {
         timeval tv{};
         tv.tv_sec = 0;
         tv.tv_usec = 0;
-        if (auto ret = select(input_pipe_fid + 1, &set, nullptr, nullptr, &tv); ret > 0) {
-            auto end = static_cast<int>(input_pipe_fifo.length());
-            char buf[1024 * 1024];
-            memcpy(buf, input_pipe_fifo.c_str(), end);
-            ret = static_cast<int>(read(input_pipe_fid, buf + end, sizeof(buf) - end));
-            G13_LOG(log4cpp::Priority::DEBUG << "read " << ret << " characters");
+        if (auto read_result = select(input_pipe_fid + 1, &set, nullptr, nullptr, &tv); read_result > 0) {
+            auto buffer_end = static_cast<int>(input_pipe_fifo.length());
+            char buffer[1024 * 1024];
+            memcpy(buffer, input_pipe_fifo.c_str(), buffer_end);
+            read_result = static_cast<int>(read(input_pipe_fid, buffer + buffer_end, sizeof(buffer) - buffer_end));
+            G13_LOG(log4cpp::Priority::DEBUG << "read " << read_result << " characters");
 
-            if (ret < 0) {}
+            if (read_result < 0) {}
             // Read error: should not occur after successful select().
-            else if (ret + end == 960) {
+            else if (read_result + buffer_end == 960) {
                 // TODO probably image, for now, don't test, just assume image
-                getLCDRef().Image(reinterpret_cast<unsigned char*>(buf), ret + end);
+                getLCDRef().Image(reinterpret_cast<unsigned char*>(buffer), read_result + buffer_end);
             }
             else {
-                int beg = 0;
-                for (ret += end; end < ret; end++) {
-                    if (buf[end] == '\r' || buf[end] == '\n') {
-                        if (end != beg) {
-                            buf[end] = '\0';
-                            Command(buf + beg, "command");
+                int buffer_begin = 0;
+                for (read_result += buffer_end; buffer_end < read_result; buffer_end++) {
+                    if (buffer[buffer_end] == '\r' || buffer[buffer_end] == '\n') {
+                        if (buffer_end != buffer_begin) {
+                            buffer[buffer_end] = '\0';
+                            Command(buffer + buffer_begin, "command");
                         }
-                        beg = end + 1;
+                        buffer_begin = buffer_end + 1;
                     }
                 }
                 input_pipe_fifo.clear();
-                if (ret - beg < static_cast<int>(sizeof(buf))) {
+                if (read_result - buffer_begin < static_cast<int>(sizeof(buffer))) {
                     // Drop too long lines.
-                    input_pipe_fifo = std::string(buf + beg, ret - beg);
+                    input_pipe_fifo = std::string(buffer + buffer_begin, read_result - buffer_begin);
                 }
             }
         }
@@ -359,9 +348,9 @@ namespace G13 {
         return names;
     }
 
-    ProfilePtr G13_Device::Profile(const std::string& name) {
+    std::shared_ptr<G13_Profile> G13_Device::Profile(const std::string& name) {
         // try to get profile from map
-        ProfilePtr profile = profiles[name];
+        std::shared_ptr<G13_Profile> profile = profiles[name];
 
         // if not found, create it
         if (!profile) {
@@ -383,8 +372,6 @@ namespace G13 {
             return std::make_shared<G13_Action_Command>(*this, &action[1]);
         }
         return std::make_shared<G13_Action_Keys>(*this, action);
-        // UNREACHABLE: throw G13_CommandException("can't create action for " +
-        // action);
     }
 
     // *************************************************************************
@@ -446,17 +433,17 @@ namespace G13 {
         });
 
         commandAdder add_bind(command_table, "bind", [this](const char* remainder) {
-            std::string keyname, action, actionup;
+            std::string keyname, action, action_up;
             advance_ws(remainder, keyname);
-            const char* rawaction = ltrim(remainder);
+            const char* raw_action = ltrim(remainder);
             advance_ws(remainder, action);
-            advance_ws(remainder, actionup);
+            advance_ws(remainder, action_up);
 
             if (!action.empty() && strchr("!>", action[0])) {
-                action = std::string(rawaction);
+                action = std::string(raw_action);
             }
-            else if (!actionup.empty()) {
-                action += std::string(" ") + actionup;
+            else if (!action_up.empty()) {
+                action += std::string(" ") + action_up;
             }
 
             try {
@@ -778,8 +765,8 @@ namespace G13 {
 
         current_font->InstallFont(font8x8_basic, G13_FontChar::FF_ROTATE, 0);
 
-        const std::shared_ptr<G13_Font> fiveXeight(new G13_Font("5x8", 5));
-        fiveXeight->InstallFont(font5x8, 0, 32);
-        fonts[fiveXeight->name()] = fiveXeight;
+        const std::shared_ptr<G13_Font> new_font5x8(new G13_Font("5x8", 5));
+        new_font5x8->InstallFont(font5x8_basic, 0, 32);
+        fonts[new_font5x8->name()] = new_font5x8;
     }
-} // namespace G13
+}

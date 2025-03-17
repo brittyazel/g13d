@@ -15,10 +15,10 @@ namespace G13 {
                                          libusb_hotplug_event event, void* user_data);
     int LIBUSB_CALL HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
                                           libusb_hotplug_event event, void* user_data);
-    int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
+    int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, const libusb_device* dev,
                                           libusb_hotplug_event event, void* user_data);
     void ArmHotplugCallbacks();
 
-} // namespace G13
+}
 
 #endif //G13_HOTPLUG_HPP

@@ -22,8 +22,6 @@ namespace G13 {
     class G13_Profile;
     class G13_Font;
 
-    typedef std::shared_ptr<G13_Profile> ProfilePtr;
-
     constexpr size_t G13_NUM_KEYS = 40;
 
     int G13CreateUinput(G13_Device* g13);
@@ -45,7 +43,7 @@ namespace G13 {
         void SwitchToProfile(const std::string& name);
 
         [[nodiscard]] std::vector<std::string> FilteredProfileNames(const std::regex& pattern) const;
-        ProfilePtr Profile(const std::string& name);
+        std::shared_ptr<G13_Profile> Profile(const std::string& name);
 
         void Dump(std::ostream& o, int detail = 0);
         void Command(const char* str, const char* info = nullptr);
@@ -93,8 +91,8 @@ namespace G13 {
 
         std::map<std::string, std::shared_ptr<G13_Font>> fonts;
         std::shared_ptr<G13_Font> current_font;
-        std::map<std::string, ProfilePtr> profiles;
-        ProfilePtr current_profile;
+        std::map<std::string, std::shared_ptr<G13_Profile>> profiles;
+        std::shared_ptr<G13_Profile> current_profile;
         std::vector<std::string> files_currently_loading;
 
         G13_LCD lcd;
@@ -105,6 +103,6 @@ namespace G13 {
         libusb_device_handle* usb_handle;
         libusb_device* usb_device;
     };
-} // namespace G13
+}
 
 #endif // G13_DEVICE_HPP

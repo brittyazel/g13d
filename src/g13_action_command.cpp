@@ -20,4 +20,4 @@ namespace G13 {
     void G13_Action_Command::dump(std::ostream& o) const {
         o << "COMMAND : " << repr(_cmd);
     }
-} // namespace G13
+}

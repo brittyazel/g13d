@@ -20,6 +20,6 @@ namespace G13 {
 
         std::string _cmd;
     };
-} // namespace G13
+}
 
 #endif //G13_ACTION_COMMAND_HPP

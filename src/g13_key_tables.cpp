@@ -19,7 +19,7 @@ namespace G13 {
             nullptr
         };
 
-    const char* G13_Key_Tables::G13_NONPARSED_KEYS[] = {
+    const char* G13_Key_Tables::G13_NON_PARSED_KEYS[] = {
             "UNDEF1", "LIGHT_STATE", "UNDEF3", "LIGHT",
             "LIGHT2", "UNDEF3", "MISC_TOGGLE",
             nullptr
@@ -29,4 +29,4 @@ namespace G13 {
             "LEFT", "RIGHT", "MIDDLE", "SIDE", "EXTRA",
             nullptr
         };
-} // namespace G13
+}

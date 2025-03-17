@@ -155,4 +155,4 @@ namespace G13 {
             G13_ERR("Error registering hotplug removal callback: " << G13_Device::DescribeLibusbErrorCode(error));
         }
     }
-} // namespace G13
+}
