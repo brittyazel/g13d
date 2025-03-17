@@ -2,47 +2,62 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#include <log4cpp/OstreamAppender.hh>
 #include <log4cpp/BasicLayout.hh>
 #include <log4cpp/Category.hh>
-#include <memory>
 
 #include "g13_log.hpp"
 #include "g13_main.hpp"
 
 namespace G13 {
     void start_logging() {
-        auto appender1 = std::make_unique<log4cpp::OstreamAppender>("console", &std::cout);
+        if (logging_initialized) {
+            return; // Prevent re-initialization
+        }
+
+        appender1 = std::make_unique<log4cpp::OstreamAppender>("console", &std::cout);
         appender1->setLayout(new log4cpp::BasicLayout());
+
         log4cpp::Category& root = log4cpp::Category::getRoot();
         root.addAppender(appender1.get());
+        root.setPriority(log4cpp::Priority::INFO);
 
-        // Keep the unique_ptr alive to avoid de-allocation
-        static auto appender1_keeper = std::move(appender1);
-
-        // TODO: this is for later when --log_file is implemented
-        //    auto appender2 = std::make_unique<log4cpp::FileAppender>("default", "g13d-output.log");
-        //    appender2->setLayout(new log4cpp::BasicLayout());
-        //    log4cpp::Category &sub1 = log4cpp::Category::getInstance(std::string("sub1"));
-        //    sub1.addAppender(appender2.get());
+        logging_initialized = true;
     }
 
     void stop_logging() {
+        if (!logging_initialized) {
+            return;
+        }
+
         log4cpp::Category::shutdown();
+
+        // Don't manually delete/reset appender1, to prevent double free
+        appender1.release(); // Release ownership but don’t delete it
+
+        logging_initialized = false;
     }
 
     void SetLogLevel(const log4cpp::Priority::PriorityLevel lvl) {
-        G13_OUT("set log level to " << lvl);
+        if (!logging_initialized) {
+            return;
+        }
+
+        G13_OUT("Setting log level to " << lvl);
+        log4cpp::Category::getRoot().setPriority(lvl);
     }
 
     void SetLogLevel(const std::string& level) {
+        if (!logging_initialized) {
+            return;
+        }
+
         log4cpp::Category& root = log4cpp::Category::getRoot();
         try {
             const auto numLevel = log4cpp::Priority::getPriorityValue(level);
             root.setPriority(numLevel);
         }
-        catch ([[maybe_unused]] std::invalid_argument& e) {
-            G13_ERR("unknown log level " << level);
+        catch (const std::invalid_argument&) {
+            G13_ERR("Unknown log level: " << level);
         }
     }
 }
