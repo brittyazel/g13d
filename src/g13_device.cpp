@@ -1,6 +1,4 @@
 //
-// Created by khampf on 07-05-2020.
-//
 // Created by Britt Yazel on 03-16-2025.
 //
 
@@ -696,14 +694,17 @@ namespace G13 {
         }
     }
 
-    void G13_Device::Cleanup() const {
-        SetKeyColor(0, 0, 0);
-        remove(input_pipe_name.c_str());
-        remove(output_pipe_name.c_str());
-        ioctl(uinput_fid, UI_DEV_DESTROY);
-        close(uinput_fid);
-        libusb_release_interface(usb_handle, 0);
-        libusb_close(usb_handle);
+    void G13_Device::Cleanup() {
+        if (usb_handle) {
+            SetKeyColor(0, 0, 0);
+            remove(input_pipe_name.c_str());
+            remove(output_pipe_name.c_str());
+            ioctl(uinput_fid, UI_DEV_DESTROY);
+            close(uinput_fid);
+            libusb_release_interface(usb_handle, 0);
+            libusb_close(usb_handle);
+            usb_handle = nullptr;
+        }
     }
 
     void G13_Device::parse_joystick(const unsigned char* buf) {
@@ -730,15 +731,15 @@ namespace G13 {
         unsigned char buffer[G13_LCD_BUFFER_SIZE + 32] = {};
         buffer[0] = 0x03;
         memcpy(buffer + 32, data, G13_LCD_BUFFER_SIZE);
-        int bytes_written;
 
+        int transferred = 0;
         const int error = libusb_interrupt_transfer(usb_handle, LIBUSB_ENDPOINT_OUT | G13_LCD_ENDPOINT, buffer,
-                                                    G13_LCD_BUFFER_SIZE + 32, &bytes_written, 1000);
+                                                    G13_LCD_BUFFER_SIZE + 32, &transferred, 1000);
 
         if (error) {
             G13_LOG(
                 log4cpp::Priority::ERROR << "Error when transferring image: " << DescribeLibusbErrorCode(error) << ", "
-                << bytes_written << " bytes written");
+                << transferred << " bytes written");
         }
     }
 

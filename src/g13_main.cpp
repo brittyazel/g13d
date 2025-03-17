@@ -106,17 +106,27 @@ namespace G13 {
     void Cleanup() {
         G13_OUT("Cleaning up");
 
+        // Deregister hotplug callbacks
         for (const auto this_handle : usb_hotplug_cb_handle) {
             if (this_handle) {
                 libusb_hotplug_deregister_callback(usb_context, this_handle);
             }
         }
-        // TODO: This might be better with an iterator and also g13s.erase(iter)
+
+        // Cleanup G13 devices
         for (const auto g13 : g13s) {
-            //g13->Cleanup();
-            delete g13;
+            if (g13) {
+                g13->Cleanup();
+                delete g13;
+            }
         }
         g13s.clear();
+
+        // Free device list if allocated
+        if (devs) {
+            libusb_free_device_list(devs, 1);
+            devs = nullptr;
+        }
 
         // Exit libusb context
         if (usb_context) {
@@ -270,5 +280,4 @@ namespace G13 {
     void setLogoFilename(const std::string& newLogoFilename) {
         logoFilename = newLogoFilename;
     }
-
 }

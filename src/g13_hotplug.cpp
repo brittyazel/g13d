@@ -41,68 +41,55 @@ namespace G13 {
 
         libusb_set_auto_detach_kernel_driver(usb_handle, true);
         error = libusb_claim_interface(usb_handle, 0);
-        if (error != LIBUSB_SUCCESS) {
-            G13_ERR("Cannot Claim Interface: " << G13_Device::DescribeLibusbErrorCode(error));
-        }
-        if (error == LIBUSB_ERROR_BUSY) {
-            if (libusb_kernel_driver_active(usb_handle, 0) == 1) {
-                if (libusb_detach_kernel_driver(usb_handle, 0) == 0) {
-                    G13_ERR("Kernel driver detached");
-                }
+        if (error == LIBUSB_ERROR_BUSY && libusb_kernel_driver_active(usb_handle, 0) == 1) {
+            if (libusb_detach_kernel_driver(usb_handle, 0) == 0) {
+                G13_ERR("Kernel driver detached");
                 error = libusb_claim_interface(usb_handle, 0);
-                G13_ERR("Still cannot claim Interface: " << G13_Device::DescribeLibusbErrorCode(error));
             }
         }
 
-        if (error == LIBUSB_SUCCESS) {
-            G13_DBG("Interface successfully claimed");
-            const auto g13 = new G13_Device(dev, usb_context, usb_handle, static_cast<int>(g13s.size()));
-            g13s.push_back(g13);
-            return 0;
+        if (error != LIBUSB_SUCCESS) {
+            G13_ERR("Cannot Claim Interface: " << G13_Device::DescribeLibusbErrorCode(error));
+            libusb_close(usb_handle);
+            return 1;
         }
 
-        libusb_release_interface(usb_handle, 0);
-        libusb_close(usb_handle);
-        return 1;
+        G13_DBG("Interface successfully claimed");
+        const auto g13 = new G13_Device(dev, usb_context, usb_handle, static_cast<int>(g13s.size()));
+        g13s.push_back(g13);
+        return 0;
     }
 
     int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
                                              libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device found during enumeration");
-
-        // Call this as it would have been detected on connection later
-        HotplugCallbackInsert(usb_context, dev, event, user_data);
-        return 1;
+        return HotplugCallbackInsert(usb_context, dev, event, user_data);
     }
 
     int LIBUSB_CALL HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
                                           libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device connected");
 
-        // Just make sure we have not been called multiple times
         for (const auto g13 : g13s) {
             if (dev == g13->getDevicePtr()) {
                 return 1;
             }
         }
 
-        // It's brand new!
         OpenAndAddG13(dev);
-
-        // NOTE: can not SetupDevice() from this thread
         return 0; // Rearm
     }
 
     int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
                                           libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device disconnected");
-        int i = 0;
-        for (auto iter = g13s.begin(); iter != g13s.end(); ++i) {
+
+        for (auto iter = g13s.begin(); iter != g13s.end();) {
             if (dev == (*iter)->getDevicePtr()) {
-                G13_OUT("Closing device " << i);
-                const auto g13 = *iter;
-                iter = g13s.erase(iter); // remove from vector first
-                delete g13; // delete the object after
+                G13_OUT("Closing device " << std::distance(g13s.begin(), iter));
+                (*iter)->Cleanup();
+                delete *iter;
+                iter = g13s.erase(iter);
             }
             else {
                 ++iter;

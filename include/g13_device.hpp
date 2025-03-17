@@ -61,7 +61,7 @@ namespace G13 {
         void LcdWrite(const unsigned char* data, size_t size) const;
         bool updateKeyState(int key, bool state);
 
-        void Cleanup() const;
+        void Cleanup();
         void RegisterContext(libusb_context* new_usb_context);
         void LcdWriteFile(const std::string& filename) const;
         static std::string DescribeLibusbErrorCode(int code);
