@@ -11,6 +11,7 @@
 #include "g13_device.hpp"
 #include "g13_state_key.hpp"
 
+
 namespace G13 {
     /// Action to send one or more keystrokes
     class G13_Action_Keys final : public G13_Action {

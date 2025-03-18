@@ -2,6 +2,7 @@
 // Created by britt on 3/15/25.
 //
 
+#include <cstring>
 #include <libevdev-1.0/libevdev/libevdev.h>
 
 #include "g13_key.hpp"

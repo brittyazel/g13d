@@ -22,7 +22,7 @@
          A0.01 A1.01 A2.01 ...
  */
 
-
+#include "g13_font.hpp"
 #include "g13_main.hpp"
 #include "g13_lcd.hpp"
 #include "g13_log.hpp"

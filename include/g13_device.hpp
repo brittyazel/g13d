@@ -5,18 +5,15 @@
 #ifndef G13_DEVICE_HPP
 #define G13_DEVICE_HPP
 
-#include <functional>
+
 #include <libusb-1.0/libusb.h>
 #include <linux/uinput.h>
-#include <map>
-#include <memory>
-#include <regex>
-#include <vector>
 
+#include <g13_action.hpp>
 #include "g13_lcd.hpp"
 #include "g13_profile.hpp"
 #include "g13_stick.hpp"
-#include "g13_font.hpp"
+
 
 namespace G13 {
     class G13_Profile;

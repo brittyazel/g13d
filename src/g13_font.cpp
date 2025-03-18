@@ -2,8 +2,7 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#include <utility>
-#include "g13_device.hpp"
+#include <string>
 
 #include "g13_font.hpp"
 

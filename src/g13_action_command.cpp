@@ -3,6 +3,7 @@
 //
 
 #include "g13_action_command.hpp"
+#include "g13_device.hpp"
 #include "g13_key.hpp"
 
 namespace G13 {

@@ -5,8 +5,6 @@
 #ifndef UTILITIES_HPP
 #define UTILITIES_HPP
 
-#include <exception>
-#include <string>
 
 namespace G13 {
     class string_repr_out {

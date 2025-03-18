@@ -5,21 +5,16 @@
 #include <filesystem>
 #include <fstream>
 #include <ranges>
-#include <regex>
-#include <unistd.h>
-#include <vector>
 
-#include "g13_device.hpp"
 #include "g13_action_command.hpp"
 #include "g13_action_keys.hpp"
 #include "g13_action_pipeout.hpp"
+#include "g13_device.hpp"
 #include "g13_font.hpp"
-#include "g13_font_char.hpp"
 #include "g13_font_family.hpp"
+#include "g13_key.hpp"
 #include "g13_log.hpp"
 #include "g13_main.hpp"
-#include "g13_profile.hpp"
-#include "g13_stick.hpp"
 #include "g13_stickzone.hpp"
 #include "logo.hpp"
 

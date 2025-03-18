@@ -5,7 +5,6 @@
 #include <cstring>
 #include <iomanip>
 #include <functional>
-#include <sstream>
 
 #include "utilities.hpp"
 

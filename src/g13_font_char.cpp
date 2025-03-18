@@ -2,10 +2,8 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#include <memory>
 
 #include "g13_font_char.hpp"
-#include "g13_device.hpp"
 
 namespace G13 {
     void G13_FontChar::SetCharacter(const unsigned char* data, const unsigned int width, const unsigned flags) {

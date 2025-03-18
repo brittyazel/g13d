@@ -2,11 +2,11 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
+#include <vector>
+#include <regex>
 
-#include "g13_action.hpp"
 #include "g13_action_keys.hpp"
 #include "g13_log.hpp"
-#include "g13_main.hpp"
 #include "g13_stick.hpp"
 #include "g13_stickzone.hpp"
 

@@ -3,19 +3,14 @@
 //
 
 #include <csignal>
+#include <cstring>
 #include <getopt.h>
-#include <iostream>
 #include <iomanip>
-#include <libevdev-1.0/libevdev/libevdev.h>
-#include <libusb-1.0/libusb.h>
-#include <log4cpp/OstreamAppender.hh>
-#include <memory>
 
-#include "g13_main.hpp"
-#include "g13_device.hpp"
 #include "g13_hotplug.hpp"
+#include "g13_key.hpp"
 #include "g13_log.hpp"
-#include "utilities.hpp"
+#include "g13_main.hpp"
 #include "version.hpp"
 
 // *************************************************************************

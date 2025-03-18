@@ -2,9 +2,12 @@
 // Created by britt on 3/15/25.
 //
 
+#include <vector>
+
 #include "g13_action.hpp"
 #include "g13_action_keys.hpp"
 #include "g13_device.hpp"
+#include "g13_key.hpp"
 #include "g13_log.hpp"
 #include "g13_main.hpp"
 

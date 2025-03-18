@@ -6,7 +6,9 @@
 #define G13_MAIN_HPP_
 
 #include <libusb-1.0/libusb.h>
-#include <log4cpp/Priority.hh>
+#include <map>
+#include <string>
+#include <vector>
 
 #include "g13_device.hpp"
 

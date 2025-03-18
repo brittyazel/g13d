@@ -5,6 +5,10 @@
 #ifndef G13_HOTPLUG_HPP
 #define G13_HOTPLUG_HPP
 
+#include <libusb-1.0/libusb.h>
+
+#include "g13_device.hpp"
+
 namespace G13 {
 
     void DiscoverG13s(libusb_device** devs, ssize_t count);

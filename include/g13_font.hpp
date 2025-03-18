@@ -5,7 +5,6 @@
 #ifndef G13_FONT_HPP
 #define G13_FONT_HPP
 
-#include <memory>
 #include <string>
 
 #include "g13_font_char.hpp"

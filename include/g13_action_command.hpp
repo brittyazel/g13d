@@ -6,7 +6,6 @@
 #define G13_ACTION_COMMAND_HPP
 
 #include "g13_action.hpp"
-#include "g13_device.hpp"
 
 namespace G13 {
     /// Action to send a command to the g13

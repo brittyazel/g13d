@@ -8,7 +8,6 @@
 #include <map>
 
 #include "g13_action.hpp"
-#include "g13_actionable.hpp"
 #include "g13_state_key.hpp"
 
 namespace G13 {
