@@ -37,4 +37,4 @@ namespace G13 {
         G13_FontChar m_chars[256];
     };
 }
-#endif // G13_FONT_HPP
+#endif

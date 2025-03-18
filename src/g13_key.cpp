@@ -11,9 +11,18 @@
 #include "g13_main.hpp"
 
 namespace G13 {
-
     //definitions
     LINUX_KEY_VALUE input_key_max;
+
+    //Constructors
+    G13_Key::G13_Key(G13_Profile& mode, const std::string& name, const int index) : G13_Actionable(mode, name),
+                                                                       _index(index), _should_parse(true) {}
+
+    G13_Key::G13_Key(G13_Profile& mode, const G13_Key& key) : G13_Actionable(mode, key.name()), _index(key._index),
+                                                     _should_parse(key._should_parse) {
+        // TODO: do not invoke virtual member function from ctor
+        G13_Actionable::set_action(key.action());
+    }
 
     void G13_Key::dump(std::ostream& o) const {
         o << FindG13KeyName(index()) << "(" << index() << ") : ";

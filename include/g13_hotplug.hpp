@@ -25,4 +25,4 @@ namespace G13 {
 
 }
 
-#endif //G13_HOTPLUG_HPP
+#endif

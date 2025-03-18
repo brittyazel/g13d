@@ -8,16 +8,18 @@
 
 #include <libusb-1.0/libusb.h>
 #include <linux/uinput.h>
+#include <map>
+#include <regex>
+#include <vector>
 
-#include <g13_action.hpp>
+#include "g13_action.hpp"
+#include "g13_font.hpp"
 #include "g13_lcd.hpp"
 #include "g13_profile.hpp"
 #include "g13_stick.hpp"
 
 
 namespace G13 {
-    class G13_Profile;
-    class G13_Font;
 
     constexpr size_t G13_NUM_KEYS = 40;
 
@@ -105,4 +107,4 @@ namespace G13 {
     };
 }
 
-#endif // G13_DEVICE_HPP
+#endif

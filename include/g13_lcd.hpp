@@ -35,4 +35,4 @@ namespace G13 {
         void WritePos(int row, int col);
     };
 }
-#endif // G13_LCD_HPP
+#endif

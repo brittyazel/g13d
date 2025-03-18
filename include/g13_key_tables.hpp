@@ -33,4 +33,4 @@ namespace G13 {
         static const char* G13_BTN_SEQ[];
     };
 }
-#endif // G13_KEY_TABLES_HPP
+#endif

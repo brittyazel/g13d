@@ -30,4 +30,4 @@ namespace G13 {
     };
 }
 
-#endif //G13_STICKZONE_HPP
+#endif

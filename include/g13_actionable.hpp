@@ -8,6 +8,8 @@
 #include <memory>
 #include <string>
 
+#include "g13_action.hpp"
+
 namespace G13 {
     class G13_Action;
 

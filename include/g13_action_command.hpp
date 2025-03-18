@@ -21,4 +21,4 @@ namespace G13 {
     };
 }
 
-#endif //G13_ACTION_COMMAND_HPP
+#endif

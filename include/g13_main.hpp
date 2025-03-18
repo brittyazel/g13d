@@ -2,8 +2,8 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#ifndef G13_MAIN_HPP_
-#define G13_MAIN_HPP_
+#ifndef G13_MAIN_HPP
+#define G13_MAIN_HPP
 
 #include <libusb-1.0/libusb.h>
 #include <map>
@@ -52,4 +52,4 @@ namespace G13 {
     };
 }
 
-#endif  // G13_MAIN_HPP_
+#endif

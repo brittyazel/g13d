@@ -59,4 +59,4 @@ namespace G13 {
     };
 }
 
-#endif // G13_STICK_HPP
+#endif

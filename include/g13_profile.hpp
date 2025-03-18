@@ -10,7 +10,6 @@
 #include <regex>
 
 
-
 namespace G13 {
     class G13_Key;
     /*!
@@ -40,4 +39,4 @@ namespace G13 {
     };
 }
 
-#endif // G13_PROFILE_HPP
+#endif

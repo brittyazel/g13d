@@ -6,11 +6,10 @@
 #define G13_ACTION_HPP
 
 #include "g13_actionable.hpp"
+#include "g13_device.hpp"
 
 namespace G13 {
     class G13_Device;
-    class G13_Profile;
-
 
     /// Holds potential actions which can be bound to G13 activity
     class G13_Action {
@@ -33,4 +32,4 @@ namespace G13 {
         G13_Device& _keypad;
     };
 }
-#endif // G13_ACTION_HPP
+#endif

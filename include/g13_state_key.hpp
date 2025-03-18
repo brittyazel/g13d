@@ -22,4 +22,4 @@ namespace G13 {
     };
 }
 
-#endif //G13_STATE_KEY_HPP
+#endif

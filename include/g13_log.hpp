@@ -25,4 +25,4 @@ namespace G13 {
     inline bool logging_initialized = false;
 }
 
-#endif // G13_LOG_HPP
+#endif

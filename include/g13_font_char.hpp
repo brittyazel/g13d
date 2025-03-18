@@ -24,4 +24,4 @@ namespace G13 {
         unsigned char bits_inverted[CHAR_BUF_SIZE]{};
     };
 }
-#endif // G13_FONT_CHAR_HPP
+#endif
