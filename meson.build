@@ -24,7 +24,7 @@ sources = files(
     'src/g13_log.cpp',
     'src/g13_profile.cpp',
     'src/g13_stick.cpp',
-    'src/helper.cpp'
+    'src/utilities.cpp'
 )
 
 # Include directories

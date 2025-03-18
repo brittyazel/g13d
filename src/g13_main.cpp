@@ -15,7 +15,7 @@
 #include "g13_device.hpp"
 #include "g13_hotplug.hpp"
 #include "g13_log.hpp"
-#include "helper.hpp"
+#include "utilities.hpp"
 #include "version.hpp"
 
 // *************************************************************************

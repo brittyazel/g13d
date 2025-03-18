@@ -2,8 +2,8 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#ifndef FOO_BAR_TPP
-#define FOO_BAR_TPP
+#ifndef UTILITIES_TPP
+#define UTILITIES_TPP
 
 #include <map>
 

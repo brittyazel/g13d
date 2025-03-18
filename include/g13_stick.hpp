@@ -8,7 +8,7 @@
 #include <vector>
 #include <regex>
 
-#include "helper.hpp"
+#include "utilities.hpp"
 
 namespace G13 {
     class G13_Device;

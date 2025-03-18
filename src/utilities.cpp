@@ -7,7 +7,7 @@
 #include <functional>
 #include <sstream>
 
-#include "helper.hpp"
+#include "utilities.hpp"
 
 namespace G13 {
     string_repr_out::string_repr_out(std::string str) : str(std::move(str)) {}

@@ -2,8 +2,8 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#ifndef HELPER_HPP_
-#define HELPER_HPP_
+#ifndef UTILITIES_HPP
+#define UTILITIES_HPP
 
 #include <exception>
 #include <string>
@@ -39,6 +39,6 @@ namespace G13 {
 
 }
 
-#include "helper.tpp"
+#include "utilities.tpp"
 
-#endif // HELPER_HPP_
+#endif
