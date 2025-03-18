@@ -22,55 +22,33 @@
          A0.01 A1.01 A2.01 ...
  */
 
-#include "g13_main.hpp"
-#include "g13_device.hpp"
-#include "g13_font.hpp"
-#include <fstream>
-#include <log4cpp/Category.hh>
 
+#include "g13_main.hpp"
+#include "g13_lcd.hpp"
 #include "g13_log.hpp"
 
 namespace G13 {
-    void G13_LCD::Image(const unsigned char* data, const int size) const {
-        m_keypad.LcdWrite(data, size);
-    }
-
     G13_LCD::G13_LCD(G13_Device& keypad) : m_keypad(keypad) {
         cursor_col = 0;
         cursor_row = 0;
         text_mode = 0;
     }
 
-    /*
-    void G13_LCD::image_setpixel(unsigned row, unsigned col) {
-        unsigned offset = image_byte_offset(row, col);  // col + (row /8 ) *
-    BYTES_PER_ROW * 8; unsigned char mask = 1 << ((row)&7);
-    
-        if (offset >= G13_LCD_BUF_SIZE) {
-            G13_LOG(log4cpp::Priority::ERROR << "bad offset " << offset << " for "
-    << (row) << " x "
-                                             << (col));
-            return;
-        }
-    
-        image_buf[offset] |= mask;
+    void G13_LCD::image_send() const {
+        Image(image_buf, G13_LCD_BUF_SIZE);
     }
-    */
 
-    /*
-    void G13_LCD::image_clearpixel(unsigned row, unsigned col) {
-        unsigned offset = image_byte_offset(row, col);  // col + (row /8 ) *
-    BYTES_PER_ROW * 8; unsigned char mask = 1 << ((row)&7);
-    
-        if (offset >= G13_LCD_BUF_SIZE) {
-            G13_LOG(log4cpp::Priority::ERROR << "bad offset " << offset << " for "
-    << (row) << " x "
-                                             << (col));
-            return;
-        }
-        image_buf[offset] &= ~mask;
+    void G13_LCD::image_clear() {
+        memset(image_buf, 0, G13_LCD_BUF_SIZE);
     }
-    */
+
+    void G13_LCD::Image(const unsigned char* data, const int size) const {
+        m_keypad.LcdWrite(data, size);
+    }
+
+    unsigned G13_LCD::image_byte_offset(const unsigned row, const unsigned col) {
+        return col + row / 8 * G13_LCD_BYTES_PER_ROW * 8;
+    }
 
     void G13_LCD::WritePos(const int row, const int col) {
         cursor_row = row;
@@ -133,37 +111,4 @@ namespace G13 {
         }
         image_send();
     }
-
-    /*
-    void G13_LCD::image_test(int x, int y) {
-        int row, col;
-        if (y >= 0) {
-            image_setpixel(x, y);
-        } else {
-            image_clear();
-            switch (x) {
-                case 1:
-                    for (row = 0; row < G13_LCD_ROWS; ++row) {
-                        col = row;
-                        image_setpixel(row, col);
-                        image_setpixel(row, G13_LCD_COLUMNS - col);
-                    }
-                    break;
-    
-                case 2:
-                default:
-                    for (row = 0; row < G13_LCD_ROWS; ++row) {
-                        col = row;
-                        image_setpixel(row, 8);
-                        image_setpixel(row, G13_LCD_COLUMNS - 8);
-                        image_setpixel(row, G13_LCD_COLUMNS / 2);
-                        image_setpixel(row, col);
-                        image_setpixel(row, G13_LCD_COLUMNS - col);
-                    }
-                    break;
-            }
-        }
-        image_send();
-    }
-    */
 }
