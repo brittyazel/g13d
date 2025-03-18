@@ -108,9 +108,9 @@ namespace G13 {
         G13_OUT("Active Stick zones ");
         g13->getStickRef().dump(std::cout);
 
-        if (const std::string config_fn = getStringConfigValue("config"); !config_fn.empty()) {
-            G13_OUT("config_fn = " << config_fn);
-            g13->ReadConfigFile(config_fn);
+        if (const std::string config_filename = getStringConfigValue("config"); !config_filename.empty()) {
+            G13_OUT("Reading configuration from: " << config_filename);
+            g13->ReadCommandsFromFile(config_filename, "  cfg");
         }
     }
 

@@ -1,5 +1,5 @@
 //
-// Created by khampf on 07-05-2020.
+// Created by Britt Yazel on 03-16-2025.
 //
 
 #ifndef G13_DEVICE_HPP
@@ -48,10 +48,8 @@ namespace G13 {
         void Dump(std::ostream& o, int detail = 0);
         void Command(const char* str, const char* info = nullptr);
         void ReadCommandsFromPipe();
-        void ReadCommandsFromFile(const std::string& filename, const char* info = nullptr);
-        void ReadConfigFile(const std::string& filename);
         int ReadKeypresses();
-        void parse_joystick(const unsigned char* buf);
+        void ReadCommandsFromFile(const std::string& filename, const char* info = nullptr);
 
         std::shared_ptr<G13_Action> MakeAction(const std::string& action);
         void SetKeyColor(int red, int green, int blue) const;
@@ -77,6 +75,12 @@ namespace G13 {
         void LcdInit() const;
         void InitCommands();
 
+    private:
+        static bool IsDataAvailable(int fd);
+        void ProcessBuffer(char* buffer, int buffer_end, int read_result);
+        [[nodiscard]] std::string NormalizeFilePath(const std::string& filename) const;
+        void parse_joystick(const unsigned char* buf);
+
         CommandFunctionTable command_table;
         input_event device_event{};
 
@@ -99,7 +103,6 @@ namespace G13 {
         G13_Stick stick;
         bool keys[G13_NUM_KEYS]{};
 
-    private:
         libusb_device_handle* usb_handle;
         libusb_device* usb_device;
     };

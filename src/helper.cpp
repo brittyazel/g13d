@@ -3,184 +3,220 @@
 //
 
 #include <cstring>
+#include <iomanip>
 #include <functional>
+#include <sstream>
 
 #include "helper.hpp"
 
 namespace G13 {
-    string_repr_out::string_repr_out(std::string str) : s(std::move(str)) {}
+    string_repr_out::string_repr_out(std::string str) : str(std::move(str)) {}
 
-    void string_repr_out::write_on(std::ostream& o) const {
-        o << "\"";
-        const char* cp = s.c_str();
-        const char* end = cp + s.size();
-
-        while (cp < end) {
-            switch (*cp) {
-            case '\n':
-                o << "\\n";
+    void string_repr_out::write_on(std::ostream& output_stream) const {
+        output_stream << "\"";
+        for (const char character : str) {
+            switch (character) {
+            case '\n': output_stream << "\\n";
                 break;
-            case '\r':
-                o << "\\r";
+            case '\r': output_stream << "\\r";
                 break;
-            case '\0':
-                o << "\\0";
+            case '\0': output_stream << "\\0";
                 break;
-            case '\t':
-                o << "\\t";
+            case '\t': output_stream << "\\t";
                 break;
             case '\\':
             case '\'':
-            case '\"':
-                o << "\\" << *cp;
+            case '\"': output_stream << "\\" << character;
                 break;
             default:
-                if (const unsigned char c = *cp; c < 32) {
-                    const unsigned char hi = '0' + (c & 0x0F);
-                    const unsigned char lo = '0' + (static_cast<unsigned char>(c >> 4) & 0x0F);
-                    o << "\\x" << hi << lo;
+                if (character < 32 || character > 126) {
+                    output_stream << "\\x" << std::hex << std::setw(2) << std::setfill('0') <<
+                        static_cast<int>(static_cast<unsigned char>(character));
                 }
                 else {
-                    o << c;
+                    output_stream << character;
                 }
             }
-            cp++;
         }
-
-        o << "\"";
+        output_stream << "\"";
     }
 
-    std::ostream& operator<<(std::ostream& o, const string_repr_out& sro) {
-        sro.write_on(o);
-        return o;
-    }
-
-    string_repr_out repr(const std::string& s) {
-        return string_repr_out(s);
+    std::ostream& operator<<(std::ostream& output_stream, const string_repr_out& string_repr) {
+        string_repr.write_on(output_stream);
+        return output_stream;
     }
 
     const char* NotFoundException::what() const noexcept {
         return "Element not found";
     }
 
-    const char* ltrim(const char* string, const char* ws) {
-        return string + strspn(string, ws);
+    /**
+    * @brief Trims leading spaces and tabs from a string.
+    *
+    * This function skips over any leading spaces and tabs in the input string
+    * and returns a pointer to the first non-whitespace character.
+    *
+    * @param string The input string to be trimmed.
+    * @return A pointer to the first non-whitespace character in the input string.
+    */
+    const char* left_trim(const char* string) {
+        // Skip over leading spaces and tabs
+        while (*string == ' ' || *string == '\t') {
+            ++string;
+        }
+        // Return pointer to the first non-whitespace character
+        return string;
     }
 
-    const char* advance_ws(const char*& source, std::string& dest) {
-        source = ltrim(source);
-        const size_t l = strcspn(source, "# \t");
-        dest = std::string(source, l);
-        source = !source[l] || source[l] == '#' ? "" : source + l + 1;
-        return source;
+    /**
+     * @brief Extracts the next token from the source string and advances the source pointer.
+     *
+     * This function trims leading whitespace from the source string, extracts the next token
+     * (delimited by whitespace or a hash character), and advances the source pointer past the token.
+     *
+     * @param source A reference to the source string pointer. The pointer will be advanced past the extracted token.
+     * @return The extracted token.
+     */
+    std::string extract_and_advance_token(const char*& source) {
+        std::istringstream stream(source);
+        std::string token;
+        char delimiter;
+
+        // Extract the next token delimited by whitespace or a hash character
+        while (stream.get(delimiter)) {
+            if (delimiter == ' ' || delimiter == '#') {
+                break;
+            }
+            token += delimiter;
+        }
+
+        // Update the source pointer to the remaining string
+        source += stream.tellg();
+        return token;
     }
 
-    void IGUR(...) {}
-
-    std::string glob2regex(const char* glob) {
+    /**
+     * @brief Converts a glob pattern to a regular expression pattern.
+     *
+     * This function takes a glob pattern (commonly used for filename matching) and converts it into a
+     * regular expression (regex) pattern. The resulting regex pattern can be used for advanced and
+     * flexible string matching operations.
+     *
+     * The function handles the following glob pattern elements:
+     * - `*` : Matches any sequence of characters (except for the directory separator `/`).
+     * - `**` : Matches any sequence of characters, including directory separators.
+     * - `?` : Matches any single character.
+     * - `[...]` : Matches any one of the enclosed characters.
+     * - `{...}` : Matches any of the comma-separated alternatives.
+     *
+     * @param glob The input glob pattern as a C-style string.
+     * @return A string containing the equivalent regular expression pattern.
+     */
+    std::string glob_to_regex(const char* glob) {
+        // Initialize the regex string with the start anchor
         std::string regex("^");
-        constexpr char lparent = '(';
-        constexpr char rparent = ')';
-        constexpr char lbracket = '[';
-        constexpr char rbracket = ']';
-        constexpr char lbrace = '{';
-        constexpr char rbrace = '}';
 
+        // Define constants for various characters used in the function
+        constexpr char left_parent = '(';
+        constexpr char right_parent = ')';
+        constexpr char left_bracket = '[';
+        constexpr char right_bracket = ']';
+        constexpr char left_brace = '{';
+        constexpr char right_brace = '}';
+
+        // Lambda function to handle wildcard characters (* and ?)
         auto wildcard = [&] {
-            unsigned int min(0);
-            bool nomax(false);
+            unsigned int min = 0;
+            bool no_max = false;
 
+            // Handle double asterisk (**) for matching any number of directories
             if (*glob == '*' && glob[1] == '*') {
-                regex += ".";
-                for (glob += 2; *glob == '*'; glob++);
+                regex += ".*";
+                glob += 2;
+                while (*glob == '*') {
+                    ++glob;
+                }
             }
             else {
-                regex += "[^/]";
-                for (;; glob++) {
+                // Handle single asterisk (*) and question mark (?)
+                regex += "[^/]*";
+                while (*glob == '?' || *glob == '*') {
                     if (*glob == '?') {
-                        min++;
+                        ++min;
                     }
                     else if (*glob == '*') {
-                        if (glob[1] == '*') {
-                            break;
-                        }
-                        nomax = true;
+                        no_max = true;
                     }
-                    else {
-                        break;
-                    }
+                    ++glob;
                 }
             }
 
-            if (!min) {
-                regex += '*';
-            }
-            else if (min == 1) {
-                if (nomax) {
-                    regex += '+';
-                }
-            }
-            else {
+            // Add quantifiers to the regex based on the number of wildcards
+            if (min > 1) {
                 regex += "{" + std::to_string(min);
-                if (nomax) {
+                if (no_max) {
                     regex += ',';
                 }
                 regex += '}';
             }
+            else if (min == 1 && no_max) {
+                regex += '+';
+            }
         };
 
+        // Lambda function to handle character sets ([...])
         auto set = [&] {
             regex += *glob++;
             if (*glob == '^' || *glob == '!') {
-                regex += "^";
-                glob++;
+                regex += '^';
+                ++glob;
             }
-            while (auto c = *glob) {
-                glob++;
-                if (c == rbracket) {
-                    break;
+            while (*glob && *glob != right_bracket) {
+                if (*glob == '-' && glob[1] != right_bracket) {
+                    regex += '-';
+                    ++glob;
                 }
-                if (c != '-') {
-                    if (c == '\\' && *glob) {
-                        c = *glob++;
+                else {
+                    if (*glob == '\\' && glob[1]) {
+                        regex += '\\';
+                        ++glob;
                     }
-                    if (strchr("]\\-", c)) {
-                        regex += "\\";
-                    }
+                    regex += *glob++;
                 }
-                regex += c;
             }
-            regex += rbracket;
+            if (*glob == right_bracket) {
+                regex += right_bracket;
+                ++glob;
+            }
         };
 
+        // Lambda function to handle groups ({...})
         std::function<void(bool)> terms;
         auto group = [&] {
-            regex += lparent;
-            for (glob++; *glob;) {
+            regex += left_parent;
+            ++glob;
+            while (*glob && *glob != right_brace) {
                 if (*glob == ',') {
                     regex += '|';
-                    glob++;
-                }
-                else if (*glob == rbrace) {
-                    glob++;
-                    break;
+                    ++glob;
                 }
                 else {
                     terms(true);
                 }
             }
-            regex += rparent;
+            if (*glob == right_brace) {
+                ++glob;
+            }
+            regex += right_parent;
         };
 
-        terms = [&](const bool ingroup) {
-            while (*glob) {
-                if (ingroup && (*glob == ',' || *glob == rbrace)) {
-                    break;
-                }
-                if (*glob == lbracket) {
+        // Lambda function to handle terms within the glob pattern
+        terms = [&](const bool in_group) {
+            while (*glob && (!in_group || (*glob != ',' && *glob != right_brace))) {
+                if (*glob == left_bracket) {
                     set();
                 }
-                else if (*glob == lbrace) {
+                else if (*glob == left_brace) {
                     group();
                 }
                 else if (*glob == '?' || *glob == '*') {
@@ -188,7 +224,8 @@ namespace G13 {
                 }
                 else {
                     if (*glob == '\\' && glob[1]) {
-                        glob++;
+                        regex += '\\';
+                        ++glob;
                     }
                     if (strchr("$^+*?.=!|\\()[]{}", *glob)) {
                         regex += '\\';
@@ -198,9 +235,11 @@ namespace G13 {
             }
         };
 
+        // Process the entire glob pattern
         while (*glob) {
             terms(false);
         }
+        // Add the end anchor to the regex string
         return regex + '$';
     }
 }
