@@ -5,16 +5,19 @@
 #include "g13_log.hpp"
 
 namespace G13 {
+    log4cpp::Appender *appender1;
+    bool logging_initialized = false;
+
     void start_logging() {
         if (logging_initialized) {
             return; // Prevent re-initialization
         }
 
-        appender1 = std::make_unique<log4cpp::OstreamAppender>("console", &std::cout);
+        appender1 = new log4cpp::OstreamAppender("console", &std::cout);
         appender1->setLayout(new log4cpp::BasicLayout());
 
         log4cpp::Category& root = log4cpp::Category::getRoot();
-        root.addAppender(appender1.get());
+        root.addAppender(appender1);
         root.setPriority(log4cpp::Priority::INFO);
 
         logging_initialized = true;
@@ -25,10 +28,8 @@ namespace G13 {
             return;
         }
 
+        appender1->close();
         log4cpp::Category::shutdown();
-
-        // Don't manually delete/reset appender1, to prevent double free
-        appender1.release(); // Release ownership but don’t delete it
 
         logging_initialized = false;
     }

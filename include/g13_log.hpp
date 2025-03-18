@@ -20,9 +20,6 @@ namespace G13 {
     void stop_logging();
     void SetLogLevel(log4cpp::Priority::PriorityLevel lvl);
     void SetLogLevel(const std::string& level);
-
-    inline std::unique_ptr<log4cpp::OstreamAppender> appender1;
-    inline bool logging_initialized = false;
 }
 
 #endif
