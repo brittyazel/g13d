@@ -54,7 +54,7 @@ namespace G13 {
             };
 
         while (true) {
-            const auto short_opts = "l:c:i:o:u:d:h";
+            const auto short_opts = "l:c:p:u:d:h";
             const auto opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
 
             if (-1 == opt) {

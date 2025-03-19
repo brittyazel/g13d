@@ -4,7 +4,7 @@ BindsTo=g13d.target
 After=g13d.target
 
 [Service]
-ExecStart=/usr/bin/g13d --config /etc/g13d/default.bind --pipe_dir /run/g13d
+ExecStart=/usr/bin/g13d --config /etc/g13d/default.bind
 Restart=always
 
 [Install]
