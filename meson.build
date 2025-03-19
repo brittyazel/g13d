@@ -2,6 +2,7 @@
 # Project: g13d
 # Language: C++
 # License: MIT
+# Author: Britt W. Yazel <bwyazel@gmail.com>
 #
 # This project is a daemon for managing and interacting with the Logitech
 # G13 gameboard. It includes functionalities for handling device input,
@@ -59,4 +60,4 @@ g13d = executable(
 )
 
 # Installation
-install_subdir('host', install_dir : '/', strip_directory : true)
+install_subdir('host', install_dir : '/usr/lib', strip_directory : true)

@@ -1,6 +1,6 @@
 # Maintainer: Britt W. Yazel <bwyazel@gmail.com>
-# Maintainer: K. Hampf <khampf@users.sourceforge.net>
-# Original maintainer: Lukas Sabota <lukas@lwsabota.com>
+# Previous Maintainer: K. Hampf <khampf@users.sourceforge.net>
+# Original Maintainer: Lukas Sabota <lukas@lwsabota.com>
 
 pkgbase="g13d"
 pkgname="g13d-git"
