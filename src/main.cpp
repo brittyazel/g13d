@@ -45,8 +45,7 @@ namespace G13 {
         const option long_opts[] = {
                 {"logo", required_argument, nullptr, 'l'},
                 {"config", required_argument, nullptr, 'c'},
-                {"pipe_in", required_argument, nullptr, 'i'},
-                {"pipe_out", required_argument, nullptr, 'o'},
+                {"pipe_dir", required_argument, nullptr, 'p'},
                 {"umask", required_argument, nullptr, 'u'},
                 {"log_level", required_argument, nullptr, 'd'},
                 // {"log_file", required_argument, nullptr, 'f'},
@@ -72,12 +71,8 @@ namespace G13 {
                 setStringConfigValue("config", std::string(optarg));
                 break;
 
-            case 'i':
-                setStringConfigValue("pipe_in", std::string(optarg));
-                break;
-
-            case 'o':
-                setStringConfigValue("pipe_out", std::string(optarg));
+            case 'p':
+                setStringConfigValue("pipe_dir", std::string(optarg));
                 break;
 
             case 'u':
@@ -134,9 +129,7 @@ namespace G13 {
         std::cout << std::left << std::setw(indent) << "  --logo <file>" << "set logo from file" << std::endl;
         std::cout << std::left << std::setw(indent) << "  --config <file>" << "load config commands from file" <<
             std::endl;
-        std::cout << std::left << std::setw(indent) << "  --pipe_in <name>" << "specify name for input pipe" <<
-            std::endl;
-        std::cout << std::left << std::setw(indent) << "  --pipe_out <name>" << "specify name for output pipe" <<
+        std::cout << std::left << std::setw(indent) << "  --pipe_dir <name>" << "specify the root directory for input and output pipes" <<
             std::endl;
         std::cout << std::left << std::setw(indent) << "  --umask <octal>" << "specify umask for pipes creation" <<
             std::endl;
@@ -152,23 +145,6 @@ namespace G13 {
         G13_OUT("Caught signal " << signal << " (" << strsignal(signal) << ")");
         running = false;
         // TODO: Should we break libusb handling with a reset?
-    }
-
-    std::string MakePipeName(const G13_Device* usb_device, const bool is_input) {
-        auto pipe_name = [&](const char* param, const char* suffix) -> std::string {
-            if (std::string config_base = getStringConfigValue(param); !config_base.empty()) {
-                if (usb_device->getDeviceIndex() == 0) {
-                    return config_base;
-                }
-                return config_base + "-" + std::to_string(usb_device->getDeviceIndex());
-            }
-            return std::string(CONTROL_DIR) + "/g13-" + std::to_string(usb_device->getDeviceIndex()) + suffix;
-        };
-
-        if (is_input) {
-            return pipe_name("pipe_in", "");
-        }
-        return pipe_name("pipe_out", "_out");
     }
 
     int Run() {

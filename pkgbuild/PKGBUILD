@@ -19,8 +19,7 @@ sha256sums=('SKIP')
 install=g13d.install
 
 build() {
-    meson setup build "${pkgbase}" --prefix "/usr"
-    meson compile -C build g13d pbm2lpbm
+    meson setup build "${pkgbase}" --prefix "/usr" -Dcontrol_dir=/run/g13d
 }
 
 package() {

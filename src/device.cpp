@@ -72,18 +72,29 @@ namespace G13 {
         SetKeyColor(red, green, blue);
 
         uinput_fid = G13CreateUinput(this);
-        input_pipe_name = MakePipeName(this, true);
+        MakePipeNames();
         input_pipe_fid = G13CreateFifo(input_pipe_name.c_str(), S_IRGRP | S_IROTH);
 
         if (input_pipe_fid == -1) {
             G13_ERR("failed opening input pipe " << input_pipe_name);
         }
 
-        output_pipe_name = MakePipeName(this, false);
         output_pipe_fid = G13CreateFifo(output_pipe_name.c_str(), S_IWGRP | S_IWOTH);
 
         if (output_pipe_fid == -1) {
             G13_ERR("failed opening output pipe " << output_pipe_name);
+        }
+    }
+
+    void G13_Device::MakePipeNames() {
+        if (const std::string config_pipe_dir = getStringConfigValue("pipe_dir"); !config_pipe_dir.empty()) {
+            input_pipe_name = config_pipe_dir + "/g13-" + std::to_string(getDeviceIndex());
+            output_pipe_name = config_pipe_dir + "/g13-" + std::to_string(getDeviceIndex()) + "_out";
+        }
+        else {
+            // Default to CONTROL_DIR: i.e. /run/g13/g13-0 and /run/g13/g13-0_out
+            input_pipe_name = std::string(CONTROL_DIR) + "/g13-" + std::to_string(getDeviceIndex());
+            output_pipe_name = std::string(CONTROL_DIR) + "/g13-" + std::to_string(getDeviceIndex()) + "_out";
         }
     }
 

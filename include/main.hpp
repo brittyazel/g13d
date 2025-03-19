@@ -37,7 +37,6 @@ namespace G13 {
     void setLogoFilename(const std::string& newLogoFilename);
     std::string getStringConfigValue(const std::string& name);
     void setStringConfigValue(const std::string& name, const std::string& value);
-    std::string MakePipeName(const G13_Device* usb_device, bool is_input);
     void SignalHandler(int);
 
 

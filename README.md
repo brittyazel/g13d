@@ -67,8 +67,7 @@ Option 				|  Description
  --help             | show help
  --logo *arg*       | set logo from file
  --config *arg*     | load config commands from file
- --pipe_in *arg*    | specify name for input pipe
- --pipe_out *arg*   | specify name for output pipe
+ --pipe_dir *arg*   | specify the root directory for input and output pipes
  --umask *octal*    | specify umask for pipes creation
 
 ## Configuring / Remote Control
@@ -193,12 +192,7 @@ Dumps G13 configuration info to g13d console
 
 ### log_level *trace|debug|info|warning|error|fatal*
 
-Changes the level of detail written to the g13d console 
-
-### LCD display
-
-Use pbm2lpbm to convert a pbm image to the correct format, then just cat that into the pipe (cat starcraft2.lpbm > /run/g13d/g13-0).
-The pbm file must be 160x43 pixels.
+Changes the level of detail written to the g13d console
 
 ## License
 

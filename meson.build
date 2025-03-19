@@ -1,16 +1,24 @@
+#
+# Project: g13d
+# Language: C++
+# License: MIT
+#
+# This project is a daemon for managing and interacting with the Logitech
+# G13 gameboard. It includes functionalities for handling device input,
+# managing profiles, and displaying information on the G13's LCD screen.
+#
+
+# Project Configuration
 project(
     'g13d',
     'cpp',
     version : '0.1.0',
-    default_options : ['cpp_std=c++23']
+    default_options : ['cpp_std=c++23'],
 )
 
-# define the control directory
-control_dir = '"/run/g13d"'
-
-# Project arguments
-add_project_arguments('-DCONTROL_DIR=' + control_dir, language : 'cpp')
-add_project_arguments('-DPROJECT_VERSION="@0@"'.format(meson.project_version()), language : 'cpp')
+# Project Arguments
+add_project_arguments('-DCONTROL_DIR="' + get_option('control_dir') + '"', language : 'cpp')
+add_project_arguments('-DPROJECT_VERSION="' + meson.project_version() + '"', language : 'cpp')
 
 # Sources
 project_src_files = files(
@@ -40,7 +48,6 @@ project_dependencies = [
     dependency('libevdev'),
     dependency('libsystemd'),
 ]
-
 
 # Executables
 g13d = executable(

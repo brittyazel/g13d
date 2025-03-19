@@ -1,0 +1,2 @@
+# The control directory for the G13 device. Default is /run/g13d
+option('control_dir', type: 'string', value: '/run/g13d', description: 'Directory for G13 control socket')

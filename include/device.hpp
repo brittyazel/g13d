@@ -80,6 +80,7 @@ namespace G13 {
         void ProcessBuffer(char* buffer, int buffer_end, int read_result);
         [[nodiscard]] std::string NormalizeFilePath(const std::string& filename) const;
         void parse_joystick(const unsigned char* buf);
+        void MakePipeNames();
 
         CommandFunctionTable command_table;
         input_event device_event{};
