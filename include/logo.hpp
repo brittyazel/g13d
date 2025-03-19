@@ -2,8 +2,8 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#ifndef G13_LOGO_HPP
-#define G13_LOGO_HPP
+#ifndef LOGO_HPP
+#define LOGO_HPP
 
 namespace G13 {
     static unsigned char g13_logo[160 * 48 / 8] = {

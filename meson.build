@@ -1,23 +1,55 @@
-project('g13d', 'cpp', version : '0.1.0', default_options : ['cpp_std=c++23'])
+project(
+    'g13d',
+    'cpp',
+    version : '0.1.0',
+    default_options : ['cpp_std=c++23']
+)
 
-# Define CONTROL_DIR
-add_project_arguments('-DCONTROL_DIR="/run/g13d"', language : 'cpp')
+# define the control directory
+control_dir = '"/run/g13d"'
+
+# Project arguments
+add_project_arguments('-DCONTROL_DIR=' + control_dir, language : 'cpp')
+add_project_arguments('-DPROJECT_VERSION="@0@"'.format(meson.project_version()), language : 'cpp')
 
 # Sources
-sources = files('src/g13_main.cpp', 'src/g13_action_keys.cpp', 'src/g13_action_pipeout.cpp', 'src/g13_stickzone.cpp', 'src/g13_action_command.cpp', 'src/g13_device.cpp', 'src/g13_font.cpp', 'src/g13_font_char.cpp', 'src/g13_hotplug.cpp', 'src/g13_state_key.cpp', 'src/g13_key_tables.cpp', 'src/g13_key.cpp', 'src/g13_lcd.cpp', 'src/g13_log.cpp', 'src/g13_profile.cpp', 'src/g13_stick.cpp', 'src/utilities.cpp')
-
-# Include directories
-inc = include_directories('include')
+project_src_files = files(
+    'src/main.cpp',
+    'src/action_keys.cpp',
+    'src/action_pipeout.cpp',
+    'src/stickzone.cpp',
+    'src/action_command.cpp',
+    'src/device.cpp',
+    'src/font.cpp',
+    'src/font_char.cpp',
+    'src/lifecycle.cpp',
+    'src/key_state.cpp',
+    'src/key_tables.cpp',
+    'src/key.cpp',
+    'src/lcd.cpp',
+    'src/log.cpp',
+    'src/profile.cpp',
+    'src/stick.cpp',
+    'src/utilities.cpp',
+)
 
 # Dependencies
-libusb = dependency('libusb-1.0')
-log4cpp = dependency('log4cpp')
-libevdev = dependency('libevdev')
-libsystemd = dependency('libsystemd')
+project_dependencies = [
+    dependency('libusb-1.0'),
+    dependency('log4cpp'),
+    dependency('libevdev'),
+    dependency('libsystemd'),
+]
+
 
 # Executables
-g13d = executable('g13d', sources, include_directories: inc, dependencies: [libusb, libsystemd, log4cpp, libevdev], install: true)
-pbm2lpbm = executable('pbm2lpbm', 'src/utils/pbm2lpbm.cpp', include_directories: inc, install: true)
+g13d = executable(
+    'g13d',
+    project_src_files,
+    include_directories : ['include'],
+    dependencies : project_dependencies,
+    install : true
+)
 
 # Installation
 install_subdir('host', install_dir : '/', strip_directory : true)
