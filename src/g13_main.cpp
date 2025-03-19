@@ -3,9 +3,9 @@
 //
 
 #include <csignal>
-#include <cstring>
 #include <getopt.h>
 #include <iomanip>
+#include <thread>
 
 #include "g13_hotplug.hpp"
 #include "g13_key.hpp"
@@ -109,13 +109,7 @@ namespace G13 {
         }
 
         // Cleanup G13 devices
-        for (const auto g13 : g13s) {
-            if (g13) {
-                g13->Cleanup();
-                delete g13;
-            }
-        }
-        g13s.clear();
+        CleanupDevices();
 
         // Free device list if allocated
         if (devs) {
@@ -183,7 +177,6 @@ namespace G13 {
         DisplayKeys();
 
         int error = libusb_init(&usb_context);
-
         if (error != LIBUSB_SUCCESS) {
             G13_ERR("libusb initialization error: " << G13_Device::DescribeLibusbErrorCode(error));
             Cleanup();
@@ -192,17 +185,9 @@ namespace G13 {
         libusb_set_option(usb_context, LIBUSB_OPTION_LOG_LEVEL, 3);
 
         if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG)) {
-            const ssize_t cnt = libusb_get_device_list(usb_context, &devs);
-            if (cnt < 0) {
-                G13_ERR("Error while getting device list");
-                Cleanup();
-                return EXIT_FAILURE;
-            }
+            int ret = InitializeDevices();
 
-            DiscoverG13s(devs, cnt);
-            libusb_free_device_list(devs, 1);
-            G13_OUT("Found " << g13s.size() << " G13s");
-            if (g13s.empty()) {
+            if (g13s.empty() || ret != 0) {
                 G13_ERR("Unable to open any device");
                 Cleanup();
                 return EXIT_FAILURE;
@@ -216,40 +201,41 @@ namespace G13 {
         signal(SIGTERM, SignalHandler);
 
         for (const auto g13 : g13s) {
-            // This can not be done from the event handler (will give LIBUSB_ERROR_BUSY)
             SetupDevice(g13);
         }
 
-        do {
+        std::thread suspend_thread(MonitorSuspendResume);
+        suspend_thread.detach(); // Run the suspend monitoring in the background
+
+        while (running) {
             if (g13s.empty()) {
                 G13_OUT("Waiting for device to show up ...");
                 error = libusb_handle_events(usb_context);
-                G13_DBG("USB Event wakeup with " << g13s.size() << " devices registered");
+                G13_OUT("USB Event wakeup with " << g13s.size() << " devices registered");
+
                 if (error != LIBUSB_SUCCESS) {
                     G13_ERR("Error: " << G13_Device::DescribeLibusbErrorCode(error));
                 }
                 else {
                     for (const auto g13 : g13s) {
-                        // This can not be done from the event handler (will give LIBUSB_ERROR_BUSY)
                         SetupDevice(g13);
                     }
                 }
             }
 
             // Main loop
-            for (const auto g13 : g13s) {
-                const int status = g13->ReadKeypresses();
-                if (!g13s.empty()) {
-                    // Cleanup might have removed the object before this loop has run
-                    // TODO: This will not work with multiple devices and can be better
-                    g13->ReadCommandsFromPipe();
-                }
-                if (status < 0) {
-                    running = false;
+            if (!suspended) {
+                for (const auto g13 : g13s) {
+                    const int status = g13->ReadDeviceInputs();
+                    if (!g13s.empty()) {
+                        g13->ReadCommandsFromPipe();
+                    }
+                    if (status < 0) {
+                        running = false;
+                    }
                 }
             }
         }
-        while (running);
 
         Cleanup();
         G13_OUT("Exit");

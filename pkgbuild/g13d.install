@@ -1,6 +1,5 @@
 post_install() {
     systemctl enable --now g13d.target
-    systemctl enable --now g13d-resume.service
 }
 
 post_upgrade() {
@@ -9,5 +8,4 @@ post_upgrade() {
 
 pre_remove() {
     systemctl disable --now g13d.target
-    systemctl disable --now g13d-resume.service
 }

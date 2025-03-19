@@ -46,6 +46,71 @@ namespace G13 {
 
     // *************************************************************************
 
+    void G13_Device::Cleanup() {
+        if (usb_handle) {
+            SetKeyColor(0, 0, 0);
+            remove(input_pipe_name.c_str());
+            remove(output_pipe_name.c_str());
+            ioctl(uinput_fid, UI_DEV_DESTROY);
+            close(uinput_fid);
+            libusb_release_interface(usb_handle, 0);
+            libusb_close(usb_handle);
+            usb_handle = nullptr;
+        }
+    }
+
+    void G13_Device::RegisterContext(libusb_context* new_usb_context) {
+        usb_context = new_usb_context;
+
+        constexpr int leds = 0;
+        constexpr int red = 0;
+        constexpr int green = 0;
+        constexpr int blue = 255;
+        LcdInit();
+
+        SetModeLeds(leds);
+        SetKeyColor(red, green, blue);
+
+        uinput_fid = G13CreateUinput(this);
+        input_pipe_name = MakePipeName(this, true);
+        input_pipe_fid = G13CreateFifo(input_pipe_name.c_str(), S_IRGRP | S_IROTH);
+
+        if (input_pipe_fid == -1) {
+            G13_ERR("failed opening input pipe " << input_pipe_name);
+        }
+
+        output_pipe_name = MakePipeName(this, false);
+        output_pipe_fid = G13CreateFifo(output_pipe_name.c_str(), S_IWGRP | S_IWOTH);
+
+        if (output_pipe_fid == -1) {
+            G13_ERR("failed opening output pipe " << output_pipe_name);
+        }
+    }
+
+    // ************************************************************************
+
+    // Reads and processes key state report from G13
+    int G13_Device::ReadDeviceInputs() {
+        unsigned char buffer[G13_REPORT_SIZE];
+        int size = 0;
+        const int error = libusb_interrupt_transfer(usb_handle, LIBUSB_ENDPOINT_IN | G13_KEY_ENDPOINT, buffer,
+                                                    G13_REPORT_SIZE, &size, 100);
+
+        if (error && error != LIBUSB_ERROR_TIMEOUT) {
+            G13_ERR("Error while reading keys: " << DescribeLibusbErrorCode(error));
+            if (error == LIBUSB_ERROR_NO_DEVICE || error == LIBUSB_ERROR_IO) {
+                G13_DBG("Giving libusb a nudge");
+                libusb_handle_events(usb_context);
+            }
+        }
+        if (size == G13_REPORT_SIZE) {
+            parse_joystick(buffer);
+            getCurrentProfileRef().ParseKeys(buffer);
+            SendEvent(EV_SYN, SYN_REPORT, 0);
+        }
+        return 0;
+    }
+
     bool G13_Device::updateKeyState(const int key, const bool state) {
         // state == true if key is pressed
         const bool oldState = keys[key];
@@ -201,30 +266,6 @@ namespace G13 {
         if (error != 5) {
             G13_ERR("Problem changing color: " + DescribeLibusbErrorCode(error));
         }
-    }
-
-    /*! reads and processes key state report from G13
-     *
-     */
-    int G13_Device::ReadKeypresses() {
-        unsigned char buffer[G13_REPORT_SIZE];
-        int size = 0;
-        const int error = libusb_interrupt_transfer(usb_handle, LIBUSB_ENDPOINT_IN | G13_KEY_ENDPOINT, buffer,
-                                                    G13_REPORT_SIZE, &size, 100);
-
-        if (error && error != LIBUSB_ERROR_TIMEOUT) {
-            G13_ERR("Error while reading keys: " << DescribeLibusbErrorCode(error));
-            if (error == LIBUSB_ERROR_NO_DEVICE || error == LIBUSB_ERROR_IO) {
-                G13_DBG("Giving libusb a nudge");
-                libusb_handle_events(usb_context);
-            }
-        }
-        if (size == G13_REPORT_SIZE) {
-            parse_joystick(buffer);
-            getCurrentProfileRef().ParseKeys(buffer);
-            SendEvent(EV_SYN, SYN_REPORT, 0);
-        }
-        return 0;
     }
 
     // Normalize and sanitize filename.
@@ -684,47 +725,6 @@ namespace G13 {
         }
         catch (const std::exception& ex) {
             G13_ERR("command failed : " << ex.what());
-        }
-    }
-
-    void G13_Device::RegisterContext(libusb_context* new_usb_context) {
-        usb_context = new_usb_context;
-
-        constexpr int leds = 0;
-        constexpr int red = 0;
-        constexpr int green = 0;
-        constexpr int blue = 255;
-        LcdInit();
-
-        SetModeLeds(leds);
-        SetKeyColor(red, green, blue);
-
-        uinput_fid = G13CreateUinput(this);
-        input_pipe_name = MakePipeName(this, true);
-        input_pipe_fid = G13CreateFifo(input_pipe_name.c_str(), S_IRGRP | S_IROTH);
-
-        if (input_pipe_fid == -1) {
-            G13_ERR("failed opening input pipe " << input_pipe_name);
-        }
-
-        output_pipe_name = MakePipeName(this, false);
-        output_pipe_fid = G13CreateFifo(output_pipe_name.c_str(), S_IWGRP | S_IWOTH);
-
-        if (output_pipe_fid == -1) {
-            G13_ERR("failed opening output pipe " << output_pipe_name);
-        }
-    }
-
-    void G13_Device::Cleanup() {
-        if (usb_handle) {
-            SetKeyColor(0, 0, 0);
-            remove(input_pipe_name.c_str());
-            remove(output_pipe_name.c_str());
-            ioctl(uinput_fid, UI_DEV_DESTROY);
-            close(uinput_fid);
-            libusb_release_interface(usb_handle, 0);
-            libusb_close(usb_handle);
-            usb_handle = nullptr;
         }
     }
 
