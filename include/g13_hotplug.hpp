@@ -11,6 +11,8 @@
 
 namespace G13 {
 
+    extern bool suspended;
+
     void DiscoverG13s(libusb_device** devs, ssize_t count);
     int OpenAndAddG13(libusb_device* dev);
     void SetupDevice(G13_Device* g13);
@@ -22,6 +24,11 @@ namespace G13 {
     int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, const libusb_device* dev,
                                           libusb_hotplug_event event, void* user_data);
     void ArmHotplugCallbacks();
+
+    void CleanupDevices(const libusb_device* dev = nullptr);
+    int ReinitializeDevices(libusb_device* dev = nullptr);
+
+    void MonitorSuspendResume();
 
 }
 

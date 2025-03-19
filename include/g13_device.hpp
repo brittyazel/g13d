@@ -35,6 +35,9 @@ namespace G13 {
                    int device_index);
         ~G13_Device();
 
+        void Cleanup();
+        void RegisterContext(libusb_context* new_usb_context);
+
         G13_LCD& getLCDRef();
         G13_Stick& getStickRef();
 
@@ -47,7 +50,7 @@ namespace G13 {
         void Dump(std::ostream& o, int detail = 0);
         void Command(const char* str, const char* info = nullptr);
         void ReadCommandsFromPipe();
-        int ReadKeypresses();
+        int ReadDeviceInputs();
         void ReadCommandsFromFile(const std::string& filename, const char* info = nullptr);
 
         std::shared_ptr<G13_Action> MakeAction(const std::string& action);
@@ -58,8 +61,6 @@ namespace G13 {
         void LcdWrite(const unsigned char* data, size_t size) const;
         bool updateKeyState(int key, bool state);
 
-        void Cleanup();
-        void RegisterContext(libusb_context* new_usb_context);
         void LcdWriteFile(const std::string& filename) const;
         static std::string DescribeLibusbErrorCode(int code);
 
