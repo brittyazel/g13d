@@ -84,13 +84,13 @@ namespace G13 {
     }
 
     void SetupDevice(G13_Device* g13) {
-        G13_OUT("Setting up device ");
+        G13_OUT("Setting up device" << " " << g13->getDeviceIndex());
         g13->RegisterContext(usb_context);
         if (!logoFilename.empty()) {
             g13->LcdWriteFile(logoFilename);
         }
 
-        G13_OUT("Active Stick zones ");
+        G13_OUT("Active Stick Zones:");
         g13->getStickRef().dump(std::cout);
 
         if (const std::string config_filename = getStringConfigValue("config"); !config_filename.empty()) {
@@ -187,15 +187,15 @@ namespace G13 {
                 if (suspend_state) {
                     if (!suspended) {
                         G13_OUT("System is suspending...");
-                        CleanupDevices();
                         suspended = true;
+                        CleanupDevices();
                     }
                 }
                 else {
                     if (suspended) {
                         G13_OUT("System has resumed...");
-                        InitializeDevices();
                         suspended = false;
+                        InitializeDevices();
                     }
                 }
 

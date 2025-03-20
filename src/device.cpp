@@ -10,13 +10,15 @@
 #include "action_keys.hpp"
 #include "action_pipeout.hpp"
 #include "device.hpp"
+
 #include "font.hpp"
 #include "font_family.hpp"
 #include "key.hpp"
+#include "lifecycle.hpp"
 #include "log.hpp"
+#include "logo.hpp"
 #include "main.hpp"
 #include "stickzone.hpp"
-#include "logo.hpp"
 
 namespace G13 {
     // *************************************************************************
@@ -104,6 +106,11 @@ namespace G13 {
 
     // Reads and processes key state report from G13
     int G13_Device::ReadDeviceInputs() {
+        // If not connected or suspended, stop here
+        if (!connected || suspended) {
+            return 1;
+        }
+
         unsigned char buffer[G13_REPORT_SIZE];
         int size = 0;
         const int error = libusb_interrupt_transfer(usb_handle, LIBUSB_ENDPOINT_IN | G13_KEY_ENDPOINT, buffer,
@@ -116,6 +123,7 @@ namespace G13 {
                 libusb_handle_events(usb_context);
             }
         }
+
         if (size == G13_REPORT_SIZE) {
             parse_joystick(buffer);
             getCurrentProfileRef().ParseKeys(buffer);

@@ -185,7 +185,7 @@ namespace G13 {
 
         while (running) {
             if (g13s.empty()) {
-                G13_OUT("Waiting for device to show up ...");
+                G13_OUT("Waiting for device to show up...");
                 error = libusb_handle_events(usb_context);
                 G13_OUT("USB Event wakeup with " << g13s.size() << " devices registered");
 
