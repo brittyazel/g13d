@@ -29,6 +29,8 @@ namespace G13 {
         current_profile = std::make_shared<G13_Profile>(*this, "default");
         profiles["default"] = current_profile;
 
+        connected = true;
+
         for (bool& key : keys) {
             key = false;
         }
@@ -157,6 +159,15 @@ namespace G13 {
         return usb_handle;
     }
 
+    G13_Device* G13_Device::GetG13DeviceHandle(const libusb_device* dev) {
+        for (const auto g13 : g13s) {
+            if (dev == g13->getDevicePtr()) {
+                return g13;
+            }
+        }
+        return nullptr;
+    }
+
     std::string G13_Device::DescribeLibusbErrorCode(const int code) {
         auto description = std::string(libusb_strerror(code));
         return description;
@@ -266,6 +277,10 @@ namespace G13 {
     }
 
     void G13_Device::SetKeyColor(const int red, const int green, const int blue) const {
+        if (!connected) {
+            return;
+        }
+
         unsigned char usb_data[] = {5, 0, 0, 0, 0};
         usb_data[1] = red;
         usb_data[2] = green;

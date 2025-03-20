@@ -71,12 +71,14 @@ namespace G13 {
                                           libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device connected");
         const int ret = InitializeDevices(dev);
+        G13_Device::GetG13DeviceHandle(dev)->connected = true;
         return ret; // Rearm
     }
 
     int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
                                           libusb_hotplug_event event, void* user_data) {
         G13_OUT("USB device disconnected");
+        G13_Device::GetG13DeviceHandle(dev)->connected = false;
         CleanupDevices(dev);
         return 0; // Rearm
     }

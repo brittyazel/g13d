@@ -31,6 +31,8 @@ namespace G13 {
         typedef std::function<void(const char*)> COMMAND_FUNCTION;
         typedef std::map<std::string, COMMAND_FUNCTION> CommandFunctionTable;
 
+        bool connected;
+
         G13_Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle,
                    int device_index);
         ~G13_Device();
@@ -69,6 +71,7 @@ namespace G13 {
         [[nodiscard]] libusb_device* getDevicePtr() const;
         [[nodiscard]] G13_Font& getCurrentFontRef() const;
         [[nodiscard]] G13_Profile& getCurrentProfileRef() const;
+        static G13_Device* GetG13DeviceHandle(const libusb_device* dev);
 
     protected:
         void InitFonts();
