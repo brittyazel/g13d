@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <libevdev-1.0/libevdev/libevdev.h>
+#include <ranges>
 
 #include "key.hpp"
 #include "key_tables.hpp"
@@ -16,10 +17,10 @@ namespace G13 {
 
     //Constructors
     G13_Key::G13_Key(G13_Profile& mode, const std::string& name, const int index) : G13_Actionable(mode, name),
-                                                                       _index(index), _should_parse(true) {}
+        _index(index), _should_parse(true) {}
 
     G13_Key::G13_Key(G13_Profile& mode, const G13_Key& key) : G13_Actionable(mode, key.name()), _index(key._index),
-                                                     _should_parse(key._should_parse) {
+                                                              _should_parse(key._should_parse) {
         // TODO: do not invoke virtual member function from ctor
         G13_Actionable::set_action(key.action());
     }
@@ -101,11 +102,38 @@ namespace G13 {
     }
 
     void DisplayKeys() {
-        G13_OUT("Known keys on G13:");
-        G13_OUT(map_keys_out(g13_name_to_key));
+        /* Display the know keys for the G13 */
+        std::ostringstream output; // Create a stream to hold the output
 
-        G13_OUT("Known keys to map to:");
-        G13_OUT(map_keys_out(input_name_to_key));
+        // First line should be on its own
+        output << "Known keys on the Logitech G13:" << "\n";
+        output << map_keys_out(g13_name_to_key);
+        // Print the final output
+        G13_OUT(output.str() << "\n");
+
+        /***********************************/
+
+        /* Display the know keys that we can map to */
+        // There are a lot of keys, so we need to break them up into lines
+        constexpr int max_line_length = 250;
+        unsigned int current_length = 0;
+        output.str(""); // Clear the stream
+
+        // First line should be on its own
+        output << "Known keys to map to:" << "\n";
+
+        // Loop through the keys, add each to the output stream, insert a newline if we exceed the max line length
+        for (const auto& key : input_name_to_key | std::views::keys) {
+            if (current_length + key.length() + 1 > max_line_length) { // +1 for the space
+                output << "\n";
+                current_length = 0;
+            }
+            output << key << " ";
+            current_length += key.length() + 1; // +1 for the space
+        }
+
+        // Print the final output
+        G13_OUT(output.str() << "\n");
     }
 
     void InitKeynames() {
