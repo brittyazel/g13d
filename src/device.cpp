@@ -11,13 +11,15 @@
 #include "action_keys.hpp"
 #include "action_pipeout.hpp"
 #include "device.hpp"
+
+#include <logo.hpp>
+
 #include "utilities/exceptions.hpp"
 #include "font.hpp"
 #include "font_family.hpp"
 #include "key.hpp"
 #include "lifecycle.hpp"
 #include "log.hpp"
-#include "logo.hpp"
 #include "main.hpp"
 #include "stickzone.hpp"
 
@@ -71,7 +73,7 @@ namespace G13 {
         constexpr int red = 0;
         constexpr int green = 0;
         constexpr int blue = 255;
-        LcdInit();
+        InitLCD();
 
         SetModeLeds(leds);
         SetKeyColor(red, green, blue);
@@ -126,7 +128,7 @@ namespace G13 {
         }
 
         if (size == G13_REPORT_SIZE) {
-            parse_joystick(buffer);
+            getStickRef().ParseJoystick(buffer);
             getCurrentProfileRef().ParseKeys(buffer);
             SendEvent(EV_SYN, SYN_REPORT, 0);
         }
@@ -470,24 +472,25 @@ namespace G13 {
 
     // *************************************************************************
 
-    void G13_Device::Dump(std::ostream& o, const int detail) {
-        o << "G13 id=" << getDeviceIndex() << std::endl;
-        o << "   input_pipe_name=" << formatter(input_pipe_name) << std::endl;
-        o << "   output_pipe_name=" << formatter(output_pipe_name) << std::endl;
-        o << "   current_profile=" << getCurrentProfileRef().name() << std::endl;
-        o << "   current_font=" << getCurrentFontRef().name() << std::endl;
+    void G13_Device::InitFonts() {
+        current_font = std::make_shared<G13_Font>("8x8", 8);
+        fonts[current_font->name()] = current_font;
 
-        if (detail > 0) {
-            o << "STICK" << std::endl;
-            getStickRef().dump(o);
-            if (detail == 1) {
-                getCurrentProfileRef().dump(o);
-            }
-            else {
-                for (const auto& profile : profiles | std::views::values) {
-                    profile->dump(o);
-                }
-            }
+        current_font->InstallFont(font8x8_basic, G13_FontChar::FF_ROTATE, 0);
+
+        const std::shared_ptr<G13_Font> new_font5x8(new G13_Font("5x8", 5));
+        new_font5x8->InstallFont(font5x8_basic, 0, 32);
+        fonts[new_font5x8->name()] = new_font5x8;
+    }
+
+    // Initialization
+    void G13_Device::InitLCD() {
+        if (const int error = libusb_control_transfer(getHandlePtr(), 0, 9, 1, 0, nullptr, 0, 1000);
+            error != LIBUSB_SUCCESS) {
+            G13_ERR("Error when initializing LCD endpoint: " << DescribeLibusbErrorCode(error));
+        }
+        else {
+            getLCDRef().LcdWrite(g13_logo, sizeof(g13_logo));
         }
     }
 
@@ -577,7 +580,7 @@ namespace G13 {
                 G13_ERR("bad textmode format: <" << remainder << ">");
             }
             else {
-                getLCDRef().text_mode = textmode;
+                getLCDRef().setTextMode(textmode);
             }
         };
 
@@ -763,67 +766,24 @@ namespace G13 {
         }
     }
 
-    void G13_Device::parse_joystick(const unsigned char* buf) {
-        getStickRef().ParseJoystick(buf);
-    }
+    void G13_Device::Dump(std::ostream& o, const int detail) {
+        o << "G13 id=" << getDeviceIndex() << std::endl;
+        o << "   input_pipe_name=" << formatter(input_pipe_name) << std::endl;
+        o << "   output_pipe_name=" << formatter(output_pipe_name) << std::endl;
+        o << "   current_profile=" << getCurrentProfileRef().name() << std::endl;
+        o << "   current_font=" << getCurrentFontRef().name() << std::endl;
 
-    void G13_Device::LcdInit() const {
-        if (const int error = libusb_control_transfer(usb_handle, 0, 9, 1, 0, nullptr, 0, 1000); error !=
-            LIBUSB_SUCCESS) {
-            G13_ERR("Error when initializing LCD endpoint: " << G13_Device::DescribeLibusbErrorCode(error));
+        if (detail > 0) {
+            o << "STICK" << std::endl;
+            getStickRef().dump(o);
+            if (detail == 1) {
+                getCurrentProfileRef().dump(o);
+            }
+            else {
+                for (const auto& profile : profiles | std::views::values) {
+                    profile->dump(o);
+                }
+            }
         }
-        else {
-            LcdWrite(g13_logo, sizeof(g13_logo));
-        }
-    }
-
-    void G13_Device::LcdWrite(const unsigned char* data, const size_t size) const {
-        if (size != G13_LCD_BUFFER_SIZE) {
-            G13_LOG(
-                log4cpp::Priority::ERROR << "Invalid LCD data size " << size << ", should be " << G13_LCD_BUFFER_SIZE);
-            return;
-        }
-
-        unsigned char buffer[G13_LCD_BUFFER_SIZE + 32] = {};
-        buffer[0] = 0x03;
-        memcpy(buffer + 32, data, G13_LCD_BUFFER_SIZE);
-
-        int transferred = 0;
-        const int error = libusb_interrupt_transfer(usb_handle, LIBUSB_ENDPOINT_OUT | G13_LCD_ENDPOINT, buffer,
-                                                    G13_LCD_BUFFER_SIZE + 32, &transferred, 1000);
-
-        if (error) {
-            G13_LOG(
-                log4cpp::Priority::ERROR << "Error when transferring image: " << DescribeLibusbErrorCode(error) << ", "
-                << transferred << " bytes written");
-        }
-    }
-
-    void G13_Device::LcdWriteFile(const std::string& filename) const {
-        std::ifstream filestr;
-
-        filestr.open(filename.c_str());
-        std::filebuf* pbuf = filestr.rdbuf();
-
-        const size_t size = pbuf->pubseekoff(0, std::ios::end, std::ios::in);
-        pbuf->pubseekpos(0, std::ios::in);
-
-        char buffer[size];
-
-        pbuf->sgetn(buffer, static_cast<long>(size));
-
-        filestr.close();
-        LcdWrite(reinterpret_cast<unsigned char*>(buffer), size);
-    }
-
-    void G13_Device::InitFonts() {
-        current_font = std::make_shared<G13_Font>("8x8", 8);
-        fonts[current_font->name()] = current_font;
-
-        current_font->InstallFont(font8x8_basic, G13_FontChar::FF_ROTATE, 0);
-
-        const std::shared_ptr<G13_Font> new_font5x8(new G13_Font("5x8", 5));
-        new_font5x8->InstallFont(font5x8_basic, 0, 32);
-        fonts[new_font5x8->name()] = new_font5x8;
     }
 }

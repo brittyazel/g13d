@@ -87,7 +87,7 @@ namespace G13 {
         G13_OUT("Setting up device" << " " << g13->getDeviceIndex());
         g13->RegisterContext(usb_context);
         if (!logoFilename.empty()) {
-            g13->LcdWriteFile(logoFilename);
+            g13->getLCDRef().LcdWriteFile(logoFilename);
         }
 
         G13_OUT("Active Stick Zones:");

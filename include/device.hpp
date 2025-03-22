@@ -12,7 +12,6 @@
 #include <regex>
 #include <vector>
 
-#include "action.hpp"
 #include "font.hpp"
 #include "lcd.hpp"
 #include "profile.hpp"
@@ -63,10 +62,7 @@ namespace G13 {
         void SetModeLeds(int leds) const;
         void SendEvent(int type, int code, int val);
         void OutputPipeWrite(const std::string& out) const;
-        void LcdWrite(const unsigned char* data, size_t size) const;
         bool updateKeyState(int key, bool state);
-
-        void LcdWriteFile(const std::string& filename) const;
         static std::string DescribeLibusbErrorCode(int code);
 
         [[nodiscard]] int getDeviceIndex() const;
@@ -78,14 +74,13 @@ namespace G13 {
 
     protected:
         void InitFonts();
-        void LcdInit() const;
+        void InitLCD();
         void InitCommands();
 
     private:
         static bool IsDataAvailable(int fd);
         void ProcessBuffer(char* buffer, int buffer_end, int read_result);
         [[nodiscard]] std::string NormalizeFilePath(const std::string& filename) const;
-        void parse_joystick(const unsigned char* buf);
         void MakePipeNames();
 
         CommandFunctionTable command_table;
