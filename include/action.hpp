@@ -33,6 +33,6 @@ namespace G13 {
 
 }
 
-#include "templates/action.tpp"
+#include "action.tpp"
 
 #endif

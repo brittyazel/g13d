@@ -6,47 +6,22 @@
 #include <iomanip>
 #include <functional>
 
-#include "utilities.hpp"
+#include "utilities/utilities.hpp"
 
 namespace G13 {
-    string_repr_out::string_repr_out(std::string str) : str(std::move(str)) {}
 
-    void string_repr_out::write_on(std::ostream& output_stream) const {
-        output_stream << "\"";
-        for (const char character : str) {
-            switch (character) {
-            case '\n': output_stream << "\\n";
-                break;
-            case '\r': output_stream << "\\r";
-                break;
-            case '\0': output_stream << "\\0";
-                break;
-            case '\t': output_stream << "\\t";
-                break;
-            case '\\':
-            case '\'':
-            case '\"': output_stream << "\\" << character;
-                break;
-            default:
-                if (character < 32 || character > 126) {
-                    output_stream << "\\x" << std::hex << std::setw(2) << std::setfill('0') <<
-                        static_cast<int>(static_cast<unsigned char>(character));
-                }
-                else {
-                    output_stream << character;
-                }
-            }
-        }
-        output_stream << "\"";
-    }
-
-    std::ostream& operator<<(std::ostream& output_stream, const string_repr_out& string_repr) {
-        string_repr.write_on(output_stream);
-        return output_stream;
-    }
-
-    const char* NotFoundException::what() const noexcept {
-        return "Element not found";
+    /**
+    * @brief Creates an EscapedStringFormatter object from a given string.
+    *
+    * This function takes a string as input and returns an EscapedStringFormatter
+    * object initialized with the provided string. The EscapedStringFormatter
+    * can be used to format the string with escape sequences.
+    *
+    * @param new_string The input string to be formatted.
+    * @return An EscapedStringFormatter object initialized with the input string.
+    */
+    EscapedStringFormatter formatter(const std::string& new_string) {
+        return EscapedStringFormatter(new_string);
     }
 
     /**

@@ -27,6 +27,8 @@ namespace G13 {
     int G13CreateUinput(G13_Device* g13);
     int G13CreateFifo(const char* fifo_name, mode_t umask);
 
+    inline void IGUR(...) {}
+
     class G13_Device {
     public:
         typedef std::function<void(const char*)> COMMAND_FUNCTION;

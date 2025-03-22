@@ -7,9 +7,11 @@
 
 #include <map>
 
+#include "exceptions.hpp"
+
 namespace G13 {
     template <class T>
-    const T& repr(const T& v);
+    const T& formatter(const T& v);
 
     template <class KEYT, class VALT>
     const VALT& find_or_throw(const std::map<KEYT, VALT>& m, const KEYT& target);
@@ -65,7 +67,7 @@ namespace G13 {
                     split_t::empties_t empties = split_t::empties_ok);
 
     template <class T>
-    const T& repr(const T& v) {
+    const T& formatter(const T& v) {
         return v;
     }
 

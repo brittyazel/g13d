@@ -39,16 +39,6 @@ namespace G13 {
     void setStringConfigValue(const std::string& name, const std::string& value);
     void SignalHandler(int);
 
-
-    // *************************************************************************
-    class G13_CommandException final : public std::exception {
-    public:
-        explicit G13_CommandException(std::string reason) : reason(std::move(reason)) {}
-        [[nodiscard]] const char* what() const noexcept override;
-
-    private:
-        std::string reason;
-    };
 }
 
 #endif

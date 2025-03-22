@@ -137,10 +137,6 @@ namespace G13 {
         exit(1);
     }
 
-    const char* G13_CommandException::what() const noexcept {
-        return reason.c_str();
-    }
-
     void SignalHandler(const int signal) {
         G13_OUT("Caught signal " << signal << " (" << strsignal(signal) << ")");
         running = false;
@@ -230,7 +226,7 @@ namespace G13 {
     }
 
     void setStringConfigValue(const std::string& name, const std::string& value) {
-        G13_DBG("setStringConfigValue " << name << " = " << repr(value));
+        G13_DBG("setStringConfigValue " << name << " = " << formatter(value));
         stringConfigValues[name] = value;
     }
 

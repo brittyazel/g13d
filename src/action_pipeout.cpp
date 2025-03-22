@@ -5,6 +5,7 @@
 #include "action_pipeout.hpp"
 #include "key.hpp"
 
+
 namespace G13 {
     G13_Action_PipeOut::G13_Action_PipeOut(G13_Device& keypad, const std::string& out) : G13_Action(keypad),
         _out(out + "\n") {}
@@ -18,6 +19,6 @@ namespace G13 {
     }
 
     void G13_Action_PipeOut::dump(std::ostream& o) const {
-        o << "WRITE PIPE : " << repr(_out);
+        o << "WRITE PIPE : " << formatter(_out);
     }
 }

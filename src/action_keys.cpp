@@ -9,7 +9,7 @@
 #include "device.hpp"
 #include "key.hpp"
 #include "log.hpp"
-#include "main.hpp"
+#include "utilities/exceptions.hpp"
 
 namespace G13 {
     G13_Action_Keys::G13_Action_Keys(G13_Device& keypad, const std::string& keys_string) : G13_Action(keypad) {

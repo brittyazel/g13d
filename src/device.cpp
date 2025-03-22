@@ -11,6 +11,7 @@
 #include "action_keys.hpp"
 #include "action_pipeout.hpp"
 #include "device.hpp"
+#include "utilities/exceptions.hpp"
 #include "font.hpp"
 #include "font_family.hpp"
 #include "key.hpp"
@@ -471,8 +472,8 @@ namespace G13 {
 
     void G13_Device::Dump(std::ostream& o, const int detail) {
         o << "G13 id=" << getDeviceIndex() << std::endl;
-        o << "   input_pipe_name=" << repr(input_pipe_name) << std::endl;
-        o << "   output_pipe_name=" << repr(output_pipe_name) << std::endl;
+        o << "   input_pipe_name=" << formatter(input_pipe_name) << std::endl;
+        o << "   output_pipe_name=" << formatter(output_pipe_name) << std::endl;
         o << "   current_profile=" << getCurrentProfileRef().name() << std::endl;
         o << "   current_font=" << getCurrentFontRef().name() << std::endl;
 

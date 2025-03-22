@@ -39,7 +39,8 @@ project_src_files = files(
     'src/log.cpp',
     'src/profile.cpp',
     'src/stick.cpp',
-    'src/utilities.cpp',
+    'src/utilities/utilities.cpp',
+    'src/utilities/escaped_string_formatter.cpp',
 )
 
 # Dependencies
