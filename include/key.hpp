@@ -7,7 +7,6 @@
 
 #include <map>
 #include <string>
-#include <ostream>
 
 #include "action.hpp"
 #include "key_state.hpp"

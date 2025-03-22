@@ -2,17 +2,10 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#ifndef ACTIONABLE_HPP
-#define ACTIONABLE_HPP
-
-#include <memory>
-#include <string>
-
-#include "action.hpp"
+#ifndef ACTION_TPP
+#define ACTION_TPP
 
 namespace G13 {
-    class G13_Action;
-
     /// Template class to hold a reference to the parent object
     template <class PARENT_T>
     class G13_Actionable {

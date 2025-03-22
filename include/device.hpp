@@ -20,6 +20,7 @@
 
 
 namespace G13 {
+    class G13_Action; // Forward declaration
 
     constexpr size_t G13_NUM_KEYS = 40;
 

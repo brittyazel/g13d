@@ -5,12 +5,12 @@
 #include <filesystem>
 #include <fstream>
 #include <ranges>
+#include <unistd.h>
 
 #include "action_command.hpp"
 #include "action_keys.hpp"
 #include "action_pipeout.hpp"
 #include "device.hpp"
-
 #include "font.hpp"
 #include "font_family.hpp"
 #include "key.hpp"
