@@ -9,12 +9,9 @@
 
 namespace G13 {
 
+    enum class Empties { empties_ok, no_empties };
+
     EscapedStringFormatter formatter(const std::string& new_string);
-
-    struct split_t {
-        enum empties_t { empties_ok, no_empties };
-    };
-
     const char* left_trim(const char* string);
     std::string extract_and_advance_token(const char*& source);
     std::string glob_to_regex(const char* glob);

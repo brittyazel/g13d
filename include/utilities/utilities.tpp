@@ -64,7 +64,7 @@ namespace G13 {
 
     template <typename Container>
     Container split(const typename Container::value_type& srcStr, const typename Container::value_type& delimiters,
-                    split_t::empties_t empties = split_t::empties_ok);
+                    Empties empties = Empties::empties_ok);
 
     template <class T>
     const T& formatter(const T& v) {
@@ -151,11 +151,11 @@ namespace G13 {
 
     template <typename Container>
     Container split(const typename Container::value_type& srcStr, const typename Container::value_type& delimiters,
-                    const split_t::empties_t empties) {
+                    const Empties empties) {
         Container result;
         auto next = static_cast<size_t>(-1);
         do {
-            if (empties == split_t::no_empties) {
+            if (empties == Empties::no_empties) {
                 next = srcStr.find_first_not_of(delimiters, next + 1);
                 if (next == Container::value_type::npos) {
                     break;
