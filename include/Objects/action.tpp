@@ -29,8 +29,8 @@ namespace G13 {
         }
 
     protected:
-        std::string _name;
-        std::shared_ptr<G13_Action> _action;
+        std::string _name{};
+        std::shared_ptr<G13_Action> _action{};
 
     private:
         PARENT_T* _parent_ptr;

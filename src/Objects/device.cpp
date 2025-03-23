@@ -427,10 +427,6 @@ namespace G13 {
         return font;
     }
 
-    void G13_Device::SwitchToProfile(const std::string& name) {
-        current_profile = Profile(name);
-    }
-
     std::vector<std::string> G13_Device::FilteredProfileNames(const std::regex& pattern) const {
         std::vector<std::string> names;
 
@@ -442,9 +438,9 @@ namespace G13 {
         return names;
     }
 
-    std::shared_ptr<G13_Profile> G13_Device::Profile(const std::string& name) {
+    void G13_Device::SwitchToProfile(const std::string& name) {
         // try to get profile from map
-        std::shared_ptr<G13_Profile> profile = profiles[name];
+        auto profile = profiles[name];
 
         // if not found, create it
         if (!profile) {
@@ -452,7 +448,7 @@ namespace G13 {
             profiles[name] = profile;
         }
 
-        return profile;
+        current_profile = profile;
     }
 
     std::shared_ptr<G13_Action> G13_Device::MakeAction(const std::string& action) {

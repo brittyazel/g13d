@@ -46,7 +46,6 @@ namespace G13 {
         void SwitchToProfile(const std::string& name);
 
         [[nodiscard]] std::vector<std::string> FilteredProfileNames(const std::regex& pattern) const;
-        std::shared_ptr<G13_Profile> Profile(const std::string& name);
 
         void Dump(std::ostream& o, int detail = 0);
         void Command(const char* str, const char* info = nullptr);
