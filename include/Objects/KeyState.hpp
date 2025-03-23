@@ -10,9 +10,9 @@ namespace G13 {
     constexpr LINUX_KEY_VALUE BAD_KEY_VALUE = -1;
 
     /// A key code with up/down indicator
-    class G13_Key_State {
+    class KeyState {
     public:
-        explicit G13_Key_State(LINUX_KEY_VALUE key = 0, bool down = true);
+        explicit KeyState(LINUX_KEY_VALUE key = 0, bool down = true);
         [[nodiscard]] LINUX_KEY_VALUE key() const;
         [[nodiscard]] bool is_down() const;
 

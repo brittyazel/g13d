@@ -4,17 +4,17 @@
 
 #include <iomanip>
 
-#include "Objects/action.hpp"
-#include "Objects/stickzone.hpp"
+#include "Objects/Action.hpp"
+#include "Objects/StickZone.hpp"
 
 namespace G13 {
-    G13_StickZone::G13_StickZone(G13_Stick& stick, const std::string& name, const G13_ZoneBounds& b,
-                                 const std::shared_ptr<G13_Action>& action) :
-        G13_Actionable(stick, name), _bounds(b), _active(false) {
-        G13_Actionable::set_action(action); // Call to virtual from ctor!
+    StickZone::StickZone(Stick& stick, const std::string& name, const ZoneBounds& b,
+                                 const std::shared_ptr<Action>& action) :
+        Actionable(stick, name), _bounds(b), _active(false) {
+        Actionable::set_action(action); // Call to virtual from ctor!
     }
 
-    void G13_StickZone::dump(std::ostream& out) const {
+    void StickZone::dump(std::ostream& out) const {
         out << "   " << std::setw(20) << name() << "   " << _bounds << "  ";
         if (action()) {
             action()->dump(out);
@@ -24,7 +24,7 @@ namespace G13 {
         }
     }
 
-    void G13_StickZone::test(const G13_ZoneCoord& loc) {
+    void StickZone::test(const ZoneCoord& loc) {
         if (!_action)
             return;
         const bool prior_active = _active;
@@ -39,7 +39,7 @@ namespace G13 {
         }
     }
 
-    void G13_StickZone::set_bounds(const G13_ZoneBounds& bounds) {
+    void StickZone::set_bounds(const ZoneBounds& bounds) {
         _bounds = bounds;
     }
 }

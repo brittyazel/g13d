@@ -5,21 +5,21 @@
 #include <vector>
 #include <regex>
 
-#include "Objects/action_keys.hpp"
+#include "Objects/KeyAction.hpp"
 #include "log.hpp"
-#include "Objects/stick.hpp"
-#include "Objects/stickzone.hpp"
+#include "Objects/Stick.hpp"
+#include "Objects/StickZone.hpp"
 
 namespace G13 {
-    G13_Stick::G13_Stick(G13_Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255),
+    Stick::Stick(Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255),
                                                m_center_pos(127, 127), m_north_pos(127, 0) {
         m_stick_mode = STICK_KEYS;
 
         auto add_zone = [this, &keypad](const std::string& name, const double x1, const double y1, const double x2,
                                         const double y2) {
-            m_zones.emplace_back(*this, "STICK_" + name, G13_ZoneBounds(x1, y1, x2, y2),
-                                 std::static_pointer_cast<G13_Action>(
-                                     std::make_shared<G13_Action_Keys>(keypad, "KEY_" + name)));
+            m_zones.emplace_back(*this, "STICK_" + name, ZoneBounds(x1, y1, x2, y2),
+                                 std::static_pointer_cast<Action>(
+                                     std::make_shared<KeyAction>(keypad, "KEY_" + name)));
         };
 
         // The joystick is inverted, so UP is the bottom of the stick facing the user.
@@ -30,20 +30,20 @@ namespace G13 {
         add_zone("RIGHT", 0.7, 0.0, 1.0, 1.0);
     }
 
-    G13_StickZone* G13_Stick::zone(const std::string& name, const bool create) {
+    StickZone* Stick::zone(const std::string& name, const bool create) {
         for (auto& zone : m_zones) {
             if (zone.name() == name) {
                 return &zone;
             }
         }
         if (create) {
-            m_zones.emplace_back(*this, name, G13_ZoneBounds(0.0, 0.0, 0.0, 0.0));
+            m_zones.emplace_back(*this, name, ZoneBounds(0.0, 0.0, 0.0, 0.0));
             return &m_zones.back();
         }
         return nullptr;
     }
 
-    std::vector<std::string> G13_Stick::FilteredZoneNames(const std::regex& pattern) const {
+    std::vector<std::string> Stick::FilteredZoneNames(const std::regex& pattern) const {
         std::vector<std::string> names;
 
         for (const auto& zone : m_zones) {
@@ -54,7 +54,7 @@ namespace G13 {
         return names;
     }
 
-    void G13_Stick::set_mode(const stick_mode_t m) {
+    void Stick::set_mode(const stick_mode_t m) {
         if (m == m_stick_mode) {
             return;
         }
@@ -64,8 +64,8 @@ namespace G13 {
         m_stick_mode = m;
         switch (m_stick_mode) {
         case STICK_CALIB_BOUNDS:
-            m_bounds.tl = G13_StickCoord(255, 255);
-            m_bounds.br = G13_StickCoord(0, 0);
+            m_bounds.tl = StickCoord(255, 255);
+            m_bounds.br = StickCoord(0, 0);
             break;
         case STICK_ABSOLUTE:
         case STICK_KEYS:
@@ -75,21 +75,21 @@ namespace G13 {
         }
     }
 
-    void G13_Stick::RecalcCalibrated() {}
+    void Stick::RecalcCalibrated() {}
 
-    void G13_Stick::RemoveZone(const G13_StickZone& zone) {
-        const G13_StickZone& target(zone);
+    void Stick::RemoveZone(const StickZone& zone) {
+        const StickZone& target(zone);
         std::erase(m_zones, target);
     }
 
-    void G13_Stick::dump(std::ostream& out) const {
+    void Stick::dump(std::ostream& out) const {
         for (auto& zone : m_zones) {
             zone.dump(out);
             out << std::endl;
         }
     }
 
-    void G13_Stick::ParseJoystick(const unsigned char* buf) {
+    void Stick::ParseJoystick(const unsigned char* buf) {
         m_current_pos.x = buf[1];
         m_current_pos.y = buf[2];
 
@@ -134,8 +134,8 @@ namespace G13 {
             dy = 1.0 - dy;
         }
 
-        G13_DBG("x=" << m_current_pos.x << " y=" << m_current_pos.y << " dx=" << dx << " dy=" << dy);
-        const G13_ZoneCoord jpos(dx, dy);
+        DBG("x=" << m_current_pos.x << " y=" << m_current_pos.y << " dx=" << dx << " dy=" << dy);
+        const ZoneCoord jpos(dx, dy);
 
         if (m_stick_mode == STICK_ABSOLUTE) {
             _keypad.SendEvent(EV_ABS, ABS_X, m_current_pos.x);

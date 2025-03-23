@@ -13,11 +13,11 @@ namespace G13 {
     template <class T>
     const T& formatter(const T& v);
 
-    template <class KEYT, class VALT>
-    const VALT& find_or_throw(const std::map<KEYT, VALT>& m, const KEYT& target);
+    template <class T_KEY, class T_VAL>
+    const T_VAL& find_or_throw(const std::map<T_KEY, T_VAL>& m, const T_KEY& target);
 
-    template <class KEYT, class VALT>
-    VALT& find_or_throw(std::map<KEYT, VALT>& m, const KEYT& target);
+    template <class T_KEY, class T_VAL>
+    T_VAL& find_or_throw(std::map<T_KEY, T_VAL>& m, const T_KEY& target);
 
     template <class T>
     class Coord {
@@ -71,8 +71,8 @@ namespace G13 {
         return v;
     }
 
-    template <class KEYT, class VALT>
-    const VALT& find_or_throw(const std::map<KEYT, VALT>& m, const KEYT& target) {
+    template <class T_KEY, class T_VAL>
+    const T_VAL& find_or_throw(const std::map<T_KEY, T_VAL>& m, const T_KEY& target) {
         auto i = m.find(target);
         if (i == m.end()) {
             throw NotFoundException();
@@ -80,8 +80,8 @@ namespace G13 {
         return i->second;
     }
 
-    template <class KEYT, class VALT>
-    VALT& find_or_throw(std::map<KEYT, VALT>& m, const KEYT& target) {
+    template <class T_KEY, class T_VAL>
+    T_VAL& find_or_throw(std::map<T_KEY, T_VAL>& m, const T_KEY& target) {
         auto i = m.find(target);
         if (i == m.end()) {
             throw NotFoundException();

@@ -39,7 +39,7 @@ namespace G13 {
             return;
         }
 
-        G13_OUT("Setting log level to " << lvl);
+        OUT("Setting log level to " << lvl);
         log4cpp::Category::getRoot().setPriority(lvl);
     }
 
@@ -54,7 +54,7 @@ namespace G13 {
             root.setPriority(numLevel);
         }
         catch (const std::invalid_argument&) {
-            G13_ERR("Unknown log level: " << level);
+            ERR("Unknown log level: " << level);
         }
     }
 }

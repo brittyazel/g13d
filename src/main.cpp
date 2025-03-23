@@ -8,7 +8,7 @@
 #include <thread>
 
 #include "lifecycle.hpp"
-#include "Objects/key.hpp"
+#include "Objects/Key.hpp"
 #include "log.hpp"
 #include "main.hpp"
 
@@ -24,7 +24,7 @@ int main(const int argc, char* argv[]) {
 namespace G13 {
     // definitions
     libusb_context* usb_context = nullptr;
-    std::vector<G13_Device*> g13s = {};
+    std::vector<Device*> g13s = {};
     libusb_hotplug_callback_handle usb_hotplug_cb_handle[3] = {};
     libusb_device** devs = nullptr;
     std::string logoFilename;
@@ -39,7 +39,7 @@ namespace G13 {
         SetLogLevel("INFO");
 
         //PROJECT_VERSION is defined in meson.build and passed to the compiler
-        G13_OUT("g13d v" << PROJECT_VERSION << " " << __DATE__ << " " << __TIME__);
+        OUT("g13d v" << PROJECT_VERSION << " " << __DATE__ << " " << __TIME__);
 
         // TODO: move out argument parsing
         const option long_opts[] = {
@@ -94,7 +94,7 @@ namespace G13 {
     }
 
     void Cleanup() {
-        G13_OUT("Cleaning up");
+        OUT("Cleaning up");
 
         // Deregister hotplug callbacks
         for (const auto this_handle : usb_hotplug_cb_handle) {
@@ -138,7 +138,7 @@ namespace G13 {
     }
 
     void SignalHandler(const int signal) {
-        G13_OUT("Caught signal " << signal << " (" << strsignal(signal) << ")");
+        OUT("Caught signal " << signal << " (" << strsignal(signal) << ")");
         running = false;
         // TODO: Should we break libusb handling with a reset?
     }
@@ -150,7 +150,7 @@ namespace G13 {
 
         int error = libusb_init(&usb_context);
         if (error != LIBUSB_SUCCESS) {
-            G13_ERR("libusb initialization error: " << G13_Device::DescribeLibusbErrorCode(error));
+            ERR("libusb initialization error: " << Device::DescribeLibusbErrorCode(error));
             Cleanup();
             return EXIT_FAILURE;
         }
@@ -160,7 +160,7 @@ namespace G13 {
             int ret = InitializeDevices();
 
             if (g13s.empty() || ret != 0) {
-                G13_ERR("Unable to open any device");
+                ERR("Unable to open any device");
                 Cleanup();
                 return EXIT_FAILURE;
             }
@@ -181,12 +181,12 @@ namespace G13 {
 
         while (running) {
             if (g13s.empty()) {
-                G13_OUT("Waiting for device to show up...");
+                OUT("Waiting for device to show up...");
                 error = libusb_handle_events(usb_context);
-                G13_OUT("USB Event wakeup with " << g13s.size() << " devices registered");
+                OUT("USB Event wakeup with " << g13s.size() << " devices registered");
 
                 if (error != LIBUSB_SUCCESS) {
-                    G13_ERR("Error: " << G13_Device::DescribeLibusbErrorCode(error));
+                    ERR("Error: " << Device::DescribeLibusbErrorCode(error));
                 }
                 else {
                     for (const auto g13 : g13s) {
@@ -210,7 +210,7 @@ namespace G13 {
         }
 
         Cleanup();
-        G13_OUT("Exit");
+        OUT("Exit");
         return EXIT_SUCCESS;
     }
 
@@ -226,7 +226,7 @@ namespace G13 {
     }
 
     void setStringConfigValue(const std::string& name, const std::string& value) {
-        G13_DBG("setStringConfigValue " << name << " = " << formatter(value));
+        DBG("setStringConfigValue " << name << " = " << formatter(value));
         stringConfigValues[name] = value;
     }
 

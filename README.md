@@ -162,11 +162,11 @@ Sets the current text position to *row* *col*.
 
 ### out *text*
 
-Writes *text* to the LCD at the current text position, and advances the current position based on the font size
+Writes *text* to the screen at the current text position, and advances the current position based on the font size
 
 ### clear
 
-Clears the LCD
+Clears the screen
 
 ### textmode *mode*
 
@@ -174,7 +174,7 @@ Sets the text mode to *mode*, current options are 0 (normal) or 1 (inverted)
 
 ### refresh
 
-Resends the LCD buffer
+Resends the screen buffer
 
 ### profile *profile_name*
     

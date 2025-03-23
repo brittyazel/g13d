@@ -2,19 +2,19 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#ifndef FONT_CHAR_HPP
-#define FONT_CHAR_HPP
+#ifndef FONT_CHARACTER_HPP
+#define FONT_CHARACTER_HPP
 
 #include <cstring>
 
 namespace G13 {
-    class G13_FontChar {
+    class FontCharacter {
     public:
         static constexpr int CHAR_BUF_SIZE = 8;
 
         enum FONT_FLAGS { FF_ROTATE = 0x01 };
 
-        G13_FontChar() {
+        FontCharacter() {
             memset(bits_regular, 0, CHAR_BUF_SIZE);
             memset(bits_inverted, 0, CHAR_BUF_SIZE);
         }

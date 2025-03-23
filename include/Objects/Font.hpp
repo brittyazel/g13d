@@ -7,17 +7,16 @@
 
 #include <string>
 
-#include "font_char.hpp"
+#include "FontCharacter.hpp"
 
 namespace G13 {
-    class G13_Font {
+    class Font {
     public:
-        G13_Font();
-        explicit G13_Font(std::string name, unsigned int width = 8);
+        explicit Font(std::string name, unsigned int width = 8);
 
         [[nodiscard]] const std::string& name() const;
         [[nodiscard]] unsigned int width() const;
-        [[nodiscard]] const G13_FontChar& char_data(unsigned int x) const;
+        [[nodiscard]] const FontCharacter& char_data(unsigned int x) const;
 
         template <typename T, size_t size>
         static size_t GetFontCharacterCount(T (&)[size]) {
@@ -34,7 +33,7 @@ namespace G13 {
     protected:
         std::string m_name;
         unsigned int m_width;
-        G13_FontChar m_chars[256];
+        FontCharacter m_chars[256];
     };
 }
 #endif

@@ -3,10 +3,10 @@
 //
 
 
-#include "Objects/font_char.hpp"
+#include "Objects/FontCharacter.hpp"
 
 namespace G13 {
-    void G13_FontChar::SetCharacter(const unsigned char* data, const unsigned int width, const unsigned flags) {
+    void FontCharacter::SetCharacter(const unsigned char* data, const unsigned int width, const unsigned flags) {
         unsigned char* dest = bits_regular;
         memset(dest, 0, CHAR_BUF_SIZE);
         if (flags & FF_ROTATE) {

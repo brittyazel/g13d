@@ -12,37 +12,37 @@
 #include <regex>
 #include <vector>
 
-#include "font.hpp"
-#include "lcd.hpp"
-#include "profile.hpp"
-#include "stick.hpp"
+#include "Font.hpp"
+#include "Screen.hpp"
+#include "Profile.hpp"
+#include "Stick.hpp"
 
 
 namespace G13 {
-    class G13_Action; // Forward declaration
+    class Action; // Forward declaration
 
-    constexpr size_t G13_NUM_KEYS = 40;
+    constexpr size_t NUM_KEYS = 40;
 
     inline void IGUR(...) {}
 
-    class G13_Device {
+    class Device {
     public:
         typedef std::function<void(const char*)> COMMAND_FUNCTION;
         typedef std::map<std::string, COMMAND_FUNCTION> CommandFunctionTable;
 
         bool connected;
 
-        G13_Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle,
+        Device(libusb_device* usb_device, libusb_context* usb_context, libusb_device_handle* usb_handle,
                    int device_index);
-        ~G13_Device();
+        ~Device();
 
         void Cleanup();
         void RegisterContext(libusb_context* new_usb_context);
 
-        G13_LCD& getLCDRef();
-        G13_Stick& getStickRef();
+        Screen& getScreenRef();
+        Stick& getStickRef();
 
-        std::shared_ptr<G13_Font> SwitchToFont(const std::string& name);
+        std::shared_ptr<Font> SwitchToFont(const std::string& name);
         void SwitchToProfile(const std::string& name);
 
         [[nodiscard]] std::vector<std::string> FilteredProfileNames(const std::regex& pattern) const;
@@ -55,7 +55,7 @@ namespace G13 {
         static int G13CreateUinput();
         static int G13CreateFifo(const char* fifo_name, mode_t umask);
 
-        std::shared_ptr<G13_Action> MakeAction(const std::string& action);
+        std::shared_ptr<Action> MakeAction(const std::string& action);
         void SetKeyColor(int red, int green, int blue) const;
         void SetModeLeds(int leds) const;
         void SendEvent(int type, int code, int val);
@@ -66,13 +66,13 @@ namespace G13 {
         [[nodiscard]] int getDeviceIndex() const;
         [[nodiscard]] libusb_device_handle* getHandlePtr() const;
         [[nodiscard]] libusb_device* getDevicePtr() const;
-        [[nodiscard]] G13_Font& getCurrentFontRef() const;
-        [[nodiscard]] G13_Profile& getCurrentProfileRef() const;
-        static G13_Device* GetG13DeviceHandle(const libusb_device* dev);
+        [[nodiscard]] Font& getCurrentFontRef() const;
+        [[nodiscard]] Profile& getCurrentProfileRef() const;
+        static Device* GetG13DeviceHandle(const libusb_device* dev);
 
     protected:
         void InitFonts();
-        void InitLCD();
+        void InitScreen();
         void InitCommands();
 
     private:
@@ -93,15 +93,15 @@ namespace G13 {
         int output_pipe_fid{};
         std::string output_pipe_name;
 
-        std::map<std::string, std::shared_ptr<G13_Font>> fonts;
-        std::shared_ptr<G13_Font> current_font;
-        std::map<std::string, std::shared_ptr<G13_Profile>> profiles;
-        std::shared_ptr<G13_Profile> current_profile;
+        std::map<std::string, std::shared_ptr<Font>> fonts;
+        std::shared_ptr<Font> current_font;
+        std::map<std::string, std::shared_ptr<Profile>> profiles;
+        std::shared_ptr<Profile> current_profile;
         std::vector<std::string> files_currently_loading;
 
-        G13_LCD lcd;
-        G13_Stick stick;
-        bool keys[G13_NUM_KEYS]{};
+        Screen screen;
+        Stick stick;
+        bool keys[NUM_KEYS]{};
 
         libusb_device_handle* usb_handle;
         libusb_device* usb_device;

@@ -5,33 +5,33 @@
 #ifndef ACTION_HPP
 #define ACTION_HPP
 
-#include "device.hpp"
+#include "Device.hpp"
 
 namespace G13 {
-    class G13_Device; // Forward declaration
+    class Device; // Forward declaration
 
     /// Holds potential actions which can be bound to G13 activity
-    class G13_Action {
+    class Action {
     public:
-        explicit G13_Action(G13_Device& keypad) : _keypad(keypad) {}
-        virtual ~G13_Action() = default;
+        explicit Action(Device& keypad) : _keypad(keypad) {}
+        virtual ~Action() = default;
 
-        virtual void act(G13_Device&, bool is_down) = 0;
+        virtual void act(Device&, bool is_down) = 0;
         virtual void dump(std::ostream&) const = 0;
 
         void act(const bool is_down) {
             act(keypad(), is_down);
         }
 
-        [[nodiscard]] G13_Device& keypad() const {
+        [[nodiscard]] Device& keypad() const {
             return _keypad;
         }
 
     private:
-        G13_Device& _keypad;
+        Device& _keypad;
     };
 }
 
-#include "action.tpp"
+#include "Action.tpp"
 
 #endif

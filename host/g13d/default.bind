@@ -1,12 +1,13 @@
 # Available Keys:
 #   BD DOWN G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 G14 G15 G16 G17 G18 G19 G20 G21 G22
 #   L1 L2 L3 L4 LEFT LIGHT LIGHT_STATE M1 M2 M3 MR TOP STICK_LEFT STICK_RIGHT STICK_UP STICK_DOWN
-# Rough Markup:
-#       ______________
-#      |  160x43 LCD  |
-#      |              |
-#       ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-#      BD L1 L2 L3 L4 LIGHT_STATE
+#
+Rough Markup:
+#       _______________
+#      | 160x43 Screen |
+#      |               |
+#       ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+#  BD L1 L2 L3 L4 LIGHT_STATE
 #         M1 M2 M3 MR
 # G1  G2  G3  G4  G5  G6  G7 
 # G8  G9  G10 G11 G12 G13 G14

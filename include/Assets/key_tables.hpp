@@ -12,7 +12,7 @@ namespace G13 {
      * item corresponding to a specific bit in the G13's USB message
      * format.  Do NOT remove or insert items in this list.
      */
-    inline const char* G13_KEY_STRINGS[] = {
+    inline const char* KEY_STRINGS[] = {
         /* byte 3 */
         "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8",
         /* byte 4 */
@@ -28,15 +28,15 @@ namespace G13 {
 
     /*! sequence containing the
      * G13 keys that shouldn't be tested input.  These aren't actually keys,
-     * but they are in the bitmap defined by G13_KEY_STRINGS.
+     * but they are in the bitmap defined by KEY_STRINGS.
      */
-    inline const char* G13_NON_PARSED_KEYS[] = {
+    inline const char* NON_PARSED_KEYS[] = {
         "UNDEF1", "LIGHT_STATE", "UNDEF3", "LIGHT",
         "LIGHT2", "UNDEF3", "MISC_TOGGLE",
         nullptr
     };
 
-    /*! G13_BTN_SEQ is a Boost Preprocessor sequence containing the
+    /*! BTN_SEQ is a Boost Preprocessor sequence containing the
      * names of button events we can send through binding actions.
      * These correspond to BTN_xxx value definitions in <linux/input.h>,
      * i.e. LEFT is BTN_LEFT, RIGHT is BTN_RIGHT, etc.
@@ -45,7 +45,7 @@ namespace G13 {
      * e.g. LEFT keyboard button and LEFT mouse button
      * i.e. LEFT mouse button is named MLEFT, MIDDLE mouse button is MMIDDLE
      */
-    inline const char* G13_BTN_SEQ[] = {
+    inline const char* BTN_SEQ[] = {
         "LEFT", "RIGHT", "MIDDLE", "SIDE", "EXTRA",
         nullptr
     };

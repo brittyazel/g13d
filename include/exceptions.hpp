@@ -8,9 +8,9 @@
 #include <exception>
 
 namespace G13 {
-    class G13_CommandException final : public std::exception {
+    class CommandException final : public std::exception {
     public:
-        explicit G13_CommandException(std::string reason) : reason(std::move(reason)) {}
+        explicit CommandException(std::string reason) : reason(std::move(reason)) {}
 
         [[nodiscard]] const char* what() const noexcept override {
             return reason.c_str();

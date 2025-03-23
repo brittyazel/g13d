@@ -10,20 +10,20 @@
 #include <string>
 #include <vector>
 
-#include "Objects/device.hpp"
+#include "Objects/Device.hpp"
 
 
 namespace G13 {
-    constexpr size_t G13_VENDOR_ID = 0x046d;
-    constexpr size_t G13_PRODUCT_ID = 0xc21c;
-    constexpr size_t G13_REPORT_SIZE = 8;
-    constexpr size_t G13_KEY_ENDPOINT = 1;
-    constexpr size_t G13_LCD_ENDPOINT = 2;
+    constexpr size_t VENDOR_ID = 0x046d;
+    constexpr size_t PRODUCT_ID = 0xc21c;
+    constexpr size_t REPORT_SIZE = 8;
+    constexpr size_t KEY_ENDPOINT = 1;
+    constexpr size_t SCREEN_ENDPOINT = 2;
 
     static std::map<std::string, std::string> stringConfigValues;
 
     extern libusb_context* usb_context;
-    extern std::vector<G13_Device*> g13s;
+    extern std::vector<Device*> g13s;
     extern libusb_hotplug_callback_handle usb_hotplug_cb_handle[3];
     extern libusb_device** devs;
     extern std::string logoFilename;
