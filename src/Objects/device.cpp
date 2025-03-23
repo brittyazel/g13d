@@ -7,21 +7,19 @@
 #include <ranges>
 #include <unistd.h>
 
-#include "action_command.hpp"
-#include "action_keys.hpp"
-#include "action_pipeout.hpp"
-#include "device.hpp"
-
-#include <logo.hpp>
-
-#include "utilities/exceptions.hpp"
-#include "font.hpp"
-#include "font_family.hpp"
-#include "key.hpp"
+#include "Objects/action_command.hpp"
+#include "Objects/action_keys.hpp"
+#include "Objects/action_pipeout.hpp"
+#include "Objects/device.hpp"
+#include "Assets/logo.hpp"
+#include "exceptions.hpp"
+#include "Objects/font.hpp"
+#include "Assets/font_family.hpp"
+#include "Objects/key.hpp"
 #include "lifecycle.hpp"
 #include "log.hpp"
 #include "main.hpp"
-#include "stickzone.hpp"
+#include "Objects/stickzone.hpp"
 
 namespace G13 {
     // *************************************************************************
@@ -78,7 +76,7 @@ namespace G13 {
         SetModeLeds(leds);
         SetKeyColor(red, green, blue);
 
-        uinput_fid = G13CreateUinput(this);
+        uinput_fid = G13CreateUinput();
         MakePipeNames();
         input_pipe_fid = G13CreateFifo(input_pipe_name.c_str(), S_IRGRP | S_IROTH);
 
@@ -184,7 +182,7 @@ namespace G13 {
         return description;
     }
 
-    int G13CreateFifo(const char* fifo_name, mode_t umask) {
+    int G13_Device::G13CreateFifo(const char* fifo_name, mode_t umask) {
         // Extract the directory path from the FIFO path
         const std::filesystem::path fifo_path(fifo_name);
 
@@ -200,7 +198,7 @@ namespace G13 {
         return fd;
     }
 
-    int G13CreateUinput(G13_Device* g13) {
+    int G13_Device::G13CreateUinput() {
         uinput_user_dev new_uinput{};
         const char* dev_uinput_filename = access("/dev/input/uinput", F_OK) == 0
                                               ? "/dev/input/uinput"

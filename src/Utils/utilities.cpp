@@ -6,22 +6,22 @@
 #include <iomanip>
 #include <functional>
 
-#include "utilities/utilities.hpp"
+#include "Utils/utilities.hpp"
 
 namespace G13 {
 
     /**
-    * @brief Creates an EscapedStringFormatter object from a given string.
+    * @brief Creates an StringFormatter object from a given string.
     *
-    * This function takes a string as input and returns an EscapedStringFormatter
-    * object initialized with the provided string. The EscapedStringFormatter
+    * This function takes a string as input and returns an StringFormatter
+    * object initialized with the provided string. The StringFormatter
     * can be used to format the string with escape sequences.
     *
     * @param new_string The input string to be formatted.
-    * @return An EscapedStringFormatter object initialized with the input string.
+    * @return An StringFormatter object initialized with the input string.
     */
-    EscapedStringFormatter formatter(const std::string& new_string) {
-        return EscapedStringFormatter(new_string);
+    StringFormatter formatter(const std::string& new_string) {
+        return StringFormatter(new_string);
     }
 
     /**

@@ -2,8 +2,8 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#include "action_pipeout.hpp"
-#include "key.hpp"
+#include "Objects/action_pipeout.hpp"
+#include "Objects/key.hpp"
 
 
 namespace G13 {

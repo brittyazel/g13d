@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "device.hpp"
+#include "Objects/device.hpp"
 
 
 namespace G13 {
@@ -38,7 +38,6 @@ namespace G13 {
     std::string getStringConfigValue(const std::string& name);
     void setStringConfigValue(const std::string& name, const std::string& value);
     void SignalHandler(int);
-
 }
 
 #endif

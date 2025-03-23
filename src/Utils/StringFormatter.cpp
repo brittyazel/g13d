@@ -6,12 +6,12 @@
 #include <iomanip>
 #include <functional>
 
-#include "utilities/utilities.hpp"
+#include "Utils/StringFormatter.hpp"
 
 namespace G13 {
-    EscapedStringFormatter::EscapedStringFormatter(std::string str) : str(std::move(str)) {}
+    StringFormatter::StringFormatter(std::string str) : str(std::move(str)) {}
 
-    void EscapedStringFormatter::write_on(std::ostream& output_stream) const {
+    void StringFormatter::write_on(std::ostream& output_stream) const {
         output_stream << "\"";
         for (const char character : str) {
             switch (character) {

@@ -8,7 +8,7 @@
 #include <map>
 #include <string>
 
-#include "action.hpp"
+#include "Objects/action.hpp"
 #include "key_state.hpp"
 
 namespace G13 {
@@ -52,7 +52,6 @@ namespace G13 {
     std::string FindInputKeyName(LINUX_KEY_VALUE v);
     void DisplayKeys();
     void InitKeynames();
-
 }
 
 #endif

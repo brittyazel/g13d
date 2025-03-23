@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "action.hpp"
+#include "Objects/action.hpp"
 #include "device.hpp"
 #include "key_state.hpp"
 

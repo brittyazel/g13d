@@ -23,9 +23,6 @@ namespace G13 {
 
     constexpr size_t G13_NUM_KEYS = 40;
 
-    int G13CreateUinput(G13_Device* g13);
-    int G13CreateFifo(const char* fifo_name, mode_t umask);
-
     inline void IGUR(...) {}
 
     class G13_Device {
@@ -56,6 +53,8 @@ namespace G13 {
         void ReadCommandsFromPipe();
         int ReadDeviceInputs();
         void ReadCommandsFromFile(const std::string& filename, const char* info = nullptr);
+        static int G13CreateUinput();
+        static int G13CreateFifo(const char* fifo_name, mode_t umask);
 
         std::shared_ptr<G13_Action> MakeAction(const std::string& action);
         void SetKeyColor(int red, int green, int blue) const;

@@ -5,7 +5,7 @@
 #include <memory>
 #include <systemd/sd-bus.h>
 
-#include "device.hpp"
+#include "Objects/device.hpp"
 #include "lifecycle.hpp"
 #include "log.hpp"
 #include "main.hpp"

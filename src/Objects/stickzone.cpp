@@ -4,8 +4,8 @@
 
 #include <iomanip>
 
-#include "action.hpp"
-#include "stickzone.hpp"
+#include "Objects/action.hpp"
+#include "Objects/stickzone.hpp"
 
 namespace G13 {
     G13_StickZone::G13_StickZone(G13_Stick& stick, const std::string& name, const G13_ZoneBounds& b,

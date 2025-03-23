@@ -4,10 +4,10 @@
 
 #include <cassert>
 
-#include "key.hpp"
-#include "key_tables.hpp"
+#include "Objects/key.hpp"
+#include "Assets/key_tables.hpp"
 #include "main.hpp"
-#include "profile.hpp"
+#include "Objects/profile.hpp"
 
 namespace G13 {
     G13_Profile::G13_Profile(G13_Device& keypad, std::string name_arg) :
@@ -22,16 +22,16 @@ namespace G13 {
     void G13_Profile::_init_keys() {
         // create a G13_Key entry for every key in G13_KEY_STRINGS
         int key_index = 0;
-        // std::string str = G13_Key_Tables::G13_KEY_STRINGS[0];
+        // std::string str = G13_KEY_STRINGS[0];
 
-        for (auto symbol = G13_Key_Tables::G13_KEY_STRINGS; *symbol; symbol++) {
+        for (auto symbol = G13_KEY_STRINGS; *symbol; symbol++) {
             _keys.emplace_back(G13_Key(*this, *symbol, key_index));
             key_index++;
         }
         assert(_keys.size() == G13_NUM_KEYS);
 
         // now disable testing for keys in G13_NON_PARSED_KEYS
-        for (auto symbol = G13_Key_Tables::G13_NON_PARSED_KEYS; *symbol; symbol++) {
+        for (auto symbol = G13_NON_PARSED_KEYS; *symbol; symbol++) {
             G13_Key* key = FindKey(*symbol);
             key->_should_parse = false;
         }

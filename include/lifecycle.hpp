@@ -7,10 +7,9 @@
 
 #include <libusb-1.0/libusb.h>
 
-#include "device.hpp"
+#include "Objects/device.hpp"
 
 namespace G13 {
-
     extern bool suspended;
 
     void DiscoverG13s(libusb_device** devs, ssize_t count);
@@ -18,7 +17,7 @@ namespace G13 {
     void SetupDevice(G13_Device* g13);
 
     int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
-                                         libusb_hotplug_event event, void* user_data);
+                                             libusb_hotplug_event event, void* user_data);
     int LIBUSB_CALL HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
                                           libusb_hotplug_event event, void* user_data);
     int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, const libusb_device* dev,
@@ -29,7 +28,6 @@ namespace G13 {
     int InitializeDevices(libusb_device* dev = nullptr);
 
     void MonitorSuspendResume();
-
 }
 
 #endif

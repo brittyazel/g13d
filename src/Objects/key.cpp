@@ -6,8 +6,8 @@
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <ranges>
 
-#include "key.hpp"
-#include "key_tables.hpp"
+#include "Objects/key.hpp"
+#include "Assets/key_tables.hpp"
 #include "log.hpp"
 #include "main.hpp"
 
@@ -140,7 +140,7 @@ namespace G13 {
         int key_index = 0;
 
         // setup maps to let us convert between strings and G13 key names
-        for (auto name = G13_Key_Tables::G13_KEY_STRINGS; *name; name++) {
+        for (auto name = G13_KEY_STRINGS; *name; name++) {
             g13_key_to_name[key_index] = *name;
             g13_name_to_key[*name] = key_index;
             G13_DBG("mapping G13 " << *name << " = " << key_index);
@@ -159,7 +159,7 @@ namespace G13 {
         }
 
         // setup maps to let us convert between strings and linux button names
-        for (auto symbol = G13_Key_Tables::G13_BTN_SEQ; *symbol; symbol++) {
+        for (auto symbol = G13_BTN_SEQ; *symbol; symbol++) {
             auto name = std::string("M" + std::string(*symbol));
             auto keyname = std::string("BTN_" + std::string(*symbol));
             if (int code = libevdev_event_code_from_name(EV_KEY, keyname.c_str()); code < 0) {

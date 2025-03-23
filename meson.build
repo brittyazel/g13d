@@ -24,23 +24,22 @@ add_project_arguments('-DPROJECT_VERSION="' + meson.project_version() + '"', lan
 # Sources
 project_src_files = files(
     'src/main.cpp',
-    'src/action_keys.cpp',
-    'src/action_pipeout.cpp',
-    'src/stickzone.cpp',
-    'src/action_command.cpp',
-    'src/device.cpp',
-    'src/font.cpp',
-    'src/font_char.cpp',
+    'src/Objects/action_keys.cpp',
+    'src/Objects/action_pipeout.cpp',
+    'src/Objects/stickzone.cpp',
+    'src/Objects/action_command.cpp',
+    'src/Objects/device.cpp',
+    'src/Objects/font.cpp',
+    'src/Objects/font_char.cpp',
     'src/lifecycle.cpp',
-    'src/key_state.cpp',
-    'src/key_tables.cpp',
-    'src/key.cpp',
-    'src/lcd.cpp',
+    'src/Objects/key_state.cpp',
+    'src/Objects/key.cpp',
+    'src/Objects/lcd.cpp',
     'src/log.cpp',
-    'src/profile.cpp',
-    'src/stick.cpp',
-    'src/utilities/utilities.cpp',
-    'src/utilities/escaped_string_formatter.cpp',
+    'src/Objects/profile.cpp',
+    'src/Objects/stick.cpp',
+    'src/Utils/utilities.cpp',
+    'src/Utils/StringFormatter.cpp',
 )
 
 # Dependencies
@@ -61,4 +60,8 @@ g13d = executable(
 )
 
 # Installation
-install_subdir('host', install_dir : '/usr/lib', strip_directory : true)
+install_subdir(
+    'host',
+    install_dir : '/usr/lib',
+    strip_directory : true
+)

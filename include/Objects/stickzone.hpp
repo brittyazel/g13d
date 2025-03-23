@@ -5,7 +5,7 @@
 #ifndef STICKZONE_HPP
 #define STICKZONE_HPP
 
-#include "action.hpp"
+#include "Objects/action.hpp"
 #include "stick.hpp"
 
 namespace G13 {

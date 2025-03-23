@@ -2,9 +2,9 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#include "font.hpp"
+#include "Objects/font.hpp"
 #include "main.hpp"
-#include "lcd.hpp"
+#include "Objects/lcd.hpp"
 #include "log.hpp"
 
 #include <fstream>

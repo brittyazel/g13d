@@ -2,7 +2,7 @@
 // Created by Britt Yazel on 03-16-2025.
 //
 
-#include "key_state.hpp"
+#include "Objects/key_state.hpp"
 
 namespace G13 {
     G13_Key_State::G13_Key_State(const LINUX_KEY_VALUE key, const bool down) {

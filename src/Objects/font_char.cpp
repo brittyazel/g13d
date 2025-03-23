@@ -3,7 +3,7 @@
 //
 
 
-#include "font_char.hpp"
+#include "Objects/font_char.hpp"
 
 namespace G13 {
     void G13_FontChar::SetCharacter(const unsigned char* data, const unsigned int width, const unsigned flags) {

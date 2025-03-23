@@ -5,10 +5,10 @@
 #include <vector>
 #include <regex>
 
-#include "action_keys.hpp"
+#include "Objects/action_keys.hpp"
 #include "log.hpp"
-#include "stick.hpp"
-#include "stickzone.hpp"
+#include "Objects/stick.hpp"
+#include "Objects/stickzone.hpp"
 
 namespace G13 {
     G13_Stick::G13_Stick(G13_Device& keypad) : _keypad(keypad), m_bounds(0, 0, 255, 255),

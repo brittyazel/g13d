@@ -8,7 +8,7 @@
 #include "device.hpp"
 
 namespace G13 {
-    class G13_Device;  // Forward declaration
+    class G13_Device; // Forward declaration
 
     /// Holds potential actions which can be bound to G13 activity
     class G13_Action {
@@ -30,7 +30,6 @@ namespace G13 {
     private:
         G13_Device& _keypad;
     };
-
 }
 
 #include "action.tpp"

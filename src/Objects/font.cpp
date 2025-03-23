@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "font.hpp"
+#include "Objects/font.hpp"
 
 namespace G13 {
     G13_Font::G13_Font() : m_name("default"), m_width(8) {}
