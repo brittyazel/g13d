@@ -12,9 +12,9 @@
 #include "log.hpp"
 #include "main.hpp"
 
-// *************************************************************************
-// ***************************** Entry point *******************************
-// *************************************************************************
+// ************************************************************************* //
+// ***************************** Entry Point ******************************* //
+// ************************************************************************* //
 int main(const int argc, char* argv[]) {
     G13::Initialize(argc, argv);
     return G13::Run();
@@ -143,6 +143,29 @@ namespace G13 {
         // TODO: Should we break libusb handling with a reset?
     }
 
+    std::string getStringConfigValue(const std::string& name) {
+        try {
+            return find_or_throw(stringConfigValues, name);
+        }
+        catch (...) {
+            return "";
+        }
+    }
+
+    void setStringConfigValue(const std::string& name, const std::string& value) {
+        DBG("setStringConfigValue " << name << " = " << formatter(value));
+        stringConfigValues[name] = value;
+    }
+
+    void setLogoFilename(const std::string& newLogoFilename) {
+        logoFilename = newLogoFilename;
+    }
+
+
+    // ************************************************************************* //
+    // ****************************** Main Loop ******************************** //
+    // ************************************************************************* //
+
     int Run() {
         running = true;
 
@@ -212,25 +235,5 @@ namespace G13 {
         Cleanup();
         OUT("Exit");
         return EXIT_SUCCESS;
-    }
-
-    /****************************************************************/
-
-    std::string getStringConfigValue(const std::string& name) {
-        try {
-            return find_or_throw(stringConfigValues, name);
-        }
-        catch (...) {
-            return "";
-        }
-    }
-
-    void setStringConfigValue(const std::string& name, const std::string& value) {
-        DBG("setStringConfigValue " << name << " = " << formatter(value));
-        stringConfigValues[name] = value;
-    }
-
-    void setLogoFilename(const std::string& newLogoFilename) {
-        logoFilename = newLogoFilename;
     }
 }

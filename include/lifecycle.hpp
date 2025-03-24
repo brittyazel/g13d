@@ -15,6 +15,10 @@ namespace G13 {
     void DiscoverG13s(libusb_device** devs, ssize_t count);
     int OpenAndAddG13(libusb_device* dev);
     void SetupDevice(Device* g13);
+    void CleanupDevices(const libusb_device* dev = nullptr);
+    int InitializeDevices(libusb_device* dev = nullptr);
+
+    void MonitorSuspendResume();
 
     int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
                                              libusb_hotplug_event event, void* user_data);
@@ -23,11 +27,6 @@ namespace G13 {
     int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, const libusb_device* dev,
                                           libusb_hotplug_event event, void* user_data);
     void ArmHotplugCallbacks();
-
-    void CleanupDevices(const libusb_device* dev = nullptr);
-    int InitializeDevices(libusb_device* dev = nullptr);
-
-    void MonitorSuspendResume();
 }
 
 #endif

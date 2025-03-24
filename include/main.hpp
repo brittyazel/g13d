@@ -29,15 +29,16 @@ namespace G13 {
     extern std::string logoFilename;
     extern const int class_id;
 
-
     void Initialize(int argc, char* argv[]);
     void printHelp();
-    int Run();
     void Cleanup();
     void setLogoFilename(const std::string& newLogoFilename);
     std::string getStringConfigValue(const std::string& name);
     void setStringConfigValue(const std::string& name, const std::string& value);
     void SignalHandler(int);
+
+    int Run();
 }
+
 
 #endif

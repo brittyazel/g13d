@@ -11,9 +11,9 @@
 #include "main.hpp"
 
 
-// *************************************************************************
-
 namespace G13 {
+
+    // Declarations
     bool suspended = false;
 
     void DiscoverG13s(libusb_device** devs, const ssize_t count) {
@@ -61,28 +61,6 @@ namespace G13 {
         return 0;
     }
 
-    int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
-                                             libusb_hotplug_event event, void* user_data) {
-        OUT("USB device found during enumeration");
-        return HotplugCallbackInsert(usb_context, dev, event, user_data);
-    }
-
-    int LIBUSB_CALL HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
-                                          libusb_hotplug_event event, void* user_data) {
-        OUT("USB device connected");
-        const int ret = InitializeDevices(dev);
-        Device::GetG13DeviceHandle(dev)->connected = true;
-        return ret; // Rearm
-    }
-
-    int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
-                                          libusb_hotplug_event event, void* user_data) {
-        OUT("USB device disconnected");
-        Device::GetG13DeviceHandle(dev)->connected = false;
-        CleanupDevices(dev);
-        return 0; // Rearm
-    }
-
     void SetupDevice(Device* g13) {
         OUT("Setting up device" << " " << g13->getDeviceIndex());
         g13->RegisterContext(usb_context);
@@ -96,35 +74,6 @@ namespace G13 {
         if (const std::string config_filename = getStringConfigValue("config"); !config_filename.empty()) {
             OUT("Reading configuration from: " << config_filename);
             g13->ReadCommandsFromFile(config_filename, "  cfg");
-        }
-    }
-
-    void ArmHotplugCallbacks() {
-        DBG("Registering USB hotplug callbacks");
-
-        // For currently attached devices
-        int error = libusb_hotplug_register_callback(usb_context, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
-                                                     LIBUSB_HOTPLUG_ENUMERATE, VENDOR_ID, PRODUCT_ID, class_id,
-                                                     HotplugCallbackEnumerate, nullptr, &usb_hotplug_cb_handle[0]);
-        if (error != LIBUSB_SUCCESS) {
-            ERR("Error registering hotplug enumeration callback: " << Device::DescribeLibusbErrorCode(error));
-        }
-
-        // For future devices
-        error = libusb_hotplug_register_callback(usb_context, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
-                                                 LIBUSB_HOTPLUG_NO_FLAGS, VENDOR_ID, PRODUCT_ID, class_id,
-                                                 HotplugCallbackInsert, nullptr, &usb_hotplug_cb_handle[1]);
-        if (error != LIBUSB_SUCCESS) {
-            ERR("Error registering hotplug insertion callback: " << Device::DescribeLibusbErrorCode(error));
-        }
-
-        // For disconnected devices
-        error = libusb_hotplug_register_callback(usb_context, LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
-                                                 LIBUSB_HOTPLUG_NO_FLAGS, VENDOR_ID, PRODUCT_ID, class_id,
-                                                 HotplugCallbackRemove, nullptr, &usb_hotplug_cb_handle[2]);
-
-        if (error != LIBUSB_SUCCESS) {
-            ERR("Error registering hotplug removal callback: " << Device::DescribeLibusbErrorCode(error));
         }
     }
 
@@ -167,6 +116,11 @@ namespace G13 {
 
         return 0;
     }
+
+
+    // ************************************************************************* //
+    // **************************** Systemd Thread ***************************** //
+    // ************************************************************************* //
 
     // Monitor system suspend/resume events using libsystemd
     // This runs in a separate thread started in Run()
@@ -220,5 +174,62 @@ namespace G13 {
         }
 
         sd_bus_unref(bus);
+    }
+
+
+    // ************************************************************************* //
+    // ******************************* Callbacks ******************************* //
+    // ************************************************************************* //
+
+
+    int LIBUSB_CALL HotplugCallbackEnumerate(libusb_context* usb_context, libusb_device* dev,
+                                             libusb_hotplug_event event, void* user_data) {
+        OUT("USB device found during enumeration");
+        return HotplugCallbackInsert(usb_context, dev, event, user_data);
+    }
+
+    int LIBUSB_CALL HotplugCallbackInsert(libusb_context* usb_context, libusb_device* dev,
+                                          libusb_hotplug_event event, void* user_data) {
+        OUT("USB device connected");
+        const int ret = InitializeDevices(dev);
+        Device::GetG13DeviceHandle(dev)->connected = true;
+        return ret; // Rearm
+    }
+
+    int LIBUSB_CALL HotplugCallbackRemove(libusb_context* usb_context, libusb_device* dev,
+                                          libusb_hotplug_event event, void* user_data) {
+        OUT("USB device disconnected");
+        Device::GetG13DeviceHandle(dev)->connected = false;
+        CleanupDevices(dev);
+        return 0; // Rearm
+    }
+
+    void ArmHotplugCallbacks() {
+        DBG("Registering USB hotplug callbacks");
+
+        // For currently attached devices
+        int error = libusb_hotplug_register_callback(usb_context, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
+                                                     LIBUSB_HOTPLUG_ENUMERATE, VENDOR_ID, PRODUCT_ID, class_id,
+                                                     HotplugCallbackEnumerate, nullptr, &usb_hotplug_cb_handle[0]);
+        if (error != LIBUSB_SUCCESS) {
+            ERR("Error registering hotplug enumeration callback: " << Device::DescribeLibusbErrorCode(error));
+        }
+
+        // For future devices
+        error = libusb_hotplug_register_callback(usb_context, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
+                                                 LIBUSB_HOTPLUG_NO_FLAGS, VENDOR_ID, PRODUCT_ID, class_id,
+                                                 HotplugCallbackInsert, nullptr, &usb_hotplug_cb_handle[1]);
+        if (error != LIBUSB_SUCCESS) {
+            ERR("Error registering hotplug insertion callback: " << Device::DescribeLibusbErrorCode(error));
+        }
+
+        // For disconnected devices
+        error = libusb_hotplug_register_callback(usb_context, LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
+                                                 LIBUSB_HOTPLUG_NO_FLAGS, VENDOR_ID, PRODUCT_ID, class_id,
+                                                 HotplugCallbackRemove, nullptr, &usb_hotplug_cb_handle[2]);
+
+        if (error != LIBUSB_SUCCESS) {
+            ERR("Error registering hotplug removal callback: " << Device::DescribeLibusbErrorCode(error));
+        }
     }
 }
